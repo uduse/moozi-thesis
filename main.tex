@@ -1,14 +1,91 @@
 \documentclass[12pt]{article}
+\usepackage[a4paper,
+            inner=10mm,
+            outer=70mm, % = marginparsep + marginparwidth 
+                       %   + 5mm (between marginpar and page border)
+            top=20mm,
+            bottom=25mm,
+            marginparsep=5mm,
+            marginparwidth=60mm,
+            % showframe
+            ]{geometry}
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{xcolor}
+\usepackage{todonotes}
 
 % define command for grey colored text
-\newcommand{\hint}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
+% \newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
+\newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black]{#1}}
 
 \begin{document}
 
-\section*{Introduction}
+\listoftodos
+
+\section{Introduction}
+
+\note{8 - 10 pages of introduction}
+
+\textbf{Deep Learning (DL)} is a branch of \textbf{Artificial Intelligence} (AI) that emphasizes the use of neural networks to fit the inputs and outputs of a dataset.
+The training of a neural network is done by computing the gradients of the loss function with respect to the weights and biases of the network.
+A better trained neural network can better approximate the function that maps the inputs to the outputs of the dataset.
+
+\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes on solving problems through trials and errors with delayed rewards.
+RL had most success in the domain of \textbf{Game Playing}: making agents that could play boardgames, Atari games, or other types of games.
+An extension to Game Playing is \textbf{General Game Playing} (GGP), with the goal of designing agents that could play any type of game without having much prior knowledge of the games.
+
+\textbf{Deep Reinforcement Learning (DRL)} is a rising branch that combines DL and RL techniques to solve problems.
+In a DRL system, RL usually defines the backbone structure of the algorithm especially the Agent-Environment interface.
+On the other hand, DL is responsible for approximating specific functions by using the generated data.
+
+\textbf{Planning} refers to any computational process that analyzes a sequence of generated actions and their consequences in the enviornment.
+In the RL notation, planning specifically means the use of a model to improve a policy.
+
+A \textbf{Distributed System} is a computer system that uses multiple processes with various purposes to complete tasks.
+
+In this thesis we will describle a framework for solving the problem of GGP.
+We will also detail \textbf{MooZi}, a system that implements the GGP framework and the \textbf{MuZero} algorithm for playing both boardgames and Atari games.
+
+
+\section{Literature Review}
+\note{4 - 5 pages}
+
+% \subsection{Planning and Search}
+\note{describe search in general and with a focus on MCTS}
+
+Early AI research has been focused on the use of search as a planning method.
+Algorithms like \textbf{A*} were designed to find the optimal path to goals.
+Although A* works quite well for many problems, it falls short in cases where the assumptions of A* do not hold.
+For example, A* does not yield optimal solution under stochastic environments and it could be computationally infeasible on problems with high branching factors.
+More sophisticated search algorithms were developed to cater to the growing complexity of use cases.
+
+\textbf{Real-Time Heursitic Search} pioneered the study of search algorithms with bounded computation.
+Monte-Carlo techniques were adopted to handle environment stochasticity.
+Tree-based search algorithms such as \textbf{MiniMax} and \textbf{Alpha-Beta Pruning} were also designed to better play two-player games.
+
+\subsection{Monte-Carlo Tree Search (MCTS)}
+\textbf{Monte-Carlo Tree Search (MCTS)} is a search algorithm for game AI that combines both Monte-Carlo rollouts and tree search.
+MCTS requires less domain knowledge than other classic approaches to game AI while also being competent in strength.
+
+\note{describe MCTS, selection, expansion, e.t.c.}
+
+\note{also describes how MCTS and NN work together}
+
+\subsection{AlphaGo, AlphaGo Zero, and Alpha Zero}
+\textbf{AlphaGo} is the first Go program that beats a human Go champion.
+AlphaGo first learns the policy
+
+\textbf{AlphaGo Zero} is a successor of AlphaGo with the main difference of not learning from human.
+
+
+- MuZero
+- other open source implementations
+
+\section{Problem Definition}
+\note{(5 pages)}
+
+\end{document}
+
 
 \subsection*{Artificial Intelligence}
 
@@ -20,16 +97,10 @@ Though there is no consensus on the exact definition of intelligence, here we ad
 \end{quote}
 The goal of AI is to develop computer algorithms that can solve problems and achieve goals in complex environments.
 A diverse range of methods are designed as AI algorithms since the term has been coined.
-\hint{A simple list of AI algorithms, such as A*, symbolic}
+\note{A simple list of AI algorithms, such as A*, symbolic}
 
-\subsection*{Machine Learning}
-Machine learning is a branch of AI that emphasizes learning patterns from data.
-Even though 
 
-\subsection*{Deep Learning}
-Deep learning (DL) takes the learning of statistical patterns from data to another level.
-
-\subsection*{Reinforcement Learning}
+\subsection*{Markov Decision Process}
 \textbf{Markov Decision Process} (MDP) is a common used problem formulation for reinforcement learning algorithms.
 A MDP is a tuple of four elements $(S, A, P, R)$ where:
 \begin{itemize}
@@ -38,6 +109,7 @@ A MDP is a tuple of four elements $(S, A, P, R)$ where:
     \item $P(s, a, s') = Pr[ s_{t+1} = s' \mid  s_t = s, a_t = a] $ the transition probability function
     \item $R(s, a) = r(s, a)$ the reward function
 \end{itemize}
+
 \textbf{Agent-Environment Interface}
 
 \subsection*{Game Artificial Intelligence}
@@ -47,6 +119,3 @@ lookahead search: A*, DFS, BFS
 
 \subsection*{Distributed System for AI}
 IMPALA, SEED
-
-
-\end{document}
