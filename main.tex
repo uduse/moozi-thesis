@@ -23,9 +23,15 @@
 \hyphenpenalty=10000
 \hbadness=10000
 
+% bibilography management
+\usepackage[style=numeric]{biblatex}
+\addbibresource{bibs.bib}
+
 \begin{document}
 
 \listoftodos
+
+\tableofcontents
 
 \section{Introduction}
 
@@ -51,29 +57,130 @@ A \textbf{Distributed System} is a computer system that uses multiple processes 
 
 \subsection{Contribution}
 In this thesis we will describle a framework for solving the problem of GGP.
+We first define a interaction interface that's similar to the Agent-Environment Interface established in the current literature.
 We will also detail \textbf{MooZi}, a system that implements the GGP framework and the \textbf{MuZero} algorithm for playing both boardgames and Atari games.
 
 \section{Literature Review}
 \note{4 - 5 pages}
 
-% \subsection{Planning and Search}
-\note{describe search in general and with a focus on MCTS}
+\subsection{Planning and Search}
+\subsubsection{Introduction}
+Most, if not all, AI problems can be reduced to a search problem \cite[p.39]{ArtificialIntelligenceGames_Yannakakis.Togelius_2018}.
+Such search problems could be solved by determining the best plan, path, model, function, and so on, based some metrics of interest.
+Therefore, search has been playing a vital role in AI research since its dawn.
+
+The term \textbf{planning} and \textbf{search} are widely used across different domains, especially in AI, and sometimes interchangable.
+Here we adopt the definition by \citeauthor{ReinforcementLearningIntroduction_Sutton.Barto_2018} \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
+
+\textbf{Planning} refers to any process by which the agent updates the action selection policy $\pi(a \mid s)$ or the value function $v_\pi(s)$.
+We will focus on the case of improving the policy in our discussion.
+We could view the planning process as an operater $\mathcal{I}$ that takes the policy as input and outputs an improved policy $\mathcal{I}\pi$.
+
+Planning methods could be categorized into types based on the focus of the target state $s$ to improve.
+If the method improves the policy for arbitrary states, we call \textbf{background planning}.
+That is, for any timestep $t$:
+$$\pi(a \mid s) \leftarrow \mathcal{I}\pi(a \mid s), ~~ s \in \mathcal{S}$$
+Typical background planning methods include dynamic programming and Dyna-Q.
+In the case of dynamic programming, a full sweep of the state space is performed and all states are updated.
+In the case of Dyna, an random subset of the state space is selected and all states in the subset are updated.
+
+The other type of planning focuses on improving the policy of the current state $S_t$ instead of any state.
+We call this \textbf{decision-time planning}.
+That is, for any timestep $t$:
+$$\pi(a \mid s) \leftarrow \mathcal{I}\pi(a \mid s), ~~ s = S_t$$
+
+We could also use blend both types of planning together.
+Technically, we could say that algorithms like AlphaGo use both types of planning when they self-play for training.
+The decision-time part is straight-forward: a tree search is performed at the root node and updates the policy of the current state.
+At the same time, the neural network is trained on past experience and all states are updated.
+The updates of this background planning is applied when the planner pulls the latest weights of the neural networks.
+% MooZi also implements MuZero Reanalyze, which means
+
+% \note{describe search in general and with a focus on MCTS}
 
 Early AI research has been focused on the use of search as a planning method.
-Algorithms like \textbf{A*} were designed to find the optimal path to goals.
-Although A* works quite well for many problems, it falls short in cases where the assumptions of A* do not hold.
+In 1968, \citeauthor{FormalBasisHeuristic_Hart.Nilsson.ea_1968} designed the \textbf{A*} algorithm for finding shortest path from a start vertex to a target vertex \cite{FormalBasisHeuristic_Hart.Nilsson.ea_1968}.
+Although A* works quite well for many problems, especially in early game AI, it falls short in cases where the assumptions of A* do not hold.
 For example, A* does not yield optimal solution under stochastic environments and it could be computationally infeasible on problems with high branching factors.
 More sophisticated search algorithms were developed to cater to the growing complexity of use cases.
 
-\textbf{Real-Time Heursitic Search} pioneered the study of search algorithms with bounded computation.
+In 1990, \citeauthor{RealtimeHeuristicSearch_Korf_1990} framed the problem of \textbf{Real-Time Heursitic Search},
+proposed the Real-Time-A* algorith, and pioneered the study of search algorithms with bounded computation \cite{RealtimeHeuristicSearch_Korf_1990}.
+
 Monte-Carlo techniques were adopted to handle environment stochasticity.
 Tree-based search algorithms such as \textbf{MiniMax} and \textbf{Alpha-Beta Pruning} were also designed to better play two-player games.
 
-\subsection{Monte-Carlo Tree Search (MCTS)}
-\textbf{Monte-Carlo Tree Search (MCTS)} is a search algorithm for game AI that combines both Monte-Carlo rollouts and tree search.
-MCTS requires less domain knowledge than other classic approaches to game AI while also being competent in strength.
+\subsection{Monte Carlo Methods}
+In 1873, Joseph Jagger observed the bias in roulette wheels at Monte Carlo Casino.
+He studied the bias by recording results of roulette wheels and captialized over 2 million francs over several days by betting on the most favorably biased wheel \cite{MonteCarloCasino__2022}.
+Therefore, \textbf{Monte Carlo (MC)} methods gained their name as a class of algorithms based on building expectation on random processes.
 
-\note{describe MCTS, selection, expansion, e.t.c., also describes how MCTS and NN work together}
+MC methods are used in many domains but in this thesis we will primarily focus on its usage in search.
+In a game where terminal states are usually unreachable by the limited search depth, evaluations has to be performed on the leaf nodes that represent intermidate game states.
+One way of obtaining an evaluation on a state is by applying a heursitic function.
+Heursitic functions used this way are usually hand-crafted by human based on expert knowledge, and hence are prone to human error.
+The other way of evaluating the state is to perform a rollout from that state to a terminal state by selecting actions randomly.
+This evaluation process is called \textbf{random rollout} or \textbf{Monte-Carlo rollout}.
+
+\subsection{Monte-Carlo Tree Search (MCTS)}
+
+\citeauthor{BanditBasedMonteCarlo_Kocsis.Szepesvari_2006} developed the \textbf{Upper Confidence Bounds applied to Trees (UCT)} method as an extension of the Upper Confidence Bound (UCB) employed in bandits \cite{BanditBasedMonteCarlo_Kocsis.Szepesvari_2006}.
+Rémi Coulom developed the general idea of \textbf{Monte-Carlo Tree Search} that combines both Monte-Carlo rollouts and tree search \cite{EfficientSelectivityBackup_Coulom_2007} for Go program CrazyStone.
+Shortly afterwards,
+\citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} implemented MoGo that uses the UCT selection formula \cite{ModificationUCTPatterns_Gelly.Wang.ea_2006}.
+MCTS is then generalized by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} as a framework for game AI \cite{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008}.
+This framework requires less domain knowledge than other classic approaches to game AI while also being competent in strength.
+% There are four steps in this framework that are iteratively applied to the search tree.
+The core idea of this framework is to gradually build the search tree by iteratively applying four steps: \textbf{selction}, \textbf{expansion}, \textbf{evaluation}, and \textbf{backpropagation}.
+The search tree built this way will have an emphasize on more promising moves and game states.
+This means these more promising states are visited more often, have more children, and have deeper estimates that are aggregated to a more accurate value.
+
+Here we detail the four steps in the MCTS framework by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} (see Figure \ref{fig:mcts}).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{assets/mcts.png}
+    \caption[]{The Monte-Carlo Tree Search Framework}
+    \label{fig:mcts}
+\end{figure}
+
+\subsubsection{Selection}
+This selection process starts at the root node and repeats until a leaf node is reached.
+At each level of the tree, a child node is selected based on a selection formula.
+A selection formula usually has two parts, one part is based on the prior score $x$ of the state, and the other part is the exploration bonus $b$.
+For a parent node $p$ and children nodes $C$, the selection $I$ is based on
+$$I_p = \operatorname{argmax}_{c \in C} \left( x_c + b_c \right)$$
+
+The prior score could be based on the value of the child, the accumulated reward of the child, or the prior selection probability based on the policy $\pi(c \mid p)$.
+The exploration bonus is usually based on the visit count of the child and the parent.
+The more visits a child gets, the less the exploration bonus will be.
+
+For example, \citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} used this following formula for selection in their MoGo implentation:
+$$
+    I_p = \operatorname{argmax}_{c \in C} \left( \frac{v_c}{n_c} + \sqrt{\frac{2 * \log(n_b)}{n_c} } \right)
+$$
+where $v_c$ is the value of the node, $n_b$ and $n_c$ are the visit counts of the parent and child, respectively.
+
+\subsubsection{Expansion}
+The selected leaf node is then expanded by adding one or more children to the leaf node, each represents a succeeding game state of the selected leaf's state.
+
+\subsubsection{Evaluation}
+Each of the expanded nodes is now evaluated by using one of these methods:
+\begin{itemize}
+    \item A game is played until the game ends using a random policy.
+    \item A game is played until the game ends using a rollout policy.
+    \item A evaluation function is applied to the node.
+          This evaluation function could be either a hand-crafted heursitic
+          or learned by a neural network
+\end{itemize}
+
+\subsubsection{Backpropagation}
+After the expanded nodes are evaluated, the traversed nodes to reach the expanded nodes are updated.
+The statistics updated usually include visit count, estimated value and accumulated reward of the nodes.
+
+These four steps are repeated until the budget runs out.
+After this search is performed, the agent acts by selecting the action associated with the most promising child of the root node.
+This could be the most visited child, the child with the greatest value, or the child with the highest lower bound.
 
 \subsection{AlphaGo, AlphaGo Zero, and Alpha Zero}
 \note{describe AlphaGo, AlphaGo Zero, and Alpha Zero in more details}
@@ -94,7 +201,7 @@ AlphaGo learns a policy net that maps states to actions, and a value net that ma
 % \note{to be continued ...},
 
 \subsection{MuZero}
-\textbf{MuZero} is different from the Alpha Zero family where the model used for plannig is learned instead of given.
+\textbf{MuZero} is different from the Alpha Zero family where the model used for planning is learned instead of given.
 This difference further reduces game specific knowledge required for the algorithm.
 More specifically, MuZero no longer requires the access to a perfect model of the target game.
 Instead, a neural network that learns from the game experience is used in the search to replace the perfect model.
@@ -196,6 +303,7 @@ The \textbf{parameters} of a neural network includes all variables that could be
 
 \subsubsection{Being User Friendly}
 
+
 \subsubsection{Training Efficiency}
 One common problem with current open-sourced MuZero projects is their training efficiency.
 Even for simple environments, these projects could take hours to train.
@@ -238,7 +346,21 @@ In contrast to distributed systems with distributed control, ray tasks and ray a
 The driver decides when a ray task or ray actor is activated and what data should be used as inputs and where the outputs should go.
 In other words, the driver process orchestrates the data and control flow of the entire system, and ray tasks and ray actors merely response to instructions.
 
-\subsubsection{Environment Wrapper}
+\subsubsection{Environment Adaptors}
+Environment adaptors unify environments defined in different libraries into a unified interface.
+In the software engineering nomenclature, environment adaptors follow the adaptor design pattern \cite{AdapterPattern__2022}.
+
+More specifically, in our project we implement environment adaptors for three types of environments that are commonly used in RL research:
+(1) OpenAI Gym (2) OpenSpiel (3) MinAtar.
+The adaptors convert the inputs and outputs of these environments into forms that GII accepts.
+
+The adaptors have the same signature as follows:
+\begin{itemize}
+    \item \textbf{is_first} a boolean signals the episode start
+    \item \textbf{is_last}: a boolean signals the episode start
+    \item \textbf{action}: an integer indiates the last action
+\end{itemize}
+
 
 \subsubsection{Rollout Workers}
 A \textbf{rollout worker} is a ray actor that:
@@ -279,35 +401,35 @@ The parameter optimizer:
 \subsubsection{Distributed Training}
 
 \begin{python}
-for epoch in range(num_epochs):
+    for epoch in range(num_epochs):
     for w in workers_env + workers_test + workers_reanalyze:
-        w.set_params_and_state(param_opt.get_params_and_state())
+    w.set_params_and_state(param_opt.get_params_and_state())
 
     while traj_futures:
-        traj, traj_futures = ray.wait(traj_futures)
-        traj = traj[0]
-        replay_buffer.add_trajs(traj)
+    traj, traj_futures = ray.wait(traj_futures)
+    traj = traj[0]
+    replay_buffer.add_trajs(traj)
 
     if epoch >= epoch_train_start:
-        train_batch = replay_buffer.get_train_targets_batch(
-            big_batch_size
-        )
-        param_opt.update(train_batch, batch_size)
+    train_batch = replay_buffer.get_train_targets_batch(
+    big_batch_size
+    )
+    param_opt.update(train_batch, batch_size)
 
     env_trajs = [w.run(num_ticks_per_epoch) for w in workers_env]
     reanalyze_trajs = [w.run() for w in workers_reanalyze]
     traj_futures = env_trajs + reanalyze_trajs
 
     if epoch % test_interval == 0:
-        test_result = workers_test[0].run(120)
+    test_result = workers_test[0].run(120)
 
     for w in workers_reanalyze:
-        reanalyze_input = replay_buffer.get_train_targets_batch(
-            num_trajs_per_reanalyze_universe
-            * num_universes_per_reanalyze_worker
-        )
-        w.set_inputs(reanalyze_input)
-        
+    reanalyze_input = replay_buffer.get_train_targets_batch(
+    num_trajs_per_reanalyze_universe
+    * num_universes_per_reanalyze_worker
+    )
+    w.set_inputs(reanalyze_input)
+
 \end{python}
 
 \note{explain driver pseudo-code}
@@ -326,6 +448,8 @@ for epoch in range(num_epochs):
 \note{(3 pages)}
 \subsection{Future Work}
 \note{(1 page)}
+
+\printbibliography
 
 \end{document}
 
