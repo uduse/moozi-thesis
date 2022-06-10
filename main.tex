@@ -44,6 +44,7 @@ A better trained neural network can better approximate the function that maps th
 \textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes on solving problems through trials and errors with delayed rewards.
 RL had most success in the domain of \textbf{Game Playing}: making agents that could play boardgames, Atari games, or other types of games.
 An extension to Game Playing is \textbf{General Game Playing (GGP)}, with the goal of designing agents that could play any type of game without having much prior knowledge of the games.
+\note{discuss policy}
 
 \textbf{Deep Reinforcement Learning (DRL)} is a rising branch that combines DL and RL techniques to solve problems.
 In a DRL system, RL usually defines the backbone structure of the algorithm especially the Agent-Environment interface.
@@ -122,7 +123,7 @@ Heursitic functions used this way are usually hand-crafted by human based on exp
 The other way of evaluating the state is to perform a rollout from that state to a terminal state by selecting actions randomly.
 This evaluation process is called \textbf{random rollout} or \textbf{Monte-Carlo rollout}.
 
-\subsection{Monte-Carlo Tree Search (MCTS)}
+\subsection{Monte-Carlo Tree Search (MCTS)} \label{sec:MCTS}
 
 \citeauthor{BanditBasedMonteCarlo_Kocsis.Szepesvari_2006} developed the \textbf{Upper Confidence Bounds applied to Trees (UCT)} method as an extension of the Upper Confidence Bound (UCB) employed in bandits \cite{BanditBasedMonteCarlo_Kocsis.Szepesvari_2006}.
 Rémi Coulom developed the general idea of \textbf{Monte-Carlo Tree Search} that combines both Monte-Carlo rollouts and tree search \cite{EfficientSelectivityBackup_Coulom_2007} for Go program CrazyStone.
@@ -149,7 +150,10 @@ This selection process starts at the root node and repeats until a leaf node is 
 At each level of the tree, a child node is selected based on a selection formula.
 A selection formula usually has two parts, one part is based on the prior score $x$ of the state, and the other part is the exploration bonus $b$.
 For a parent node $p$ and children nodes $C$, the selection $I$ is based on
-$$I_p = \operatorname{argmax}_{c \in C} \left( x_c + b_c \right)$$
+\begin{equation}
+    \label{eq:MCTS_selection}
+    I_p = \operatorname{argmax}_{c \in C} \left( x_c + b_c \right)
+\end{equation}
 
 The prior score could be based on the value of the child, the accumulated reward of the child, or the prior selection probability based on the policy $\pi(c \mid p)$.
 The exploration bonus is usually based on the visit count of the child and the parent.
@@ -183,9 +187,60 @@ After this search is performed, the agent acts by selecting the action associate
 This could be the most visited child, the child with the greatest value, or the child with the highest lower bound.
 
 \subsection{AlphaGo, AlphaGo Zero, and Alpha Zero}
-\note{describe AlphaGo, AlphaGo Zero, and Alpha Zero in more details}
-\textbf{AlphaGo} is the first Go program that beats a human Go champion.
-AlphaGo learns a policy net that maps states to actions, and a value net that maps states to values.
+\textbf{AlphaGo} is the first Go program that beats a human Go champion by 5 games to 0.
+% AlphaGo learns a policy net that maps states to actions, and a value net that maps states to values.
+The AlphaGo is trained with a machine learning pipeline with multiple stages.
+For the first stage of training, a supervised learning policy (or SL policy) is trained to predict expert moves.
+This SL policy $p$ is parametrized by weights $\sigma$, denoted $p_{\sigma}$.
+The input of the policy network is a representation of the board state, denoted $s$.
+Given a state $s$ as the input, this network outputs a probability distribution over all legal moves $a$ through the last softmax layer.
+During the training of the network, randomly sampled expert moves are used as training targets.
+The weights $\sigma$ are then updated through gradient ascend to maximize the probability of matching the human expert move:
+$$
+    \Delta \sigma \propto \frac{\partial \log p_{\sigma}(a \mid s)}{\partial \sigma}
+$$
+For the second stage of training, the supervised policy $p_{\sigma}$ is duplicated further trained with reinforcement learning.
+This reinforcement learning trained policy (or RL policy) is parametrized by weights $\rho$ which is initialized to the same values as $\sigma$.
+In other words, the RL policy is initialized so that $p_{\rho} = p_{\sigma}$.
+The training data is then generated through self-play using $p_{\rho}$ as the rollout policy.
+For each game, the game outcome $z_t = \pm r(s_T)$, where $s_T$ is the terminal state, $+1$ for winning, $-1$ for losing from the perspective of the current player.
+Weights $\rho$ is then updated using gradient ascend to maximize the expected outcome using the update formula:
+$$
+    \Delta \rho \propto \frac{\partial \log p_{\rho}\left(a_{t} \mid s_{t}\right)}{\partial \rho} z_{t}
+$$
+For the last stage, a value function is trained to evaluate board positions.
+This value function is modeled with a neural network with weights $\theta$, denoted $v_{\theta}$.
+Given a state $s$, $v_{\theta}(s)$ predicts the outcome of the game as if both players act according to the policy $p_{\rho}$.
+The neural network is trained with stochastic gradient descent to minimize the mean squared error (MSE) between the predicted value $v_{\theta}(s)$ and the outcome $z$.
+$$
+    \Delta \theta \propto \frac{\partial v_{\theta}(s)}{\partial \theta}\left(z-v_{\theta}(s)\right)
+$$
+
+AlphaGo combines the policy network $p_{\rho}$ and the value network $v_{\theta}$ with MCTS for acting.
+AlphaGo uses a MCTS variant similar to that described in \ref{sec:MCTS}.
+In the search tree, each edge $(s, a)$ stores an action value $Q(s, a)$ a visit count $N(s, a)$, and a prior probability $P(s, a)$.
+At each time step, the search starts at the root node and simulates until the budget runs out.
+In the select phase of each simulation phase, an action is selected for each traversed node using the same base formula (\ref{eq:MCTS_selection}).
+In AlphaGo, the base score of the selection formula is the estimated value of the next states after taking the actions, namely $Q(s, a)$.
+The exploration bonus of edge $(s, a)$ is based on the prior probability and decays as visit count grows.
+\begin{equation}
+    u(s, a) \propto \frac{P(s, a)}{1 + N(s, a)}
+\end{equation}
+
+The action taken at time $t$ is the action that maximizes the sum of the base score and the exploration bonus
+\begin{equation}
+    a_{t}=\underset{a}{\operatorname{argmax}}\left(Q\left(s_{t}, a\right)+u\left(s_{t}, a\right)\right)
+\end{equation}
+
+% \begin{itemize}
+%     \item An action value $Q(s, a)$.
+%      When this edge is first explored, this value is initialized by takinig the action using a perfect model and evaluate the post-action state $s'$ with the value network $v_{\theta}(s')$.
+%     \item  Initialized to 0 and incremented for each visit during the simulations.
+%     \item Prior probability $P(s, a)$. Obtained by using the policy network $p_{\rho}(s)$.
+% \end{itemize}
+
+
+% More concretely, the update follows the REINFORCE formula developed by \citeauthor{SimpleStatisticalGradientfollowing_Williams_1992} \cite{SimpleStatisticalGradientfollowing_Williams_1992}.
 % The policy net is first trained with 
 % $$
 % \Delta \sigma \propto \frac{\partial \log p_{\sigma}(a \mid s)}{\partial \sigma}
@@ -206,7 +261,34 @@ This difference further reduces game specific knowledge required for the algorit
 More specifically, MuZero no longer requires the access to a perfect model of the target game.
 Instead, a neural network that learns from the game experience is used in the search to replace the perfect model.
 
-\note{expand MuZero discussion here, include all the formulae, address differences in the methods section}
+Central to MuZero's design are three functions trained for acting and planing.
+The \textbf{representation function} $h$ encodes a history of observations $o_1, o_2, ..., o_t$ into a hidden state $s_t$.
+The \textbf{dynamics function} $g$, given a hidden state $s^k$ and action $a^k$, produces an immediate reward $r^k$ and the next hidden state $s^{k+1}$.
+The \textbf{prediction function} $f$, given a hidden state $s^k$, produces a probability distribution $p^k$ of actions and a value associated to that hidden state $v^k$.
+
+MuZero plans with a search method based on the MCTS framework (discussed in \ref{sec:MCTS}).
+Due to the lack of access to a perfect model, MuZero's MCTS differs from a standard one in numerous ways.
+The nodes are no longer perfect representations of the board states.
+Instead, each node is associated with a hidden state $s$ as a learned representation of the board state.
+The transition is no longer made by the perfect model but the dynamics function.
+There are technically no terminal states in the tree as the learned model does not predict game termination.
+For timestep $t$, the search starts by creating the root node of the search tree with a history of observations
+using the representation function
+\begin{equation*}
+    s^0 \leftarrow h_{\theta}(o_0, o_1, o_2, ..., o_t)
+\end{equation*}
+Then an action is selected base on
+
+% These three functions are trained jointly 
+
+% dynamics, and prediction functions.
+
+% The representation function h outputs the initial hidden state s0, which is the root of the search tree by receiving history of the board for classic games and recent frames of the game concatenated by recent actions for Atari games. Dynamics function g produces the next hidden state sk and an immediate reward rk by getting previous hidden state sk−1 and a candidate action ak. Last but not least, the value vk and the policy to play pk for hidden state sk is defined by prediction function f.
+
+
+% To act in the environment, At each timestep t, the presentation function generates an initial hidden state s0 as the root of Monte-Carlo Tree Search. Thereafter, by using prediction function’s outputs as priors and dynamics function to generate new hidden states and intermediate rewards within the tree, 800 simulations for board games and 50 simulations for Atari games are executed. The search policy finally specifies the next action at+1, by which the environment generates a new observation ot+1 and reward ut+1. At the end of the episode, the trajectory data is stored into a replay buffer to be used in the training process.
+% During training, the MuZero network is unrolled for K (is considered 5) hypothetical steps and aligned to sequences sampled from the trajectories generated by the MCTS actors. Sequences are selected by sampling a state from any game in the replay buffer, then unrolling for K steps from that state. The parameters of all three functions are jointly trained, end-to-end by backpropagation-through-time. The policy, value function, and reward are improved by search probabilities pk ≈ πt+k, sample returns vk ≈ zt+k, and immediate rewards rt+k ≈ ut+k, respectively. The sample returns z could be final reward (board games) or n-step return (Atari games).
+
 
 \section{Problem Definition}
 \note{(5 pages)}
@@ -354,13 +436,35 @@ More specifically, in our project we implement environment adaptors for three ty
 (1) OpenAI Gym (2) OpenSpiel (3) MinAtar.
 The adaptors convert the inputs and outputs of these environments into forms that GII accepts.
 
+% Let's compare the libraries mentioned above with the agent-enviornment interface.
+% In the agent-environment interface, the input to the enviornment is always a single action.
+% Some of OpenSpiel's environments 
+
+% return dict(
+%     obs=timestep.observation,
+%     is_first=timestep.first(),
+%     is_last=timestep.last(),
+%     to_play=0,
+%     reward=reward,
+%     legal_actions_mask=legal_actions_mask,
+% )
+
 The adaptors have the same signature as follows:
 \begin{itemize}
-    \item \textbf{is_first} a boolean signals the episode start
-    \item \textbf{is_last}: a boolean signals the episode start
-    \item \textbf{action}: an integer indiates the last action
+    \item Inputs
+          \subitem \textbf{is\_first}: A boolean signals the episode start.
+          \subitem \textbf{is\_last}: A boolean signals the episode end.
+          \subitem \textbf{action}: An integer indiates the last action taken by the agent.
+          The valid range of the action is $\left[0, \text{number\_of\_available\_actions}\right)$.
+    \item Outputs
+          \subitem \textbf{obs}:
+          An N-dimensional array that represents the observation of the current timestep.
+          \subitem \textbf{is\_first}: A boolean signals the episode start.
+          \subitem \textbf{is\_last}: A boolean signals the episode end.
+          \subitem \textbf{to\_play}: An integer indicates the next player to take a move.
+          \subitem \textbf{reward}: A float indicates the reward of taking the given action.
+          \subitem \textbf{legal\_actions\_mask}: A bit mask of legal action indicies.
 \end{itemize}
-
 
 \subsubsection{Rollout Workers}
 A \textbf{rollout worker} is a ray actor that:
