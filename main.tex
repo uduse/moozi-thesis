@@ -277,7 +277,17 @@ using the representation function
 \begin{equation*}
     s^0 \leftarrow h_{\theta}(o_0, o_1, o_2, ..., o_t)
 \end{equation*}
-Then an action is selected base on
+Then an action is selected base on a variant of formula \ref{eq:MCTS_selection}
+
+\begin{equation}
+    \begin{aligned}
+         & a^{k}=\arg \max _{a}\{Q(s, a)                                                                                                                    \\
+         & \left.\quad+P(s, a) \frac{\sqrt{\sum_{b} N(s, b)}}{1+N(s, a)}\left[c_{1}+\log \left(\frac{\sum_{b} N(s, b)+c_{2}+1}{c_{2}}\right)\right]\right\}
+    \end{aligned}
+\end{equation}
+
+Where the base score of an edge is the $Q$ value, and the exploration bonus is computed based on the prior probability of the edge and the visit counts of both sides of the edge.
+
 
 % These three functions are trained jointly 
 
