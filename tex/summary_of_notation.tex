@@ -1,0 +1,48 @@
+\section{Summary of Notation}
+% We adopt a similar notation to \citeauthor{ReinforcementLearningIntroduction_Sutton.Barto_2018} \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
+% Capital letters are used for random variables, whereas lower case letters are used for the values of
+% random variables and for scalar functions.
+% Quantities that are required to be real-valued vectors are written in bold and in lower case (even if random variables).
+% Matrices are bold capitals.
+
+\begin{tabular}{| r | l |}
+    $s$ & state  \\
+    $a$ & action \\
+    $r$ & reward \\
+    % $e$ & visual \\
+    $o$ & partially observable environment frame \\
+    $x$ & hidden state \\
+    $G^n$ & N-step return \\
+    $\delta$ & TD-error \\
+    $V$ & value function \\
+    $Q$ & state-action value function \\
+    $\mathcal{A}^e$ & environment action space \\
+    $\mathcal{A}^a$ & agent action space, $ | \mathcal{A}^a | = | \mathcal{A}^e | + 1$ \\
+    $\mathcal{S}$ & state space \\
+    $\mathcal{O}$ & observation space \\
+    $\mathcal{T}_t$ & step sample \\
+    $\mathcal{T}$ & trajectory sample \\
+    $\mathcal{L}$ & loss function \\
+
+    \hline
+
+    % $\mathit{v}$ & variables \\
+    
+    \hline
+    $B$ & batch size\\
+    $H$ & height \\
+    $W$ & width \\
+    $T$ & terminal timestep \\
+    $C_e$ & environment channels \\
+    $C_h$ & history channels \\
+    $C_x$ & hidden space channels \\
+    $K$ & number of unrolled steps \\
+    $L$ & history length \\
+    $N$ & bootstrap length for N-step return \\
+    $\gamma$ & discount \\
+    $A$ & dimension of action \\
+    $Z$ & dimension of scalar transformation support \\
+    % $v$ & value function \\
+
+
+\end{tabular}

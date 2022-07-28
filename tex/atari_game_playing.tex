@@ -1,0 +1,116 @@
+\subsection{Atari Games Playing}
+\subsubsection{Atari Learning Environment}
+\citeauthor{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013a} introduced the \textbf{Arcade Learning Environment (ALE)} \cite{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013a}.
+ALE provided interfaces of over a hunderd of Atari game environments.
+Each ALE environment had specifications on visual representation, action space, and reward signals.
+This made ALE environments suitable for machine learning research,
+as data were well-represented and evaluation metrics were clearly defined.
+Moreover, ALE encouraged researchers to develop generalized algorithms that could learn in multiple environments.
+
+\subsubsection{Deep Q-Networks}
+\citeauthor{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013} pioneered the study of using deep neural networks to learn in ALE envrionments \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}.
+They developed the algorithm \textbf{Deep Q-Networks (DQN)} that learned to play seven of the Atari games and reached human-level performance.
+The DQN agent had a neural network that approximates the $Q$ function, parametrized by neural network weights $\theta$, denoted $Q_\theta$.
+Experiences were generated through interacting with the environment by taking the action that maximizes the immediate $q$ value
+\begin{align*}
+    \pi(a_t \mid (o_{t - L - 1}, \dots, o_t)) = \argmax{a}{Q_{\theta}(o_{t - L - 1}, \dots, o_t, a)}
+\end{align*}
+where $L$ is the length of history, and $o_t$ is the partially observable frame provided by the environment at timestep $t$ (also see \ref{sec:history_stacking}).
+Generated experience were stored in an experience replay represented by a FIFO queue.
+For each training step, a batch of uniformly sampled experience was drawn from the experience replay, and the loss was computed using
+\begin{equation*}
+    \mathcal{L}(\theta) \propto \mathbb{E}_\pi\left[r + \gamma \max _{a'} Q_{\theta'}(s', a') - Q_{\theta}(s, a) \right]
+\end{equation*}
+where $Q_{\theta'}$ were network parameters that updated less frequently than $\theta$.
+
+\subsubsection{Double Q Learning}
+\citeauthor{DoubleQlearning_Hasselt_2010} analyzed the overestimation problem of Q values in Q-learning and developed the \textbf{double Q learning}.
+Central to double Q-learning was the double Q update that replaced the traditional Q update \cite{DoubleQlearning_Hasselt_2010}.
+Double Q learning reduced the overestimation problem by introducing an additional Q estimator and updating two estimator using each other
+\begin{align*}
+    Q^{A}(s, a) \leftarrow Q^{A}(s, a)+ \alpha \left(r+\gamma Q^{B}\left(s', \argmax{a'}{Q^A(s', a')}\right)-Q^{A}(s, a)\right)  \\
+    Q^{B}(s, a) \leftarrow Q^{B}(s, a)+ \alpha \left(r+\gamma Q^{A}\left(s', \argmax{a'}{Q^B(s', a')}\right)-Q^{B}(s, a)\right)
+\end{align*}
+where $Q^A$ and $Q^B$ were two different Q estimators updated alternatively.
+\citeauthor{DeepReinforcementLearning_Hasselt.Guez.ea_2016} followed up by applying the double Q learning in DQN \cite{DeepReinforcementLearning_Hasselt.Guez.ea_2016}.
+Similar to the double Q update above, double Q update for neural networks was formulated as
+\begin{align*}
+    \mathcal{L}(\theta^A)  & \propto \mathbb{E}_\pi \left[ r + \gamma Q_{\theta^B}\left(s', \argmax{a'}{Q_{\theta^A}(s', a')} \right) - Q_{\theta^A}(s, a) \right]  \\
+    \mathcal{L}(\theta^B)  & \propto \mathbb{E}_\pi \left[ r + \gamma Q_{\theta^A}\left(s', \argmax{a'}{Q_{\theta^B}(s', a')} \right) - Q_{\theta^B}(s, a) \right]  \\
+\end{align*}
+where $Q_{\theta^A}$ and $Q_{\theta^B}$ were two sets of parameters of the same neural network architecture.
+
+\subsubsection{Experience Replay}
+\citeauthor{PrioritizedExperienceReplay_Schaul.Quan.ea_2016} studied the role of experience reply in DQN and developed the \textbf{prioritized experience replay} \cite{PrioritizedExperienceReplay_Schaul.Quan.ea_2016}.
+In the original work of DQN, all samples were drawn from the experience replay uniformly.
+In a prioritized experience replay, however, samples were drawn according to a distribution based on their calculated priority
+\begin{align*}
+    P(i)=\frac{p_{i}^{\alpha}}{\sum_{k} p_{k}^{\alpha}}
+\end{align*}
+where $P(i)$ was the probability of of $i$-th sample being drawn, $\alpha$ was a constant, and $p_i$ is the priority of the sample.
+\citeauthor{PrioritizedExperienceReplay_Schaul.Quan.ea_2016} suggested two approaches to compute priorities of samples.
+The first one was \textbf{proportional experience replay}, in which the priority $p$ of sample $i$ was calculated by
+\begin{align*}
+    p_i = \left|\delta_{i}\right|+\epsilon
+\end{align*}
+where $\delta_{i}$ was the temporal-difference error of the sample, and $\epsilon$ was a small constant to give all samples a probability to be drawn.
+The second one was \textbf{rank-based experience replay}, in which the same temporal difference was calculated, but the final priority was based on the rank of the error,
+\begin{align*}
+    \text{score($i$)}  & = \left|\delta_{i}\right|+\epsilon  \\
+    \text{rank($i$)}   & = \text{index  $i$ of} \operatorname{argsort}(-\text{score($j$) for $j$ in all samples} )  \\
+    p_{i}              & = \frac{1}{\operatorname{rank}(i)}
+\end{align*}
+\citeauthor{DistributedPrioritizedExperience_Horgan.Quan.ea_2018} followed up by implementing a distributed version of the prioritized experience replay \cite{DistributedPrioritizedExperience_Horgan.Quan.ea_2018}.
+\citeauthor{RECURRENTEXPERIENCEREPLAY_Kapturowski.Ostrovski.ea_2019} investigated the challenges of using experience replaies for RNN-based agents and developed \textbf{Recurrent Replay Distributed DQN}.
+
+\subsubsection{Network Architectures}
+\citeauthor{DuelingNetworkArchitectures_Wang.Schaul.ea_} studied an alternative neural network architecture for ALE learning \cite{DuelingNetworkArchitectures_Wang.Schaul.ea_}.
+They developed the \textbf{Dueling Q-network}, that while retaining the inputs and outputs specifications of the Q-network used in DQN, structually represented the learning of the advantage function $A(s, a)$ defined as
+\begin{align*}
+    A(s, a) = Q(s, a) - V(s)
+\end{align*}
+The Q-network was parametrized by $\theta$ that could be futher divided into three parts:
+$\theta^\text{trunk}$, the shared trunk of the network; $\theta^A$, the advantage head; and $\theta^\text{V}$, the value head.
+The network approximated the value function internally going through the shared trunk and the value head, denoted $V_{\theta^{\text{trunk}, V}}$, and the advantage function, denoted $A_{\theta^{\text{trunk}, A}}$.
+The values computed by the two heads were combined to form the Q-value as follows
+\begin{align*}
+    Q_{\theta^{\text{trunk, V, A}}}(s, a)
+    = V_{\theta^{\text{trunk, V}}}(s)
+    + \left( A_{\theta^{\text{trunk,A}}}(s, a)
+    - \frac{1}{| \mathcal{A} | } \sum_{a'}A_{\theta^{\text{trunk},A}}(s, a') \right)
+\end{align*}
+Similar to DQN, the dueling Q-network was trained through fitting to emperical data generated by interacting with the environment.
+
+\subsection{Scalar Transformation} \label{sec:scalar_transform}
+\citeauthor{ObserveLookFurther_Pohlen.Piot.ea_2018} introduced a few enhancements to achieve stable training in Atari games \cite{ObserveLookFurther_Pohlen.Piot.ea_2018}.
+We will focus on the \textbf{transformed Bellman Operator} since MuZero and our project used a similar transformation operator.
+For different Atari games, reward signals could vary drastically both in density and scale.
+This led to high variance in training targets during training of the algorithms, causing algorithms to have difficulty converging.
+\citeauthor{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013} cliped the reward signal to a range of $[-1, 1]$ to reduce such variance in DQN \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}.
+However, this clipping discarded information regarding the scale of rewards and consequently changed the set of optimal policies.
+The transformed Bellman Operator was developed to address this problem.
+The $Q$ update of the new operator was defined as
+\begin{align*}
+    % Q^{A}(s, a) \leftarrow Q^{A}(s, a)+ \alpha \left(r+\gamma Q^{B}\left(s', \argmax{a'}{Q^A(s', a')}\right)-Q^{A}(s, a)\right)  \\
+    Q(s, a) \leftarrow Q(s, a) + \alpha \phi \left(r +\gamma \max _{a' \in \mathcal{A}} \phi^{-1}\left(Q\left(s', a'\right)\right)\right)
+\end{align*}
+where $\phi$ is an invertible transformation
+\begin{align*}
+    \phi(x)       & = \operatorname{sign}(x)\left(\sqrt{|x|+1}-1\right)+\varepsilon x  \\
+    \phi^{-1}(x)  & = \operatorname{sign}(x)\left(\left(\frac{\sqrt{1+4 \varepsilon(|x|+1+\varepsilon)}-1}{2 \varepsilon}\right)^{2}-1\right)
+\end{align*}
+This transformation was also used in MuZero to transform both value targets and reward targets.
+
+\subsubsection{MinAtar}
+
+\subsubsection{Consistency Loss}
+\cite{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} \cite{MasteringAtariGames_Ye.Liu.ea_2021} \cite{ObserveLookFurther_Pohlen.Piot.ea_2018}
+
+\cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}
+\cite{RainbowCombiningImprovements_Hessel.Modayil.ea_2018}
+% \subsubsection{Systems}
+% \cite{RayDistributedFramework_Moritz.Nishihara.ea_2018}
+% \cite{AcmeResearchFramework_Hoffman.Shahriari.ea_a}
+% \cite{AsynchronousMethodsDeep_Mnih.Badia.ea_2016}
+% \cite{SEEDRLScalable_Espeholt.Marinier.ea_2020}
+% \cite{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}

@@ -1,0 +1,119 @@
+\subsubsection{MooZi Neural Network}
+\note{neural network specifical should go into experiment section}
+We used JAX, and Haiku to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020, CompilingMachineLearning_Frostig.Johnson.ea_2018, JAXAutogradXLA_JamesBradbury.RoyFrostig.ea_2022}.
+We consulted other open-source projects that use neural networks to play games \cite{MuZeroGeneral_Duvaud.AureleHainaut_2022, MasteringAtariGames_Ye.Liu.ea_2021,AcceleratingSelfPlayLearning_Wu_2020,AcceleratingSelfPlayLearning_Wu_2020}.
+We implemented the neural-network model with two different architectures in our project, one is multilayer-perceptron-based and the other one is residual-blocks-based \cite{DeepResidualLearning_He.Zhang.ea_2016}.
+We primarily used residual-blocks-based model for experiments so we will describe the architecture in full details here.
+
+Similar to MuZero described in section \ref{sec:muzero}, the model had the representation function, the dynamics function, and the dynamics function.
+Additionally, we also trained the MooZi model with a self-consistency loss similar to that described by \citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} and \citeauthor{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} \cite{MasteringAtariGames_Ye.Liu.ea_2021,VisualizingMuZeroModels_deVries.Voskuil.ea_2021}.
+We used an additional function, named as the \textbf{projection function} for this purpose.
+The learned model was used for two purposes during tree searchs.
+The first one was to construct the root nodes using the representation function and the prediction function.
+We call this process the \textbf{initial inference}.
+The second one was to create edges and child nodes for a given node and action using the dynamics function and the prediction function.
+We call this process the \textbf{recurrent inference}.
+\note{This terminology is aligned with MuZero's pseudo-code and MCTX's real code}
+
+We implemented residual blocks using the same specification as \citeauthor{DeepResidualLearning_He.Zhang.ea_2016} \cite{DeepResidualLearning_He.Zhang.ea_2016}.
+One residual block was defined as follows:
+\begin{itemize}
+    \item input $x$
+    \item save a copy of $x$ to $x'$
+    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, same channels
+    \item apply batch normalization on $x$
+    \item apply relu activation on $x$
+    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, same channels
+    \item apply batch normalization on $x$
+    \item add $x'$ to $x$
+    \item apply relu activation on $x$
+\end{itemize}
+
+The representation function $h$ is parametrized as follows:
+\begin{itemize}
+    \item input $x$ of shape $(H, W, C_h)$
+    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
+    \item apply batch normalization on $x$
+    \item apply relu activation on $x$
+    \item apply 6 residual blocks with 32 channels on $x$
+    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
+    \item apply batch normalization on $x$
+    \item apply relu activation on $x$
+    \item output the hidden state head $x_s$ % of shape $(H, W, 32)$
+\end{itemize}
+
+The prediction function $f$ is parametrized as follows:
+\begin{itemize}
+    \item input $x$ % of shape $(H, W, 32)$
+    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
+    \item apply batch normalization on $x$
+    \item apply relu activation on $x$
+    \item apply 1 residual block with 32 channels on $x$
+    \item flatten $x$
+    \item apply 1 dense layer with output size of 128 to obtain the value head $x_v$
+    \item apply batch normalization on $x_v$
+    \item apply relu activation on $x_v$
+    \item apply 1 dense layer with output size of $Z$ on $x_v$
+    \item apply 1 dense layer with output size of 128 to obtain the policy head $x_p$
+    \item apply batch normalization on $x_p$
+    \item apply relu activation on $x_p$
+    \item apply 1 dense layer with output size of $A^a$ on $x_p$
+    \item output the value head $x_v$ and the policy head $x_p$
+\end{itemize}
+
+The dynamics function $g$ is parametrized as follows:
+\begin{itemize}
+    \item input $x$ of shape $(H, W, 32)$, $a$ as an integer
+    \item encode $a$ as action planes of shape $(H, W, A)$ (described in \ref{sec:history_stacking})
+    \item append $a$ to $x$
+
+    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
+    \item apply batch normalization on $x$
+    \item apply relu activation on $x$
+
+    \item apply 1 residual block with 32 channels on $x$
+
+    \item apply 1 residual block with 32 channels on $x$ to obtain the hidden state head $x_s$
+    \item apply a 2-D padded convolution on $x_s$, with kernel size 3 by 3, 32 channels
+    \item apply batch normalization on $x_s$
+    \item apply relu activation on $x_s$
+
+    \item apply 1 dense layer with output size of 128 on $x$ to obtain the reward head $x_r$
+    \item apply batch normalization on $x_r$
+    \item apply relu activation on $x_r$
+    \item apply 1 dense layer with output size of $Z$ on $x_r$
+
+    \item output the hidden state head $x_s$ and the reward head $x_r$
+\end{itemize}
+For convinience, we made the output specification the same for both the initial inference and the recurrent inference.
+They both produced a tuple of $(x, v, r, p)$, $x$ was the hidden state, $v$ was the value prediction, $r$ was the reward prediction, and $p$ was the policy prediction.
+% For acting in an environment, the outputs $v$ and $r$ were 
+
+For the initial inference,
+\begin{itemize}
+    \item input features $\psi_t = (o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t -1})$
+    \item obtain $\mathbf{x}_t^0 = h(\psi_t)$
+    \item obtain $v^0_t, \mathbf{p}^0_t = f(\mathbf{x}_t^0)$
+    \item set $r_t^0 = 0$
+    \item return $(\mathbf{x}^0_t, v_t^0, r_t^0, \mathbf{p}^0_t)$
+\end{itemize}
+
+For the recurrent inference,
+\begin{itemize}
+    \item input features $\mathbf{x}_t^i, a_t^i$
+    \item obtain $\mathbf{x}_t^{i+1}, r_t^{i+1} = g(s_t^i, a_t^i)$
+    \item obtain $v^{i+1}_t, \mathbf{p}^{i+1}_t = f(\mathbf{x}_t^{i+1})$
+    \item return $(\mathbf{x}^{i+1}_t, v_t^{i+1}, r_t^{i+1}, \mathbf{p}^{i+1}_t)$
+\end{itemize}
+
+Moreover, we applied the invertible transformation \( \phi \) described in section \ref{sec:scalar_transform} to both the scalar reward targets and scalar value targets to create categorical representations with the same support size.
+The support we used for the transformation were integers from the interval \( [-5, 5] \), with a total size of 11.
+Scalars were first transformed using \( \phi \), then converted to a linear combination of the nearest two integers in the support.
+For example, for scalar \(\phi(x) = 1.3\), the nearest two integers in the support are $1$ and $2$, and the linear combination is \( \phi(x) = 1 * 0.7 + 2 * 0.3 \), which means the target of this scalar is $0.7$ for the category $1$, and $0.3$ for the category $2$. 
+For training, the value head and the reward head first produced estimations as logits of size $Z$.
+These logits were aligned with the scalar targets to produce categorization loss as described in the \ref{sec:loss}.
+For acting, the neural network additionally applied the softmax function to the logits to generated a distribution over the support.
+The linear combination of the distribution and their corresponding integer values were computed and fed through the inverse of the transformation, namely \( \phi^{-1}\), to produce scalar values.
+This means from the perspective of the planner, the scalar estimations made by the model were in same shape and scale as those produced by the environment.
+
+\note{reference an example in the experiments section}
