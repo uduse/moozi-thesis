@@ -6,13 +6,16 @@
 % Matrices are bold capitals.
 
 \begin{tabular}{| r | l |}
+    \hline
     $s$ & state  \\
     $a$ & action \\
     $r$ & reward \\
-    % $e$ & visual \\
+    $t$ & timestep \\
+    $T$ & terminal timestep \\
     $o$ & partially observable environment frame \\
+    $\gamma$ & discount \\
     $x$ & hidden state \\
-    $G^n$ & N-step return \\
+    $G^N$ & N-step return \\
     $\delta$ & TD-error \\
     $V$ & value function \\
     $Q$ & state-action value function \\
@@ -25,24 +28,18 @@
     $\mathcal{L}$ & loss function \\
 
     \hline
-
-    % $\mathit{v}$ & variables \\
-    
-    \hline
     $B$ & batch size\\
     $H$ & height \\
     $W$ & width \\
-    $T$ & terminal timestep \\
     $C_e$ & environment channels \\
     $C_h$ & history channels \\
     $C_x$ & hidden space channels \\
     $K$ & number of unrolled steps \\
     $L$ & history length \\
     $N$ & bootstrap length for N-step return \\
-    $\gamma$ & discount \\
     $A$ & dimension of action \\
     $Z$ & dimension of scalar transformation support \\
-    % $v$ & value function \\
+    \hline
 
 
 \end{tabular}

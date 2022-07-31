@@ -25,15 +25,26 @@
 \hyphenpenalty=10000
 \hbadness=10000
 
+\usepackage[font=small,labelfont=bf]{caption}
+
 \newcommand{\includecode}[2]{
 \begin{listing}[H]
-    \caption{#2}
-    \label{code:#1}
     \inputminted[frame=single, framesep=10pt, fontsize=\footnotesize]{python}{src/#1.py}
+    \caption[]{#2}
+    \label{code:#1}
 \end{listing}   
 }
-\renewcommand\listingscaption{Pseudo-code}
+\renewcommand\listingscaption{Algorithm}
 
+\newcommand{\includeimage}[3][0.7]{
+\begin{figure}[H]
+    \captionsetup{width=#1\linewidth}
+    \centering
+    \includegraphics[width=#1\textwidth]{assets/#2.png}
+    \caption[]{#3}
+    \label{fig:#2}
+\end{figure}
+}
 
 \newcommand{\argmax}[1]{\operatorname*{argmax}_{#1}}
 
@@ -59,7 +70,7 @@
 
 % S_0, A_0, R_1, S_1, A_1
 
-\section{Introduction}
+\section{Introduction} \label{sec:intro}
 
 \note{8 - 10 pages of introduction}
 
@@ -83,232 +94,17 @@ A \textbf{Distributed System} is a computer system that uses multiple processes 
 % DRL systems 
 
 \subsection{Contribution}
-In this thesis we will describle a framework for solving the problem of GGP.
-We first define a interaction interface that's similar to the Agent-Environment Interface established in the current literature.
-We will also detail \textbf{MooZi}, a system that implements the GGP framework and the \textbf{MuZero} algorithm for playing both boardgames and Atari games.
+In this thesis we present the project \textbf{MooZi}, a general game playing system that uses a learned model to play both boardgames and Atari games efficiently.
+More specifically, this project provides
+\begin{itemize}
+    \item a collection of environment bridges that connect the system to various environments using a unified interface
+    \item a neural network model that learns representation and could be used for planning
+    \item a MCTS based planner that uses the learned model to perform planning.
+    \item a distributed training system that efficiently trains the agent.
+    \item a thesis with emperical studies and analysis
+\end{itemize}
 
-\section{Literature Review}
-\note{4 - 5 pages}
-
-\subsection{Planning and Search}
-\subsubsection{Introduction}
-Many AI problems can be reduced to a search problem \cite[p.39]{ArtificialIntelligenceGames_Yannakakis.Togelius_2018}.
-Such search problems could be solved by determining the best plan, path, model, function, and so on, based on some metrics of interest.
-Therefore, search has played a vital role in AI research since its dawn. The term \note{s?} \textbf{planning} and \textbf{search} are widely used across different domains, especially in AI,
-and are sometimes interchangable.
-Here we adopt the definition by \citeauthor{ReinforcementLearningIntroduction_Sutton.Barto_2018} \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
-
-\textbf{Planning} refers to any process by which the agent updates the action selection policy $\pi(a \mid s)$ or the value function $v_\pi(s)$.
-We will focus on the case of improving the policy in our discussion.
-We could view the planning process as an operator $\mathcal{I}$ that takes the policy as input and outputs an improved policy $\mathcal{I}\pi$.
-
-Planning methods could be categorized into types based on the focus of the target state $s$ to improve.
-If the method improves the policy for arbitrary states, we call it \textbf{background planning}.
-That is, for any timestep $t$ and a set of states $S' \subset \mathcal{S}$:
-$$\pi(a \mid s) \leftarrow \mathcal{I}\pi(a \mid s), ~~ \forall s \in S,  S' \subset \mathcal{S}$$
-Typical background planning methods include \textbf{dynamic programming} and \textbf{Dyna-Q}.
-In the case of dynamic programming, a full sweep of the state space is performed and all states are updated.
-In the case of Dyna, a random subset of the state space is selected for update.
-
-The other type of planning focuses on improving the policy of the current state $S_t$ instead of any state.
-\note{in Rich's book $S_t$ is the specific state at time $t$, and $s$ could be any state}
-We call this \textbf{decision-time planning}.
-That is, for any timestep $t$:
-$$\pi(a \mid s) \leftarrow \mathcal{I}\pi(a \mid s), ~~ s = S_t$$
-
-We could also blend both types of planning.
-Algorithms such as AlphaGo use both types of planning when they self-play for training.
-For decision-time planing, a tree search is performed at the root node and updates the policy of the current state.
-At the same time, the neural network is trained on past experience and the policy for all states is updated.
-The updates from this background planning are applied when the planner uses the latest weights of the neural network.
-% MooZi also implements MuZero Reanalyze, which means
-
-% \note{describe search in general and with a focus on MCTS}
-
-An early example of the use of search as a planning method is the \textbf{A*} algorithm.
-In 1968, \citeauthor{FormalBasisHeuristic_Hart.Nilsson.ea_1968} designed the A* algorithm for finding shortest path from a start vertex to a target vertex \cite{FormalBasisHeuristic_Hart.Nilsson.ea_1968}.
-Although A* works quite well for many problems, especially in early game AI, it falls short in cases where the assumptions of A* do not hold.
-For example, A* does not yield an optimal solution under stochastic environments and it could be computationally infeasible on problems with high branching factors.
-More sophisticated search algorithms were developed to cater to the growing complexity of use cases.
-
-In 1990, \citeauthor{RealtimeHeuristicSearch_Korf_1990} noticed the problem of unbounded computation in the search algorithms at the time.
-Algorithms like A* could consume much more memory and spend much more time in certain states.
-This undesirable trait makes these algorithms difficult to apply to real-time problems.
-To address this problem, \citeauthor{RealtimeHeuristicSearch_Korf_1990} framed the problem of \textbf{Real-Time Heuristic Search},
-where the agent has to make a decision in each timestep with bounded computation.
-He also developed the \textbf{Real-Time-A*} algorithm as a modified version of A* with bounded computation \cite{RealtimeHeuristicSearch_Korf_1990}.
-
-Monte Carlo techniques were adopted to handle complex environments.
-Tree-based search algorithms such as \textbf{MiniMax} and \textbf{Alpha-Beta Pruning} were designed to play and solve two-player games.
-\note{find the right citation}
-
-\subsection{Monte Carlo Methods}
-In 1873, Joseph Jagger observed the bias in roulette wheels at the Monte Carlo Casino.
-He studied the bias by recording the results of roulette wheels and won over 2 million francs over several days by betting on the most favorably biased wheel \cite{MonteCarloCasino__2022}.
-Therefore, \textbf{Monte Carlo (MC)} methods gained their name as a class of algorithms based on random samplings.
-
-MC methods are used in many domains but in this thesis we will primarily focus on its usage in search.
-In a game where terminal states are usually unreachable by the limited search depth, evaluation has to be performed on the leaf nodes that represent intermidate game states.
-One way of obtaining an evaluation on a state is by applying a heursitic function.
-Heuristic functions used this way are usually hand-crafted by human based on expert knowledge, and hence are prone to human error.
-The other way of evaluating the state is to perform a rollout from that state to a terminal state by selecting actions randomly.
-This evaluation process is called \textbf{random rollout} or \textbf{Monte Carlo rollout}.
-
-\subsection{Monte-Carlo Tree Search (MCTS)} \label{sec:mcts}
-
-\citeauthor{BanditBasedMonteCarlo_Kocsis.Szepesvari_2006} developed the \textbf{Upper Confidence Bounds applied to Trees (UCT)} method as an extension of the \textbf{Upper Confidence Bound (UCB)} algorithm employed in bandits \cite{BanditBasedMonteCarlo_Kocsis.Szepesvari_2006}.
-Rémi Coulom developed the general idea of \textbf{Monte-Carlo Tree Search} that combines both Monte-Carlo rollouts and tree search \cite{EfficientSelectivityBackup_Coulom_2007} for his Go program CrazyStone.
-Shortly afterwards,
-\citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} implemented another Go program MoGo, that uses the UCT selection formula \cite{ModificationUCTPatterns_Gelly.Wang.ea_2006}.
-MCTS was generalized by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} as a framework for game AI \cite{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008}.
-This framework requires less domain knowledge than classic approaches to game AI while others giving better results.
-% There are four steps in this framework that are iteratively applied to the search tree.
-The core idea of this framework is to gradually build the search tree by iteratively applying four steps: \textbf{selction}, \textbf{expansion}, \textbf{evaluation}, and \textbf{backpropagation}.
-The search tree built in this way emphasizes more promising moves and game states based on collected statistics in rollouts.
-More promising states are visited more often, have more children, have deeper subtrees, annd rollout results are aggregated to yield more accurate value. Here we detail the four steps in the MCTS framework by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} (see Figure \ref{fig:mcts}).
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.5]{assets/mcts.png}
-    \caption[]{The Monte-Carlo Tree Search Framework}
-    \label{fig:mcts}
-\end{figure}
-
-\subsubsection{Selection}
-Thes selection process starts at the root node and repeats until a leaf node in the current tree is reached.
-At each level of the tree, a child node is selected based on a selection formula such as UCT or PUCT.
-A selection formula usually has two parts, the exploitation part is based on the evaluation function $E$, and the exploration bonus $B$.
-For edges of a parent state $(s, a), ~ a \in \mathcal{A}$ , the selection $I(s)$ is based on
-\begin{equation}
-    \label{eq:mcts_selection}
-    I(s) = \operatorname{argmax}_{a \in \mathcal{A}} \left( E(s, a) + B(s, a) \right)
-\end{equation}
-
-The prior score could be based on the value of the child, the accumulated reward of the child, or the prior selection probability based on the policy $\pi(a \mid s)$.
-The exploration bonus is usually based on the visit count of the child and the parent.
-The more visits a child gets, the less the exploration bonus will be.
-For example, the selection in the UCT algorithm is based on
-\begin{align*}
-    I(s)     & = \operatorname{argmax}_{a \in \mathcal{A}} \left( E(s, a) + B(s, a) \right)  \\
-    E(s, a)  & = \frac{V(s)}{N(s, a)}  \\
-    B(s, a)  & = \sqrt{\frac{2 * \log(n_b)}{n_c}}
-\end{align*}
-where $v_c$ is the value of the node, $n_b$ and $n_c$ are the visit counts of the parent and child, respectively.
-This \citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} used this selection rule in their implementation of MoGo,
-the first computer Go program that uses UCT \cite{ModificationUCTPatterns_Gelly.Wang.ea_2006}.
-
-\subsubsection{Expansion}
-The selected leaf node is expanded by adding one or more children, each child represents a successor game state reached by playing one legal move.
-
-\subsubsection{Evaluation}
-The expanded node is evaluated by playing a game with a rollout policy, using an evaluation function, or using a blend of both approaches.
-Many MCTS algorithms use a random policy as the rollout policy and the game result as the evaluation.
-Early work on evaluation functions focused on hand-crafted heuristic functions based on experted knowledge.
-More recently, evaluation functions are mostly approximated by deep neural networks specifically trained for the problems.
-\note{add two examples here}
-
-\note{I'm not sure if using bullets points is appropriate. I also tried using in-line number list (e.g., (1) ..., (2) ..., )}
-
-\subsubsection{Backpropagation}
-After the expanded nodes are evaluated, the nodes on the path from the expanded nodes back to the root are updated.
-The statistics updated usually include visit count, estimated value and accumulated reward of the nodes.
-
-\subsubsection{MCTS Iteration and Move Selection}
-The four steps are repeated until the budget runs out.
-After the search, the agent acts by selecting the action associated with the most promising child of the root node.
-This could be the most visited child, the child with the greatest value, or the child with the highest lower bound \cite{FreshMaxLcb_RoyJonathan_2019}.
-
-\subsection{AlphaGo}
-In \citeyear{MasteringGameGo_Silver.Schrittwieser.ea_2017},
-\citeauthor{MasteringGameGo_Silver.Schrittwieser.ea_2017} developed \textbf{AlphaGo},
-the first Go program that beats a human Go champion on even terms \cite{MasteringGameGo_Silver.Schrittwieser.ea_2017}.
-% AlphaGo learns a policy net that maps states to actions, and a value net that maps states to values.
-AlphaGo was trained with a machine learning pipeline with multiple stages.
-For the first stage of training, a supervised learning policy (or SL policy) is trained to predict expert moves using a neural network.
-This SL policy $p$ is parametrized by weights $\sigma$, denoted $p_{\sigma}$.
-The input of the policy network is a representation of the board state, denoted $s$.
-Given a state $s$ as the input, this network outputs a probability distribution over all legal moves $a$ through the last softmax layer.
-During the training of the network, randomly sampled expert moves are used as training targets.
-\note{I'm not sure if I should use past tense. I think I am describing how AlphaGo works as an algorithm (which I think is timeless), not the acutal AlphaGo software that beats Lee.}
-The weights $\sigma$ are then updated through gradient ascent to maximize the probability of matching the human expert move:
-$$
-    \Delta \sigma \propto \frac{\partial \log p_{\sigma}(a \mid s)}{\partial \sigma}
-$$
-For the second stage of training, the supervised policy $p_{\sigma}$ is used as the starting point for training with reinforcement learning.
-This reinforcement learning trained policy (or RL policy) is parametrized by weights $\rho$ so that $p_{\rho} = p_{\sigma}$.
-Training data is generated in form of self-play games using $p_{\rho}$ as the rollout policy.
-For each game, the game outcome $z_t = \pm r(s_T)$, where $s_T$ is the terminal state, $z_T = +1$ for winning, $z_T = -1$ for losing from the perspective of the current player.
-Weights $\rho$ are updated using gradient ascent to maximize the expected outcome using the update formula:
-$$
-    \Delta \rho \propto \frac{\partial \log p_{\rho}\left(a_{t} \mid s_{t}\right)}{\partial \rho} z_{t}
-$$
-For the last stage, a value function is trained to evaluate board positions.
-This value function is modeled with a neural network with weights $\theta$, denoted $v_{\theta}$.
-Given a state $s$, $v_{\theta}(s)$ predicts the outcome of the game if both players act according to the policy $p_{\rho}$.
-This neural network is trained with stochastic gradient descent to minimize the mean squared error (MSE) between the predicted value $v_{\theta}(s)$ and the outcome $z$.
-$$
-    \Delta \theta \propto \frac{\partial v_{\theta}(s)}{\partial \theta}\left(z-v_{\theta}(s)\right)
-$$
-
-AlphaGo combines the policy network $p_{\rho}$ and the value network $v_{\theta}$ with MCTS for acting.
-AlphaGo uses a MCTS variant similar to that described in \ref{sec:mcts}.
-In the search tree, each edge $(s, a)$ stores an action value $Q(s, a)$, a visit count $N(s, a)$, and a prior probability $P(s, a)$.
-At each time step, the search starts at the root node and simulates until the budget runs out.
-In the select phase of each simulation, an action is selected for each traversed node using the same base formula (\ref{eq:mcts_selection}).
-In AlphaGo, the exploitation score of the selection formula is the estimated value of the next state after taking the actions, namely $Q(s, a)$.
-The exploration bonus of edge $(s, a)$ is based on the prior probability and decays as its visit count grows.
-\begin{equation}
-    u(s, a) \propto \frac{P(s, a)}{1 + N(s, a)}
-\end{equation}
-
-The action taken at time $t$ maximizes the sum of the exploitation score and the exploration bonus
-\begin{equation}
-    a_{t}=\underset{a}{\operatorname{argmax}}\left(Q\left(s_{t}, a\right)+u\left(s_{t}, a\right)\right)
-\end{equation}
-
-AlphaGo evalutes a leaf node state $s_L$ by blending both the value network estimation $v_\theta(s_L)$ and the game result $z_L$ obtained by the rollout policy $p_\pi$
-The mixing parameter $\lambda$ is used to balance these two types of evaluations into the final evaluation $V_(s_L)$
-$$
-    V\left(s_{L}\right)=(1-\lambda) v_{\theta}\left(s_{L}\right)+\lambda z_{L}
-$$
-
-\subsection{AlphaGo Zero}
-\textbf{AlphaGo Zero} is a successor of AlphaGo that beat AlphaGo 100-0 \cite{MasteringGameGo_Silver.Schrittwieser.ea_2017}.
-The first step in the AlphaGo machine learning pipeline is to learn from human expert moves.
-In constrast, AlphaGo Zero learns to play Go \textit{tabula rasa}.
-This means it learns solely by reinforcement learning from self-play, starting from random play, without supervision from human data.
-
-Central to AlphaGo Zero is a deep neural network $f_\theta$ with parameters $\theta$.
-Given a state $s$ as an input, then network output both move probabilities $\pmb{p}$ and value estimation $v$
-$$(\pmb{p}, v) = f_\theta(s)$$.
-To generate self-play games $s_1, ..., s_T$, an MCTS is performed at each state $s$ using the latest neural network $f_\theta$.
-To select a move for a parent node $p$ in the search tree, a variant of the PUCT algorithm is used
-\begin{align*}
-    I(s)     & = \operatorname{argmax}_{a \in \mathcal{A}} \left( E(s, a) + B(s, a) \right)  \\
-    E(s, a)  & = Q(s, a)  \\
-    B(s, a)  & \propto P(s, a) \frac{\sqrt{N(s)}}{1+N(s, a)}
-\end{align*}
-
-Self-play games are processed into training targets to update the parameters $\theta$ through gradient descent on the loss function $l$
-\begin{equation*}
-    l = (z-v)^{2} - \pmb{\pi}^{\mathrm{T}} \log \pmb{p}+c\|\theta\|^{2}
-\end{equation*}
-where $(z-v)^2$ is the mean squared error regressing on value prediction,
-$-\pmb{\pi}^{\mathrm{T}} \log \pmb{p}$ is the cross-entropy loss over move probabilities,
-and $c\|\theta\|^2$ is the L2 weight regularization.
-
-\note{I want to say everything else I don't mention here is pretty much like AlphaGo, how do I say that?}
-
-\subsection{AlphaZero}
-\textbf{AlphaZero} reduces game specific knowledge of AlphaGo Zero so that the same algorithm could be also applied to Shogi and chess
-\cite{MasteringChessShogi_Silver.Hubert.ea_2017}.
-One difference between AlphaZero and AlphaGo Zero is that AlphaZero the game result is no
-longer either winning or losing ($z \in \{ -1, +1 \}$), but also could be a draw ($z \in \{-1, 0, +1 \}$).
-This adaptation takes account of games like chess have a draw condition.
-\note{The AlphaGo Zero I described above has little Go-specific information already. I don't know how to put it here.}
-
-\include{tex/muzero.tex}
-\include{tex/atari_game_playing.tex}
+\include{tex/literature_review.tex}
 
 \section{Problem Definition}
 \note{(5 pages)}
@@ -472,28 +268,28 @@ A \textbf{interaction testing rollout worker} is a ray actor that responsible fo
 A \textbf{reanalyze rollout worker} is a ray actor that pulls history trajectories and updates their search statistics using the latest network weights.
 
 \subsubsection{Environment Bridges} \label{sec:env_bridge}
-Environment bridges unify environments defined in different libraries into a unified interface.
-In the software engineering nomenclature, environment bridges follow the bridge design pattern \cite{BridgePattern__2022}.
-More specifically, in our project we implement environment bridges for three types of environments that are commonly used in RL research including OpenAI Gym, OpenSpiel, and MinAtar \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
-The bridges first wrap these environments into the \textbf{The DeepMind RL Environment API} \cite{DmEnvDeepMind__2022}.
+Environment bridges unified environments defined in different libraries into a unified interface.
+In the software engineering nomenclature, environment bridges follow the \textbf{bridge design pattern} \cite{BridgePattern__2022}.
+More specifically, in our project we implemented environment bridges for three types of environments that are commonly used in RL research including OpenAI Gym, OpenSpiel, and MinAtar \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+The bridges first wrapped these environments into the \textbf{The DeepMind RL Environment API} \cite{DmEnvDeepMind__2022}.
 In this format, each environment step outputs a four tuple.
 (1) \textbf{step\_type}: an enumerated value indicates the type of the timestep, one of \Verb|first|, the first step in the environment, \Verb|mid|, intermidate steps, and \Verb|last|, the last step in the environment.
 (2) \textbf{reward}, a floating point value indicates the reward given by the environment by taking the last given action in the environment.
 (3) \textbf{discount}, a floating point value indicates the discount associated with the step.
 (4) \textbf{observation}, a data structure represents the new environment observation, could be an N-dimensional array in visual-only observation games, or a nested structure in boardgames where other information such as the next player are represented.
-We wrap these environments again to produce a flat dictionary that the rest components in MooZi can use.
+We wrapped these environments again to produce a flat dictionary that the rest components in MooZi used.
 
 The final wrapper environment have the same signature as follows:
 \begin{itemize}
     \item Inputs
-          \subitem ($b^{\text{last}}_{t}$): A boolean signals the episode end.
-          \subitem ($a_t$): An integer indicates the last action taken by the agent.
+          \subitem $b^{\text{last}}_{t}$: A boolean signals the episode end.
+          \subitem $a_t$: An integer indicates the last action taken by the agent.
     \item Outputs
-          \subitem ($o_t$):
+          \subitem $o_t$:
           An N-dimensional array that represents the observation of the current timestep.
           In the shape of $(H, W, C)$.
-          \subitem ($b^{\text{first}}_{t}$): A boolean signals the episode start.
-          \subitem ($b^{\text{last}}_{t}$): A boolean signals the episode end.
+          \subitem $b^{\text{first}}_{t}$: A boolean signals the episode start.
+          \subitem $b^{\text{last}}_{t}$: A boolean signals the episode end.
           %   \subitem  An integer indicates the next player to take a move.
           \subitem $r_t$: A float indicates the reward of taking the given action.
           \subitem $m^{A_a}_t$: A bit mask of legal action indices. Valid
@@ -501,10 +297,10 @@ The final wrapper environment have the same signature as follows:
           $ | \mathcal{A_e} | + 1 = | \mathcal{A} | $ (see \ref{sec:a_aug}).
 \end{itemize}
 
-All environments are generalized as continuous tasks.
-This is done by passing an addition input $b^\text{last}_t$ to the environment stepping argument.
-For an episodic task, the environment is reset internally when $b^{\text{last}}_t$ is \Verb|True|.
-The policy still executes for the last environment step, but the resulting action is not used by the environment.
+All environments were generalized as continuous tasks.
+This was done by passing an addition input $b^\text{last}_t$ to the environment stepping argument.
+For an episodic task, the environment was reset internally when $b^{\text{last}}_t$ is \Verb|True|.
+The policy still executed for the last environment step, but the resulting action is not used by the environment.
 For a continuous task, the environment always step with the lastest action and the $b^{\text{last}}_t$ input is ignored.
 See \ref{code:env_interface} for pseudo-code of generalizing both types of environments to achieve a unified main loop interface.
 
@@ -592,7 +388,7 @@ We denote the channels of the final stacked history as $C_h$ so that $C_h = N * 
 At each timestep $t$, the environment provides a tuple of data as described in seciton (\ref{sec:env_bridge}).
 The agent interacts with the environment by performing a tree search and taking action $a_t$.
 The search statistics of the tree search were also saved, including the updated value estimate of the root action $\hat{v}_t$,
-    and the updated action probability distribution $\hat{p}_t$.
+and the updated action probability distribution $\hat{p}_t$.
 These completes one step sample $\mathcal{T}_t$ for timestep $t$, which is a tuple of $(o_t, a_t, b^{\text{first}}_{t}, b^{\text{last}}_{t}, r_t, m^{A_a}_t, \hat{v}_t, \hat{p}_t)$.
 Once an episode concludes ($b^{\text{last}}_{T} = 1)$, all recorded step samples are gathered and stacked together.
 This yields a final trajectory sample $\mathcal{T}$ that has a similar shape to a step sample but with an extra batch dimension with the size of $T$.
@@ -612,9 +408,9 @@ For each training target at timestep $i$, we create a training target as follows
           The actions $a_{i}, \dots, a_{i + K - 1}$ were used to unroll the model during the training for $K$ steps.
 
     \item Rewards $r_{i + 1}, \dots, r_{i + K}$ as targets of the reward head of the dynamics function.
-    
+
     \item Action probabilities $\hat{p}_{i}, \dots, \hat{p}_{i + K}$ from the statistics of $K + 1$ search trees.
-    
+
     \item Root values $\hat{v}_i, \dots, \hat{v}_{i + K}$, similarly, from the statistics of $K + 1$ search trees.
 
     \item N-step return $G^N_{i}, \dots, G^N_{i + K}$.
@@ -622,12 +418,12 @@ For each training target at timestep $i$, we create a training target as follows
           \begin{align*}
               G^N_{t} = \sum_{i = 0}^{i = N - 1}{\gamma^i r_{t+i+1}} + \gamma^N\hat{v}_{t + N}
           \end{align*}
-          
+
     \item Importance sampling ratio $\rho = 1$. Placeholder value for future override based on replay buffer sampling weights (see \ref{sec:replay}).
 \end{itemize}
 
 \subsubsection{The Loss Function} \label{sec:loss}
-The loss function was defined similar to \ref{sec:muzero}, but with additional self-consistency loss, terminal action loss, $L_2$ regularization loss, and 
+The loss function was defined similar to \ref{sec:muzero}, but with additional self-consistency loss, terminal action loss, $L_2$ regularization loss, and
 \begin{equation}
     \mathcal{L}_{t}(\theta)=
     \underbrace{\sum_{k=0}^{K} l^{\mathrm{p}}\left(\pi_{t+k}, p_{t}^{k}\right)}_{\circled{1}}
@@ -659,7 +455,7 @@ See \ref{code:interaction_training_rollout_worker} for the pseudo-code of this p
 
 \subsubsection{Replay Buffer} \label{sec:replay}
 
-Since most training targets were expected to be sampled more than once, we precomputed the training targets for all received trajectory samples in the replay buffer. 
+Since most training targets were expected to be sampled more than once, we precomputed the training targets for all received trajectory samples in the replay buffer.
 Training targets were computed with minimum information neccessary to be used in the loss function (see \ref{sec:targets}) so that the precomputation took least memory possible.
 
 The replay buffer:
@@ -714,6 +510,3 @@ The parameter optimizer:
 % Perfect vs in-Perfect information
 % \subsection*{Planning}
 % lookahead search: A*, DFS, BFS
-
-% \subsection*{Distributed System for AI}
-% IMPALA, SEED
