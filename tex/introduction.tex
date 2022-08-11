@@ -1,0 +1,32 @@
+\section{Introduction} \label{sec:intro}
+
+\textbf{Deep Learning (DL)} is a branch of \textbf{Artificial Intelligence (AI)} that emphasizes the use of neural networks to fit the inputs and outputs of a dataset.
+The training of a neural network is done by computing the gradients of the loss function with respect to the weights and biases of the network.
+A better trained neural network can better approximate the function that maps the inputs to the outputs of the dataset.
+
+\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes on solving problems through trials and errors with delayed rewards.
+RL had most success in the domain of \textbf{game playing}, including boardgames and Atari games.
+An extension to game playing is \textbf{General Game Playing (GGP)}, whose goal is to design a single algorithm that can play many different games without having much prior knowledge of the games.
+
+\textbf{Deep Reinforcement Learning (DRL)} is a rising branch that combines DL and RL techniques to solve problems.
+In a DRL system, RL techniques lay out the structure of the algorithm such as the use the \textbf{agent-environment interface} \note{reference}, a value function, a reward signal, e.t.c., while DL techniques are used approximate specific functions such as the value function.
+
+\textbf{Planning} refers to any computational process that analyzes generated actions and their consequences in an environment.
+In the RL terms, planning specifically means the use of a model to improve a policy.
+RL algorithms that use planning had great success in playing boardgames, with the most significant achievement of beating human experts in Computer Go.
+
+A \textbf{distributed system} is a computer system that uses multiple processes with various purposes to complete tasks.
+DRL systems for solving large problems are both data and compute intensive.
+Utilizing concurrency to increase efficiency and throughput for these DRL systems are sometimes necessary.
+Building a distributed system to achieve such concurrency is a common practice in the industry but requires significant engineering effort.
+
+\subsection{Contribution}
+In this thesis we present the project \textbf{MooZi}, a general game playing system that play games by planning with a learned model.
+The systems 
+\begin{itemize}
+    \item a collection of environment bridges that connect the system to various environments using a unified interface
+    \item a neural network model that learns representation and could be used for planning
+    \item a MCTS based planner that uses the learned model to perform planning.
+    \item a distributed training system that efficiently trains the agent.
+    \item a thesis with empirical studies and analysis
+\end{itemize}

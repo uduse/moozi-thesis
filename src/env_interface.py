@@ -4,14 +4,13 @@ def main_loop(env, policy):
     while True:
         result = step(env, action, result.is_last)
         action = policy(result.observation)
-    
-# episodic task stepping
-def step(env, action, is_last):
-    if is_last:
-        return env.reset()
-    else:
-        return env.step(action)
 
-# continuous task stepping
+
 def step(env, action, is_last):
-    return env.step(action)
+    if env.type == "episodic":
+        if is_last:
+            return env.reset()
+        else:
+            return env.step(action)
+    elif env.type == "continuous":
+        return env.step(action)

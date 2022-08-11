@@ -1,12 +1,12 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage[a4paper,
-            inner=10mm,
-            outer=50mm, % = marginparsep + marginparwidth 
+            % inner=10mm,
+            % outer=50mm, % = marginparsep + marginparwidth 
                        %   + 5mm (between marginpar and page border)
-            top=20mm,
-            bottom=25mm,
-            marginparsep=5mm,
-            marginparwidth=40mm,
+            % top=20mm,
+            % bottom=25mm,
+            % marginparsep=5mm,
+            % marginparwidth=40mm,
             % showframe
             ]{geometry}
 \usepackage{amsfonts}
@@ -16,10 +16,12 @@
 \usepackage{pythonhighlight}
 \usepackage{fancyvrb}
 \usepackage{minted}
+\usepackage{hyperref}
+\hypersetup{linktocpage}
 
 % define command for grey colored text
 % \newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
-\newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black]{~~ #1}}
+\newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black,inline]{~~ #1}}
 \tolerance=1
 \emergencystretch=\maxdimen
 \hyphenpenalty=10000
@@ -29,7 +31,7 @@
 
 \newcommand{\includecode}[2]{
 \begin{listing}[H]
-    \inputminted[frame=single, framesep=10pt, fontsize=\footnotesize]{python}{src/#1.py}
+    \inputminted[frame=single, framesep=5pt, fontsize=\scriptsize]{python}{src/#1.py}
     \caption[]{#2}
     \label{code:#1}
 \end{listing}   
@@ -70,105 +72,9 @@
 
 % S_0, A_0, R_1, S_1, A_1
 
-\section{Introduction} \label{sec:intro}
-
-\note{8 - 10 pages of introduction}
-
-\textbf{Deep Learning (DL)} is a branch of \textbf{Artificial Intelligence (AI)} that emphasizes the use of neural networks to fit the inputs and outputs of a dataset.
-The training of a neural network is done by computing the gradients of the loss function with respect to the weights and biases of the network.
-A better trained neural network can better approximate the function that maps the inputs to the outputs of the dataset.
-
-\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes on solving problems through trials and errors with delayed rewards.
-RL had most success in the domain of \textbf{Game Playing}: making agents that could play boardgames, Atari games, or other types of games.
-An extension to Game Playing is \textbf{General Game Playing (GGP)}, with the goal of designing agents that could play any type of game without having much prior knowledge of the games.
-\note{discuss policy}
-
-\textbf{Deep Reinforcement Learning (DRL)} is a rising branch that combines DL and RL techniques to solve problems.
-In a DRL system, RL usually defines the backbone structure of the algorithm especially the Agent-Environment interface.
-On the other hand, DL is responsible for approximating specific functions by using the generated data.
-
-\textbf{Planning} refers to any computational process that analyzes a sequence of generated actions and their consequences in the environment.
-In the RL notation, planning specifically means the use of a model to improve a policy.
-
-A \textbf{Distributed System} is a computer system that uses multiple processes with various purposes to complete tasks.
-% DRL systems 
-
-\subsection{Contribution}
-In this thesis we present the project \textbf{MooZi}, a general game playing system that uses a learned model to play both boardgames and Atari games efficiently.
-More specifically, this project provides
-\begin{itemize}
-    \item a collection of environment bridges that connect the system to various environments using a unified interface
-    \item a neural network model that learns representation and could be used for planning
-    \item a MCTS based planner that uses the learned model to perform planning.
-    \item a distributed training system that efficiently trains the agent.
-    \item a thesis with emperical studies and analysis
-\end{itemize}
-
+\include{tex/introduction.tex}
 \include{tex/literature_review.tex}
-
-\section{Problem Definition}
-\note{(5 pages)}
-
-\subsection{Markov Decision Process and Agent-Environment Interface}
-\note{this section should be in the introduction, since it defines too many things that we need for later.}
-
-A RL problem is usually represented as a \textbf{Markov Decision Process (MDP)}.
-MDP is tuple of four elements where $\mathcal{S}$ is a set of states that forms the \textbf{state space}
-$\mathcal{A}$, is a set of actions that forms the \textbf{action space};
-$P(s, a, s') = Pr[ S_{t+1} = s' \mid  S_t = s, A_t = a]$ is the \textbf{transition probability function};
-$R(s, a, s')$ is the \textbf{reward function}.
-To solve a problem formulated as an MDP, we implement the \textbf{Agent-Environment Interface} (Figure \ref{fig:agent_environment_interface}).
-The MDP is represented as the \textbf{environment}.
-The decision maker that interacts with the environment is called the \textbf{agent}.
-At each time step $t$, the agent starts at state $S_t \in \mathcal{S}$, takes an action $A_t \in \mathcal{A}$,
-transitions to state $S_{t+1} \in \mathcal{S}$ based on the transition probability function $P(S_{t+1} \mid S_t, A_t)$,
-and receives a reward $R(S_t, A_t, S_{t+1})$.
-These interactions yield a sequence of actions, states, and rewards $S_{0}, A_{0}, R_{1}, S_{1}, A_{1}, R_{2}, \dots$.
-We call this sequence a \textbf{trajectory}.
-When a trajectory ends at a terminal state $S_T$ at time $t = T$, this sequence is completed and we called it an \textbf{episode}.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.5]{assets/agent_environment_interface.png}
-    \caption[]{Agent-Environment Interface}
-    \label{fig:agent_environment_interface}
-\end{figure}
-\note{my notation is messed up but I will fix them later for sure.}
-
-At each state $s$, then agent takes an action based on its \textbf{policy} $\pi(a \mid s)$.
-This policy represents the conditional probability of the agent taking an action given a state so that
-$\pi(a \mid s) = Pr[ A_{t} = a \mid  S_t = s]$.
-One way to specify the goal of the agent is to obtain a policy that maximizes the sum of expected reward from any state $s$
-\begin{align}
-    \label{eq:maximize_reward_undiscounted}
-    \mathit{E}_{\pi}\left[\sum_{k=0}^{T}  R_{t+k+1} \mid S_t = s\right]
-\end{align}
-where $\mathit{E}_{\pi}$ denotes the expectation of the agent following policy $\pi$.
-Another way is to also use a discount factor $\gamma$ so to favor short-term rewards
-\begin{align}
-    \label{eq:maximize_reward_discounted}
-    \mathit{E}_{\pi}\left[\sum_{k=0}^{T} \gamma^{t} R_{t+k+1} \mid S_t = s\right]
-\end{align}
-Notice that (\ref{eq:maximize_reward_undiscounted}) is a special case of (\ref{eq:maximize_reward_discounted}) where $\gamma = 1$.
-\note{Maybe I should use one formula here to unify both.}
-% \note{also describes policy $\pi$}
-% \note{address this is the most common formulation and how different libraries implement the interface}
-
-% \subsection{Shortcomings of the Agent-Environment Interface for General Game Playing}
-% % \note{I'm not sure if I should address these separatly.}
-% \subsection{Multi-Agent Games}
-% \note{address OpenSpiel's design multiple agents}
-% \subsection{Partial Observability}
-% \note{address POMDP}
-% \subsection{Environment Stochasticity}
-% \note{address OpenSpiel's design of random node}
-% \subsection{Episodic vs Continuous}
-% \note{barely seen in the literature, need more literature review}
-% \subsection{Self-Observability}
-% % \note{agent needs to be able to observe itself}
-% \subsection{Environment Output Structure}
-% % The agent-environment interface specifies two return types from the environment, namely the \textbf{observation} and the \textbf{reward}.
-% % All environment implementations used in the RL field follow 
+\include{tex/problem_definition.tex}
 
 \subsection{Our Approach}
 \note{(5 pages)}
@@ -190,299 +96,11 @@ Notice that (\ref{eq:maximize_reward_undiscounted}) is a special case of (\ref{e
 % \subsubsection{Advantages}
 % \note{pure functions are efficient}
 
-\section{Method}
-\note{(20 - 25 pages)}
-\subsection{Design Philosophy}
+\include{tex/method.tex}
+\include{tex/experiments.tex}
 
-% \subsubsection{Use of Generalized Interaction Interface}
-% One of the goals of the project is to demostrate the use of Generalized Interaction Interface (GII).
-% All modules in the project will be implemented to align with the interface.
-% Third-party libraries that include game environments are wrapped with special wrappers that converts the outputs into the GII format.
-
-\subsubsection{Use of Pure Functions}
-One of the most notable difference of MooZi implementation is the use of pure functions.
-% In GII, \textbf{laws} are pure functions that read from and write to the \textbf{tape}.
-% Agents implemented in Agent-Environment Interface usually do not separate the storage of data and the handling of data.
-In MooZi, we separate the storage of data and the handling of data whenever possible, especially for the parts with heavy compuations.
-For example, we use \textbf{JAX} and \textbf{Haiku} to implement neural network related modules.
-These libraries separate the \textbf{specification} and the \textbf{parameters} of a neural network.
-The \textbf{specification} of a neural network is a pure function that is internally represented by a fixed computation graph.
-The \textbf{parameters} of a neural network includes all variables that could be used with the specification to perform a forward pass.
-\note{add one or two more examples of using pure functions, also mention how tape in the MooZi is different from the tape in GII}
-
-% \subsubsection{Being User Friendly}
-
-
-\subsubsection{Training Efficiency}
-One common problem with current open-sourced MuZero projects is their training efficiency.
-Even for simple environments, these projects could take hours to train.
-\note{
-    Data needed; I've seen multiple issues on GitHub complaining about the training speed.
-    I once assigned the task of "actually running the project and gather run time data" to Jiuqi but no follow up yet.
-}
-
-There are a few major bottlenecks of training efficiency in this type of project.
-The first one is system parallelization.
-\note{include data from previous presentation to make the point}
-
-The second one is the environment transition speed.
-\note{boardgames are fine, Atari games are slow, but in either cases we can't control}
-% Board games, especially those are implemented in \textbf{OpenSpiel}, are faster.
-
-The third one is neural network inferences used in training.
-\note{MCTS inference batching is slow due to IO overhead, include data here from previous presentation to make the point}
-
-% According to our deGeneralized Interaction Interface
-\subsection{Project Structure}
-
-\subsubsection{Overview}
-In MooZi, we use \textbf{Ray} library designed by \citeauthor{RayDistributedFramework_Moritz.Nishihara.ea_2018}
-for orchestrating distributed processes.
-We also adopt the terminology used by Ray \cite{RayDistributedFramework_Moritz.Nishihara.ea_2018}.
-In a distributed system with \textbf{centralized control}, a single process is responsible for operating all other processes.
-This central process is called the \textbf{driver}.
-Other processes are either \textbf{tasks} or \textbf{actors} .
-\textbf{Tasks} are stateless functions that takes inputs and return outputs.
-\textbf{Actors} are statefull objects that group several methods that take inputs and return outputs.
-In RL literature, \textbf{actor} is also a commonly used term for describing the process that holds a copy of the network weights and interacts with an environment \cite{SEEDRLScalable_Espeholt.Marinier.ea_2020}, \cite{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}.
-Even though MooZi does not adopt the concept of a RL actor, we will use the term \textbf{Ray task} and \textbf{Ray actor} to avoid confusion.
-In contrast to distributed systems with \textbf{distributed control}, ray tasks and ray actors are reactive and do not have busy loops.
-The driver process when a ray task or ray actor is activated and what data should be used as inputs and where the outputs should go.
-In other words, the driver process orchestrates the data and control flow of the entire system, and ray tasks and ray actors merely response to instructions, processing inputs and returning outputs on-command.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{assets/moozi_architecture.png}
-    \caption[]{MooZi Architecture}
-    \label{fig:moozi_architecture}
-\end{figure}
-
-We illustrate MooZi's architecture design in Figure (\ref{fig:moozi_architecture}).
-There are six types of processes.
-The \textbf{driver} is the entrance of the program and is responsible for setting up configurations,
-spawning other processes as ray actors, and managing data flow among the ray actors.
-The \textbf{parameter optimizer} stores the latest copy of the network weights and performs batched updates to the weights.
-The \textbf{replay buffer} stores generated trajectories and process the trajectories into training targets.
-A \textbf{interaction training rollout worker} is a ray actor that responsible for generating experiences by interacting with the environment.
-A \textbf{interaction testing rollout worker} is a ray actor that responsible for evaluating the system (e.g., average episode return) by interacting with the environment.
-A \textbf{reanalyze rollout worker} is a ray actor that pulls history trajectories and updates their search statistics using the latest network weights.
-
-\subsubsection{Environment Bridges} \label{sec:env_bridge}
-Environment bridges unified environments defined in different libraries into a unified interface.
-In the software engineering nomenclature, environment bridges follow the \textbf{bridge design pattern} \cite{BridgePattern__2022}.
-More specifically, in our project we implemented environment bridges for three types of environments that are commonly used in RL research including OpenAI Gym, OpenSpiel, and MinAtar \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
-The bridges first wrapped these environments into the \textbf{The DeepMind RL Environment API} \cite{DmEnvDeepMind__2022}.
-In this format, each environment step outputs a four tuple.
-(1) \textbf{step\_type}: an enumerated value indicates the type of the timestep, one of \Verb|first|, the first step in the environment, \Verb|mid|, intermidate steps, and \Verb|last|, the last step in the environment.
-(2) \textbf{reward}, a floating point value indicates the reward given by the environment by taking the last given action in the environment.
-(3) \textbf{discount}, a floating point value indicates the discount associated with the step.
-(4) \textbf{observation}, a data structure represents the new environment observation, could be an N-dimensional array in visual-only observation games, or a nested structure in boardgames where other information such as the next player are represented.
-We wrapped these environments again to produce a flat dictionary that the rest components in MooZi used.
-
-The final wrapper environment have the same signature as follows:
-\begin{itemize}
-    \item Inputs
-          \subitem $b^{\text{last}}_{t}$: A boolean signals the episode end.
-          \subitem $a_t$: An integer indicates the last action taken by the agent.
-    \item Outputs
-          \subitem $o_t$:
-          An N-dimensional array that represents the observation of the current timestep.
-          In the shape of $(H, W, C)$.
-          \subitem $b^{\text{first}}_{t}$: A boolean signals the episode start.
-          \subitem $b^{\text{last}}_{t}$: A boolean signals the episode end.
-          %   \subitem  An integer indicates the next player to take a move.
-          \subitem $r_t$: A float indicates the reward of taking the given action.
-          \subitem $m^{A_a}_t$: A bit mask of legal action indices. Valid
-          action indices of $1$ and invalid actions have indices of $0$.
-          $ | \mathcal{A_e} | + 1 = | \mathcal{A} | $ (see \ref{sec:a_aug}).
-\end{itemize}
-
-All environments were generalized as continuous tasks.
-This was done by passing an addition input $b^\text{last}_t$ to the environment stepping argument.
-For an episodic task, the environment was reset internally when $b^{\text{last}}_t$ is \Verb|True|.
-The policy still executed for the last environment step, but the resulting action is not used by the environment.
-For a continuous task, the environment always step with the lastest action and the $b^{\text{last}}_t$ input is ignored.
-See \ref{code:env_interface} for pseudo-code of generalizing both types of environments to achieve a unified main loop interface.
-
-Moreover, we also implemented a mock enviornment using the same interface \cite{MockObject__2021}.
-A mock environment is initialized with a trajectory sample $\mathcal{T}$, and simulates the environment by outputing step samples one at a time.
-An agent could interact with this mock environment as if it is a real environment.
-However, the actions taken by the agent would not affect state transitions since they are predetermined by the given trajectory from initialization.
-This mock environment is used for reanalyze rollout workers described in \ref{sec:reanalyze_rw}.
-
-\includecode{env_interface}{Environment Adapter Interface}
-
-\subsubsection{Vectorized Environment} \label{sec:vec_env}
-We also implement an environment supervisor that stacks multiple individual environments and forms a single vectorized environment.
-The resulting vectorized environment takes inputs and produces outputs similar to an individual environment but with an additional batch dimension.
-For example, an individual environment produces a single frame of shape $(H, W, C)$ while the vectorized environment produces a batched frame of shape $(B, H, W, C)$.
-Previous scalar outputs such as reward are also stacked into vectors with size of $B$.
-Since environment adapters generalizes episodic tasks as continuous tasks, we do not need special handling for the first and the last timesteps in the vectorized environment and its main loop looks exactly like that in \ref{code:env_interface}.
-Using vectorized environments increases the communication bandwidth between the environment and agent and facilitates designing an vectorized agent that processes a batched of observations and returns a batch of actions at a time.
-
-The mocked environment described in \ref{sec:env_bridge} was less trivial to vectorize.
-Each mocked environment has to be initialized with a trajectory sample.
-To vectorize the mocked environments of size $B$, at least $B$ trajectories have to be mocked and tracked at the same time.
-These $B$ trajectories usually have different length and therefore terminate at different timesteps.
-Once one of the mocked trajectory reaches its termination, another trajectory has to fill the slot.
-We created a trajectory buffer to address this problem in vectorized mocked environment.
-When a new trajectory is needed by one of the mocked environment, the buffer supplies a new trajectory to that mocked environment.
-With the trajectory buffer, the vectorized mocked environment could process batched interactions like a regular vectorized environment until the trajectory buffer runs out of trajectory supply.
-
-\subsubsection{Action Space Augmentation} \label{sec:a_aug}
-We augmented the action space by adding a dummy action indexed at 0.
-This dummy action has two major purposes.
-Firstly, this dummy action is to used construct history observations when the horizon is beyond the current timestep.
-For example, if the history horizon is 3, we need the last three frames and actions to construct the input observation to the policy.
-However, the current timestep could be 0, which means the agent hasn't taken an action yet.
-We used zeroed frames with the same shape as history frames, and the augmented dummy action as history actions.
-Formally, we define
-\begin{align*}
-    a_{i}  & = 0 ~~~~ \forall i < 0  \\
-    a_{T}  & = 0  \\
-\end{align*}
-
-Secondly, since MooZi's planner does not have access to a perfect model, it does not know when a terminal state is reached.
-Node expansions do not stop at terminal states and the tree search could simulate multiple steps beyond legal game states.
-Search performed in these invalid subtrees not only wastes previous search budget, but also back-propagates value and reward estimates that are not learned from generated experience.
-We addressed this issue by letting the model to learn a policy that takes the dummy action beyond terminal states.
-The learned dummy action acts as a switch that, once taken, treats all nodes in its subtree as absorting states and edges that have zero values and rewards respectively.
-
-\subsubsection{MooZi Agent}
-% \textbf{MooZi Agent} is not a standalone components, but
-
-The MCTS in MooZi Planner was similar to that described in \ref{sec:mcts} and \ref{sec:muzero}.
-We used the open-source implementation of MCTS, \textbf{MCTX}, by \citeauthor{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022} \cite{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022}.
-This library was implemented in JAX and supported \note{supports?} customized initial inference and recurrent inference.
-We built a simple adapter that connected our neural network interface with MCTX.
-
-\subsubsection{History Stacking} \label{sec:history_stacking}
-In fully observable environments, the state $s_t$ at timestep $t$ observed by the agent entails sufficient information about future state distribution.
-However, for partially observable environments, this assumption does not hold.
-The optimal policy might not be representable by a policy $\pi(a \mid o_t)$ that only takes into account the most recent partial observation $o_t$.
-Atari games are usually partially observable environments.
-In \textbf{Deep Q Networks (DQN)}, \citeauthor{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013} alleviated this problem by augmenting the inputs of the policy network from a single frame observation to a stacked history of four frames so that the policy network had a signature of $\pi(a \mid o_{t-3}, o_{t-2}, o_{t-1}, o_t)$.
-AlphaZero and MuZero not only stacked a history of environment frames, but also a history of past actions.
-We also adopted this practice in MooZi, and we use the last $L$ environment frames and taken actions so that the signature of the learned model through the policy head is $\pi(a \mid o_{t - L - 1}, \dots, o_t, a_{t - L - 2}, \dots, a_{t-1})$.
-$N$ is an adjustable configuration of the MooZi system and in fully observable environments we could set this to $1$.
-
-The exact process of creating the model input by stacking history frames and actions is as follows:
-\begin{enumerate}
-    \item prepare saved $L$ environment frames of shape $(L, H, W, C_e)$
-    \item stack the $L$ dimension with the environment channels dimension $C$, now shape of $(H, W, N * C_e)$
-    \item prepare saved $L$ past actions of shape $(L)$, represented as action indices
-    \item one-hot encode the actions, now shape of $(L, A)$
-    \item stack the $L$ dimension with the action dimension $A$, now shape of $(L * A)$
-    \item divide the action planes by the number of action, shape remains the same
-    \item tile action planes $(L * A)$ along the $H$ and $W$ dimensions, now shape of $(H, W, N * A)$
-    \item stack the environments planes and actions planes, now shape of $(H, W, L * (C_e + A))$
-    \item the history is now represented as an image with height of $H$, width of $W$, and $L * (C_e + A)$ channels
-\end{enumerate}
-To process batched inputs from vectorized environments descirbed in \ref{sec:vec_env}, all operations aboved are performed with an additional batch dimension $B$, yielding the final output with the shape $(B, H, W, L * (C_e + A))$.
-We denote the channels of the final stacked history as $C_h$ so that $C_h = N * (C_e + A)$, where the subscript $h$ means the channel dimension for the representation function $h$.
-
-\include{tex/nn.tex}
-
-\subsubsection{Training Targets Generation} \label{sec:targets}
-% The agent interacted with the environment by taking actions.
-At each timestep $t$, the environment provides a tuple of data as described in seciton (\ref{sec:env_bridge}).
-The agent interacts with the environment by performing a tree search and taking action $a_t$.
-The search statistics of the tree search were also saved, including the updated value estimate of the root action $\hat{v}_t$,
-and the updated action probability distribution $\hat{p}_t$.
-These completes one step sample $\mathcal{T}_t$ for timestep $t$, which is a tuple of $(o_t, a_t, b^{\text{first}}_{t}, b^{\text{last}}_{t}, r_t, m^{A_a}_t, \hat{v}_t, \hat{p}_t)$.
-Once an episode concludes ($b^{\text{last}}_{T} = 1)$, all recorded step samples are gathered and stacked together.
-This yields a final trajectory sample $\mathcal{T}$ that has a similar shape to a step sample but with an extra batch dimension with the size of $T$.
-For example, $o_t$ is stacked from shape $(H, W, C_e)$ to shape $(T, H, W, C_e)$.
-The interaction training rollout workers described in \ref{sec:train_rw} generate trajectories this way.
-The reanalyze rollout workers generate trajectories with the same signature, but through statistics update described in using a vectorized mocked environment (see \ref{sec:reanalyze_rw} and \ref{sec:vec_env}).
-
-Each trajectory sample with $T$ step samples were processed into $T$ training targets.
-For each training target at timestep $i$, we create a training target as follows:
-\begin{itemize}
-    \item Observations $o_{i - H - 1}, \dots, o_{i + 1}$ where $H$ is the history stacking size.
-          The first $H$ observations were used to create policy inputs as described in \ref{sec:history_stacking},
-          and the pair of observation $o_{i}, o_{i+i}$ were used to compute self-consistency loss described in \ref{sec:loss}.
-
-    \item Actions $a_{i - H - 2}, \dots, a_{i + K - 1}$.
-          Similarly, The first $H$ actions were used for policy input and the pair of actions at $(a_{i - 1}, a_{i})$ were used for self-consistency loss.
-          The actions $a_{i}, \dots, a_{i + K - 1}$ were used to unroll the model during the training for $K$ steps.
-
-    \item Rewards $r_{i + 1}, \dots, r_{i + K}$ as targets of the reward head of the dynamics function.
-
-    \item Action probabilities $\hat{p}_{i}, \dots, \hat{p}_{i + K}$ from the statistics of $K + 1$ search trees.
-
-    \item Root values $\hat{v}_i, \dots, \hat{v}_{i + K}$, similarly, from the statistics of $K + 1$ search trees.
-
-    \item N-step return $G^N_{i}, \dots, G^N_{i + K}$.
-          Each N-step return was computed based on the formula
-          \begin{align*}
-              G^N_{t} = \sum_{i = 0}^{i = N - 1}{\gamma^i r_{t+i+1}} + \gamma^N\hat{v}_{t + N}
-          \end{align*}
-
-    \item Importance sampling ratio $\rho = 1$. Placeholder value for future override based on replay buffer sampling weights (see \ref{sec:replay}).
-\end{itemize}
-
-\subsubsection{The Loss Function} \label{sec:loss}
-The loss function was defined similar to \ref{sec:muzero}, but with additional self-consistency loss, terminal action loss, $L_2$ regularization loss, and
-\begin{equation}
-    \mathcal{L}_{t}(\theta)=
-    \underbrace{\sum_{k=0}^{K} l^{\mathrm{p}}\left(\pi_{t+k}, p_{t}^{k}\right)}_{\circled{1}}
-    +
-    \underbrace{\sum_{k=0}^{K} l^{\mathrm{v}}\left(z_{t+k}, v_{t}^{k}\right)}_{\circled{2}}
-    +
-    \underbrace{\sum_{k=1}^{K} l^{\mathrm{r}}\left(u_{t+k}, r_{t}^{k}\right)}_{\circled{3}}
-    +
-    \underbrace{c\|\theta\|^{2}}_{\circled{4}}
-\end{equation}
-
-
-\subsubsection{Rollout Workers}
-\textbf{Rollout workers} are ray actors that store copies of environments or history trajectories and generated data by evaluating policies and interacting with the environments or history trajectories.
-A rollout worker does not inherently serve a specific purpose in the system and its behavior is mostly determined by the universe factory passed to it.
-There are three main types of rollout workers used in MooZi.
-
-\subsubsection{Interaction Training Rollout Worker} \label{sec:train_rw}
-The main goal of \textbf{interaction training rollout workers} were to generated trajectories by interacting with environments.
-For each worker, a vectorized enviornment was created as described in \ref{sec:vec_env}, a history stacker was created as described in \ref{sec:history_stacking}, and a planner was created using MCTS configurations as described in \ref{sec:planner}:
-Step samples and trajectory samples were collected as the vectorized enviornment stepping, and finally collected trajectory samples were returned as the final output of one run of the worker.
-See \ref{code:interaction_training_rollout_worker} for the pseudo-code of this process.
-
-\includecode{interaction_training_rollout_worker}{Interaction Training Rollout Worker}
-
-\textbf{Interaction Testing rollout worker},
-
-\subsubsection{Reanalyze Rollout Worker} \label{sec:reanalyze_rw}
-
-\subsubsection{Replay Buffer} \label{sec:replay}
-
-Since most training targets were expected to be sampled more than once, we precomputed the training targets for all received trajectory samples in the replay buffer.
-Training targets were computed with minimum information neccessary to be used in the loss function (see \ref{sec:targets}) so that the precomputation took least memory possible.
-
-The replay buffer:
-\begin{itemize}
-    \item stores trajectories generated by the rollout workers
-    \item processes the trajectories into training targets
-    \item stores processed training targets
-    \item computes and updates priorities of training targets
-    \item responsible for sampling and fetching batches of training targets
-\end{itemize}
-
-\subsubsection{Parameter Optimizer}
-The parameter optimizer:
-\begin{itemize}
-    \item stores a copy of the neural network specification
-    \item stores the latest copy of neural network parameters
-    \item stores the loss function
-    \item stores the training state
-    \item computes forward and backward passes and updates the parameters
-\end{itemize}
-
-\subsubsection{Distributed Training}
-\subsubsection{Logging and Visualization}
-
-
-\section{Experiments}
-\note{(20 pages)}
+\section{Things that went wrong}
+% batch norm and importance sampling
 
 \section{Conclusion}
 \note{(3 pages)}
