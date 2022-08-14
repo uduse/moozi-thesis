@@ -1,32 +1,48 @@
-\documentclass[11pt]{article}
-\usepackage[a4paper,
-            % inner=10mm,
-            % outer=50mm, % = marginparsep + marginparwidth 
-                       %   + 5mm (between marginpar and page border)
-            % top=20mm,
-            % bottom=25mm,
-            % marginparsep=5mm,
-            % marginparwidth=40mm,
-            % showframe
-            ]{geometry}
+\documentclass[
+11pt, % The default document font size, options: 10pt, 11pt, 12pt
+%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+english, % ngerman for German
+singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+%liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+%toctotoc, % Uncomment to add the main table of contents to the table of contents
+%parskip, % Uncomment to add space between paragraphs
+%nohyperref, % Uncomment to not load the hyperref package
+headsepline, % Uncomment to get a line under the header
+%chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+%consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+]{mystyle} % The class file specifying the document structure
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage{mathpazo} % Use the Palatino font by default
+% \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+
+\geometry{
+	paper=a4paper, % Change to letterpaper for US letter
+	inner=2.5cm, % Inner margin
+	outer=3.8cm, % Outer margin
+	bindingoffset=.5cm, % Binding offset
+	top=1.5cm, % Top margin
+	bottom=1.5cm, % Bottom margin
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+
+
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{xcolor}
 \usepackage{todonotes}
 \usepackage{pythonhighlight}
 \usepackage{fancyvrb}
-\usepackage{minted}
 \usepackage{hyperref}
 \hypersetup{linktocpage}
 
 % define command for grey colored text
 % \newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
-\newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black,inline]{~~ #1}}
-\tolerance=1
-\emergencystretch=\maxdimen
-\hyphenpenalty=10000
-\hbadness=10000
-
 \usepackage[font=small,labelfont=bf]{caption}
 
 \newcommand{\includecode}[2]{
@@ -38,11 +54,11 @@
 }
 \renewcommand\listingscaption{Algorithm}
 
-\newcommand{\includeimage}[3][0.7]{
-\begin{figure}[H]
-    \captionsetup{width=#1\linewidth}
+\newcommand{\includeimage}[3][1]{
+\begin{figure}
+    \captionsetup{width=\textwidth}
     \centering
-    \includegraphics[width=#1\textwidth]{assets/#2.png}
+    \includegraphics[width=#1\textwidth, height=#1\textheight, keepaspectratio]{assets/#2.png}
     \caption[]{#3}
     \label{fig:#2}
 \end{figure}
@@ -58,54 +74,64 @@
 \usepackage[style=numeric]{biblatex}
 \addbibresource{main.bib}
 
-\begin{document}
+% ====================================================================
+% THESIS INFORMATION
+% ====================================================================
+\thesistitle{High Performance Game-playing System that Plans with a Learned Model} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+\supervisor{Martin Müller} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+\examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
+\degree{Master of Science (Thes)} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+\author{Zeyi Wang} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
+\addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
 
+\subject{Artificial Intelligence} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
+\keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
+\university{\href{https://www.ualberta.ca/index.html}{University of Alberta}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
+\department{\href{https://www.ualberta.ca/computing-science/index.html}{Department or Computing Science}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
+% \group{\href{http://researchgroup.university.com}{Research Group Name}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+% \faculty{\href{http://faculty.university.com}{Faculty Name}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+
+\AtBeginDocument{
+\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
+\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
+\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
+}
+
+\begin{document}
 \listoftodos
 
+\include{tex/title.tex}
+\include{tex/abstract.tex}
+\include{tex/preface.tex}
+\include{tex/dedication.tex}
+\include{tex/declaration.tex}
 \tableofcontents
+% \include{tex/summary_of_notation.tex}
 
-\include{tex/summary_of_notation.tex}
+\listoftables % Prints the list of tables
+\listoffigures % Prints the list of figures
+\include{tex/symbols.tex}
 
-% Capital letters are used for random variables, whereas lower case letters are used for the values of random variables and for scalar functions.
-% Quantities that are required to be real-valued vectors are written in bold and in lower case (even if random variables).
-% Matrices are bold capitals.
 
-% S_0, A_0, R_1, S_1, A_1
-
+\mainmatter % Begin numeric (1,2,3...) page numbering
+\pagestyle{thesis} % Return the page headers back to the "thesis" style
 \include{tex/introduction.tex}
 \include{tex/literature_review.tex}
 \include{tex/problem_definition.tex}
-
-\subsection{Our Approach}
-\note{(5 pages)}
-
-% The most significant difference of our approach is the separation of data and process.
-% In the Agent-Environment Interface, both the agent and the environment are assumed to be stateful, which means they could store and process arbitrary data.
-
-% \subsubsection{Generalized Interaction Interface}
-% We propose the \textbf{Generalized Interaction Interface (GII)}.
-% We define the \textbf{tape} $E$ as the data storage of the interface, and a \textbf{law} $L$ as a pure function that operates on the tape.
-% An instance of such interface could consists of exactly one tape and multiple laws, and we define such an instance a \textbf{universe}.
-% A universe \textbf{ticks} by applying the laws on the tape.
-% \note{elaborate formally}
-
-% We implement a simplified version of this interface in \textbf{MooZi}.
-
-% % \note{elaborate on the interface}
-
-% \subsubsection{Advantages}
-% \note{pure functions are efficient}
-
 \include{tex/method.tex}
 \include{tex/experiments.tex}
 
-\section{Things that went wrong}
-% batch norm and importance sampling
-
-\section{Conclusion}
+\chapter{Conclusion}
 \note{(3 pages)}
-\subsection{Future Work}
+\chapter{Future Work}
 \note{(1 page)}
+
+% \appendix
+
+% Include the appendices of the thesis as separate files from the Appendices folder
+% Uncomment the lines as you write the Appendices
+
+% \include{Appendices/AppendixA}
 
 \printbibliography
 

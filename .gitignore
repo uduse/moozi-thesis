@@ -302,3 +302,4 @@ TSWLatexianTemp*
 
 # draw.io temp files
 *.drawio.bkp
+*.drawio.dtmp

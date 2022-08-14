@@ -9,18 +9,18 @@
     \hline
     \textbf{Symbol} & \textbf{Description}                   & \textbf{Reference}                       \\
     \hline
-    $s$             & state                                                                             \\
-    $a$             & action                                                                            \\
-    $r$             & reward                                                                            \\
-    $t$             & timestep                                                                          \\
-    $T$             & terminal timestep                                                                 \\
+    $s$             & state                                  & \ref{sec:markov}                         \\
+    $a$             & action                                 & \ref{sec:markov}                         \\
+    $r$             & reward                                 & \ref{sec:markov}                         \\
+    $t$             & timestep                               & \ref{sec:markov}                         \\
+    $T$             & terminal timestep                      & \ref{sec:markov}                         \\
+    $\gamma$        & discount                               & \ref{sec:markov}                         \\
     $o$             & partially observable environment frame                                            \\
-    $\gamma$        & discount                                                                          \\
-    $\mathbf{x}$    & hidden state                                                                      \\
-    $G^N$           & N-step return                                                                     \\
+    $G$             & N-step return                          & \ref{sec:policies_and_functions}         \\
+    $G^N$           & N-step return                          & \ref{sec:policies_and_functions}         \\
+    $V$             & value function                         & \ref{sec:policies_and_functions}         \\
+    $Q$             & state-action value function            & \ref{sec:policies_and_functions}         \\
     $\delta$        & TD-error or value diff                 & \ref{sec:replay}                         \\
-    $V$             & value function                                                                    \\
-    $Q$             & state-action value function                                                       \\
     $\mathcal{A}^e$ & environment action space               & \ref{sec:a_aug}                          \\
     $\mathcal{A}^a$ & agent action space                     & \ref{sec:a_aug}                          \\
     $\mathcal{S}$   & state space                                                                       \\
@@ -30,11 +30,11 @@
     $\mathcal{L}$   & loss function                                                                     \\
 
     \hline
+    $\mathbf{x}$    & hidden state                                                                      \\
     $h$             & representation function                                                           \\
     $g$             & dynamics function                                                                 \\
     $f$             & prediction function                                                               \\
     $\varrho$       & projection function                                                               \\
-    $\mathbf{x}$    & hidden state                                                                      \\
     $v^i$           & value prediction                                                                  \\
 
     \hline
@@ -43,7 +43,7 @@
     $W$             & width                                  & \ref{sec:env_bridge}                     \\
     $C_e$           & environment channels                   & \ref{sec:env_bridge}                     \\
     $C_h$           & history channels                       & \ref{sec:history_stacking}               \\
-    $C_x$           & hidden space channels                  &                \\
+    $C_x$           & hidden space channels                  &                                          \\
     $K$             & number of unrolled steps               & \ref{sec:targets}                        \\
     $L$             & history length                         & \ref{sec:targets}                        \\
     $N$             & bootstrap length for N-step return     & \ref{sec:targets}                        \\

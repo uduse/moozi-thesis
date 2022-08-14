@@ -1,8 +1,8 @@
-\section{Method} \label{sec:method}
+\chapter{Method} \label{sec:method}
 \note{(20 - 25 pages)}
-\subsection{Design Philosophy}
+\section{Design Philosophy}
 
-\subsubsection{Use of Pure Functions}
+\subsection{Use of Pure Functions}
 One of the most notable differences of the MooZi implementation compared to other implementations is the use of pure functions.
 In MooZi, we separate the storage of data and the handling of data whenever possible, especially for the parts with heavy computations.
 We use \textbf{JAX} and \textbf{Haiku} to implement neural network related modules (\ref{sec:jax_and_podracer}, \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}).
@@ -32,7 +32,7 @@ The \textit{algorithm} part of the agent could be abstracted into a computation 
 The \textit{state} part of the agent could be efficiently handled by tools specialized in data manipulations and transferring such as Ray (\ref{sec:ray}).
 This way, our system efficiently performs inferences on accelerators and transfers data on CPUs.
 
-\subsubsection{Training Efficiency}
+\subsection{Training Efficiency}
 In section \ref{sec:drl_systems} we reviewed common DRL systems in which developers gave training efficiency the highest priority in their system designs.
 We also designed our system so that it's efficient and scalable.
 Here we describe key features our system has to improve its efficiency.
@@ -53,13 +53,13 @@ DRL systems like IMPALA assume that the policy output can be computed by a singl
 However, MuZero's policy not only requires dozens inferences per action taken, but also requires a planner that prepares inputs for the inferences and initiates inferences.
 Our system, utilizing JAX and MCTX, handles planning with multiple inferences per action efficiently.
 
-\subsubsection{Understanding is Important}
+\subsection{Understanding is Important}
 Machine learning algorithms, especially those involve neural networks, have interpretability issues and sometimes could only be used as ``black boxes'' \cite{ExplainableAIReview_Linardatos.Papastefanopoulos.ea_2021}.
 We believe that having a system that we can understand is much more useful for future research than having a system that ``just works''.
 Therefore, our project studies the behavior of the system through extensive logging and visualization utilities.
 % We will show we use these tools to understand the learned model in section \ref{sec:logging}.
 
-\subsection{Architecture Overview}
+\section{Architecture Overview}
 In MooZi, we use the \textbf{Ray} library designed by \citeauthor{RayDistributedFramework_Moritz.Nishihara.ea_2018}
 for orchestrating distributed processes \cite{RayDistributedFramework_Moritz.Nishihara.ea_2018}.
 We also adopt the terminology used by Ray.
@@ -76,18 +76,18 @@ Ray tasks and actors merely responded to instructions, process input and return 
 We illustrate MooZi's architecture in Figure (\ref{fig:moozi_architecture}).
 
 \includeimage[1]{moozi_architecture}{
-    \textbf{MooZi Architecture.}
+    \textbf{The MooZi Architecture.}
     The \textit{driver} is the entrance point of the program and is responsible for setting up configurations,
     % spawning other processes as ray actors, and managing data flow among the ray actors \note{add ref section}.
     The \textit{parameter server} stores the latest copy of the network weights and performs batched updates to them (\ref{sec:param_server}).
     The \textit{replay buffer} stores generated trajectories and processes these trajectories into training targets (\ref{sec:replay}).
     A \textit{training worker} is a ray actor responsible for generating experiences by interacting with the environment (\ref{sec:train_rw}).
-    A \textit{testing rollout worker} is a ray actor responsible for evaluating the system by interacting with the environment (\ref{sec:test_rw}).
-    A \textit{reanalyze rollout worker} is a ray actor that updates search statistics for history trajectories (\ref{sec:re_w}).
+    A \textit{testing worker} is a ray actor responsible for evaluating the system by interacting with the environment (\ref{sec:test_rw}).
+    A \textit{reanalyze worker} is a ray actor that updates search statistics for history trajectories (\ref{sec:re_w}).
 }
 
-\subsection{Components}
-\subsubsection{Environment Bridges} \label{sec:env_bridge}
+\section{Components}
+\subsection{Environment Bridges} \label{sec:env_bridge}
 Environment bridges unify environments which are defined in different libraries into a shared interface.
 In software engineering terms, environment bridges follow the \textbf{bridge design pattern} \cite{BridgePattern__2022}.
 In our project we implement environment bridges for three types of environments that are commonly used in RL research: OpenAI Gym, OpenSpiel, and MinAtar \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
@@ -128,10 +128,10 @@ We also implement a mock environment using the same interface \cite{MockObject__
 A mock environment is initialized with a \textbf{trajectory sample} $\mathcal{T}$, and simulates the environment by outputting step samples one at a time.
 An agent can interact with this mock environment as if it were a real environment.
 However, the actions taken by the agent do not affect state transitions since they are predetermined by the given trajectory from initialization.
-This mock environment is used by the reanalyze rollout workers in section \ref{sec:re_w}.
+This mock environment is used by the reanalyze workers in section \ref{sec:re_w}.
 
 
-\subsubsection{Vectorized Environment} \label{sec:vec_env}
+\subsection{Vectorized Environment} \label{sec:vec_env}
 We also implement a vectorized environment supervisor that stack multiple individual environments to form a single vectorized environment.
 The resulting vectorized environment takes inputs and produces outputs similar to an individual environment but with an additional batch dimension.
 For example, an individual environment produces a single frame of shape $(H, W, C)$, while the vectorized environment produces a batched frame of shape $(B, H, W, C)$.
@@ -150,7 +150,7 @@ so the vectorized mocked environment can process batched interactions like a reg
 An external process has to refill the buffer once in a while.
 The driver pulls the latest trajectories from the replay buffer and supplies the mock environment's trajectory buffer \note{reference training}.
 
-\subsubsection{Action Space Augmentation} \label{sec:a_aug}
+\subsection{Action Space Augmentation} \label{sec:a_aug}
 We augment the action space by adding a dummy action $a^\text{dummy}$ indexed at 0.
 This dummy action is used to construct history observations when the horizon extends beyond the current timestep.
 For example, if the history horizon is 3, we need the last three frames and actions to construct the input observation to the policy.
@@ -170,7 +170,7 @@ To formally differentiate these two types of action spaces, we denote the origin
 \end{align*}
 Notice that the environment terminates at timestep $T$ so the last effective action taken by the agent is $a_{T-1}$.
 
-\subsubsection{History Stacking} \label{sec:history_stacking}
+\subsection{History Stacking} \label{sec:history_stacking}
 In fully observable environments, the state $s_t$ at timestep $t$ observed by the agent entails sufficient information about the future state distribution.
 However, for partially observable environments, this does not hold.
 The optimal policy might not be representable by a policy $\pi(a \mid o_t)$ that only takes into account the most recent partial observation $o_t$.
@@ -196,138 +196,54 @@ The exact process of creating the model input by stacking history frames and act
 \end{enumerate}
 
 To process batched inputs from vectorized environments described in \ref{sec:vec_env}, all operations above are performed with an additional batch dimension $B$, yielding the final output with the shape $(B, H, W, L * (C_e + |\mathcal{A}^a|))$.
-We denote the channels of the final stacked history as $C_h = L * (C_e + |\mathcal{A}^a|)$, where the subscript $h$ means the channel dimension for the representation function $h$.
-
+We denote the channels of the final stacked history $C_h = L * (C_e + |\mathcal{A}^a|)$, where the subscript $h$ means the channel dimension for the representation function $h$.
 Figure \ref{fig:stacking} illustrates this process with an example.
 \includeimage[1]{stacking}{
     An example of history stacking.
     \textit{History}: Partial observations and actions from the last 3 timesteps ($L = 3$). Actions are integers and observations are images with 2 channels each.
     \textit{One-hot Actions}: One-hot encodes $L$ history actions into vectors.
-    \textit{Normalize Actions}: Diviv
+    \textit{Normalize Actions}: Divide the resulting one-hot encoded actions by the size of the action space.
     \textit{Actions to Planes}: One-hot encodes actions into feature planes that has the same resolution (i.e., same width and height) as the observations, $|\mathcal{A}^a| = 2$.
     \textit{Stack Planes}: Stack all planes together, creating an image with 12 channels and the same resolution as the observations.
 }
 
 
-
-\subsubsection{Planner} \label{sec:planner}
-The planner is the component that decides what actions to take based on the latest observations.
+\subsection{Planner} \label{sec:planner}
 % The planner prepares inputs for the search, performs the search, collects search statistics, sends an action to the environment.
-We use the MuZero variant of MCTS described in \ref{sec:mcts} and \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022} \cite{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022}.
-The planner $\mathcal{P}$ takes a stacked history as its input (\ref{sec:history_stacking}), performs a search, collects search statistics, and outputs a action and search statistics
+The planner component $\mathcal{P}$ takes a stacked history as its input (\ref{sec:history_stacking}), performs a search, collects search statistics, and outputs a action and search statistics
 \begin{align*}
     a_t, v^*_t, \mathbf{p}^*_t = \mathcal{P}(o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t - 1}) ~~ .
 \end{align*}
 Here $v^*_t$ is the search-updated value estimate of the root, $\mathbf{p}^*_t$ is the search-updated action visits at the root, and $a_t$ is action to take.
+Training workers (\ref{sec:train_rw}) use the full planner.
+Testing workers only use the action output from the planner.
+The planner used this way is synonymous to a policy $\pi$.
+Reanalyze workers only use the statistics outputs from the planner.
+Inside of the planner, we use the MuZero variant of MCTS described in \ref{sec:mcts} \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022} \cite{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022}.
 
-\subsubsection{MooZi Neural Network} \label{sec:nn}
-\note{neural network specifical should go into experiment section}
-We used JAX, and Haiku to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2019,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
+\subsection{MooZi Neural Network} \label{sec:nn}
+MooZi use JAX, and Haiku to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2019,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
 We consulted other open-source projects that use neural networks to play games \cite{MuZeroGeneral_Duvaud.AureleHainaut_2022, MasteringAtariGames_Ye.Liu.ea_2021, AcceleratingSelfPlayLearning_Wu_2020}.
-We implemented the neural-network model with two different architectures in our project, one is multilayer-perceptron-based and the other one is residual-blocks-based \cite{DeepResidualLearning_He.Zhang.ea_2016}.
-We primarily used residual-blocks-based model for experiments so we will describe the architecture in full details here.
+MooZi implements two neural network variants, one is based on multilayer-perceptrons (contribution of Jiuqi Wang) and the other one based residual blocks \cite{DeepResidualLearning_He.Zhang.ea_2016}.
+These two implementations shared the same interface and can be used interchangeably.
 
-Similar to MuZero described in section \ref{sec:muzero}, the model had the representation function, the dynamics function, and the dynamics function.
-Additionally, we also trained the MooZi model with a self-consistency loss similar to that described by \citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} and \citeauthor{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} \cite{MasteringAtariGames_Ye.Liu.ea_2021,VisualizingMuZeroModels_deVries.Voskuil.ea_2021}.
-We used an additional function, named as the \textbf{projection function} for this purpose.
-The learned model was used for two purposes during tree searches.
-The first one was to construct the root nodes using the representation function and the prediction function.
+Similar to MuZero described in section \ref{sec:muzero}, the model has a representation function $h$, a dynamics function $g$, and a prediction function $f$.
+Additionally, MooZi has a \textbf{projection function} $\varrho$ for training with the self-consistency loss \ref{sec:loss}.
+The learned model is used to construct the root node of a tree search using the representation function $h$ and the prediction function $f$.
 We call this process the \textbf{initial inference}.
-The second one was to create edges and child nodes for a given node and action using the dynamics function and the prediction function.
+The learned model is also used to create edges and child nodes using the dynamics function $g$ and the prediction function $f$.
 We call this process the \textbf{recurrent inference}.
-\note{This terminology is aligned with MuZero's pseudo-code and MCTX's real code}
-
-We implemented residual blocks using the same specification as \citeauthor{DeepResidualLearning_He.Zhang.ea_2016} \cite{DeepResidualLearning_He.Zhang.ea_2016}.
-One residual block was defined as follows:
-\begin{itemize}
-    \item input $x$
-    \item save a copy of $x$ to $x'$
-    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, same channels
-    \item apply batch normalization on $x$
-    \item apply relu activation on $x$
-    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, same channels
-    \item apply batch normalization on $x$
-    \item add $x'$ to $x$
-    \item apply relu activation on $x$
-\end{itemize}
-
-The representation function $h$ is parametrized as follows:
-\begin{itemize}
-    \item input $x$ of shape $(H, W, C_h)$
-    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
-    \item apply batch normalization on $x$
-    \item apply relu activation on $x$
-    \item apply 6 residual blocks with 32 channels on $x$
-    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
-    \item apply batch normalization on $x$
-    \item apply relu activation on $x$
-    \item output the hidden state head $x_s$ % of shape $(H, W, 32)$
-\end{itemize}
-
-The prediction function $f$ is parametrized as follows:
-\begin{itemize}
-    \item input $x$ % of shape $(H, W, 32)$
-    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
-    \item apply batch normalization on $x$
-    \item apply relu activation on $x$
-    \item apply 1 residual block with 32 channels on $x$
-    \item flatten $x$
-    \item apply 1 dense layer with output size of 128 to obtain the value head $x_v$
-    \item apply batch normalization on $x_v$
-    \item apply relu activation on $x_v$
-    \item apply 1 dense layer with output size of $Z$ on $x_v$
-    \item apply 1 dense layer with output size of 128 to obtain the policy head $x_p$
-    \item apply batch normalization on $x_p$
-    \item apply relu activation on $x_p$
-    \item apply 1 dense layer with output size of $A^a$ on $x_p$
-    \item output the value head $x_v$ and the policy head $x_p$
-\end{itemize}
-
-The dynamics function $g$ is parametrized as follows:
-\begin{itemize}
-    \item input $x$ of shape $(H, W, 32)$, $a$ as an integer
-    \item encode $a$ as action planes of shape $(H, W, A)$ (described in \ref{sec:history_stacking})
-    \item append $a$ to $x$
-
-    \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, 32 channels
-    \item apply batch normalization on $x$
-    \item apply relu activation on $x$
-
-    \item apply 1 residual block with 32 channels on $x$
-
-    \item apply 1 residual block with 32 channels on $x$ to obtain the hidden state head $x_s$
-    \item apply a 2-D padded convolution on $x_s$, with kernel size 3 by 3, 32 channels
-    \item apply batch normalization on $x_s$
-    \item apply relu activation on $x_s$
-
-    \item apply 1 dense layer with output size of 128 on $x$ to obtain the reward head $x_r$
-    \item apply batch normalization on $x_r$
-    \item apply relu activation on $x_r$
-    \item apply 1 dense layer with output size of $Z$ on $x_r$
-
-    \item output the hidden state head $x_s$ and the reward head $x_r$
-\end{itemize}
-
-For convenience, the output specification is the same for both the initial inference and the recurrent inference.
-They both produce a tuple of $(\mathbf{x}, v, \hat{r}, \mathbf{p})$, where $\mathbf{x}$ is the hidden state, $v$ is the value prediction, $\hat{r}$ is the reward prediction, and $\mathbf{p}$ is the policy prediction.
-For the initial inference,
-\begin{itemize}
-    \item input features $\psi_t = (o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t -1})$
-    \item obtain $\mathbf{x}_t^0 = h(\psi_t)$
-    \item obtain $v^0_t, \mathbf{p}^0_t = f(\mathbf{x}_t^0)$
-    \item set $\hat{r}_t^0 = 0$
-    \item return $(\mathbf{x}^0_t, v_t^0, \hat{r}_t^0, \mathbf{p}^0_t)$
-\end{itemize}
-For the recurrent inference,
-\begin{itemize}
-    \item input features $\mathbf{x}_t^i, a_t^i$
-    \item obtain $\mathbf{x}_t^{i+1}, \hat{r}_t^{i+1} = g(\mathbf{x}_t^i, a_t^i)$
-    \item obtain $v^{i+1}_t, \mathbf{p}^{i+1}_t = f(\mathbf{x}_t^{i+1})$
-    \item return $(\mathbf{x}^{i+1}_t, v_t^{i+1}, \hat{r}_t^{i+1}, \mathbf{p}^{i+1}_t)$
-\end{itemize}
+For convenience, the initial inference and the recurrent inference both produce a tuple of $(\mathbf{x}, v, \hat{r}, \mathbf{p})$, where $\mathbf{x}$ is the hidden state, $v$ is the value prediction, $\hat{r}$ is the reward prediction, and $\mathbf{p}$ is the policy prediction.
+The reward prediction $\hat{r}$ is set to 0 for the initial inference.
+During training, $v$ and $\hat{r}$ are logits with size $|Z|$ .
+During acting, the logits of $v$ and $\hat{r}$ are first converted to softmax distributions, then converted to scalars using $\Phi$ \ref{sec:scalar_transform}.
+\note{
+    This terminology is aligned with MuZero's pseudo-code and MCTX's real code.
+    Should I mention this?
+}
 
 Moreover, we applied the invertible transformation \( \phi \) described in section \ref{sec:scalar_transform} to both the scalar reward targets and scalar value targets to create categorical representations with the same support size.
-The support we used for the transformation were integers from the interval \( [-5, 5] \), with a total size of 11.
+% The support we used for the transformation were integers from the interval \( [-5, 5] \), with a total size of 11.
 Scalars were first transformed using \( \phi \), then converted to a linear combination of the nearest two integers in the support.
 For example, for scalar \(\phi(x) = 1.3\), the nearest two integers in the support are $1$ and $2$, and the linear combination is \( \phi(x) = 1 * 0.7 + 2 * 0.3 \), which means the target of this scalar is $0.7$ for the category $1$, and $0.3$ for the category $2$.
 We denote $\Phi$ for this process of applying $\phi$ then categorizing the resulting value into a support $Z$.
@@ -339,7 +255,7 @@ For acting, the neural network additionally applied the softmax function to the 
 The linear combination of the distribution and their corresponding integer values were computed and fed through the inverse of the transformation, namely \( \phi^{-1}\), to produce scalar values.
 This means from the perspective of the planner (\ref{sec:planner}), the scalar estimations made by the model were in same shape and scale as those produced by the environment.
 
-\subsubsection{Training Targets Generation} \label{sec:targets}
+\subsection{Training Targets Generation} \label{sec:targets}
 % The agent interacted with the environment by taking actions.
 At each timestep $t$, the environment provides a tuple of data as described in section (\ref{sec:env_bridge}).
 The agent interacts with the environment by performing a tree search and taking action $a_t$.
@@ -350,7 +266,7 @@ Once an episode concludes ($b^{\text{last}}_{T} = 1)$, all recorded step samples
 This yields a final trajectory sample $\mathcal{T}$ that has a similar shape to a step sample but with an extra batch dimension with the size of $T$.
 For example, $o_t$ is stacked from shape $(H, W, C_e)$ to shape $(T, H, W, C_e)$.
 The training workers described in \ref{sec:train_rw} generate trajectories this way.
-The reanalyze rollout workers generate trajectories with the same signature, but through statistics update described in using a vectorized mocked environment (see \ref{sec:reanalyze} and \ref{sec:vec_env}).
+The reanalyze workers generate trajectories with the same signature, but through statistics update described in using a vectorized mocked environment (see \ref{sec:reanalyze} and \ref{sec:vec_env}).
 
 Each trajectory sample with $T$ step samples were processed into $T$ training targets.
 For each training target at timestep $i$, we create a training target as follows:
@@ -379,7 +295,7 @@ For each training target at timestep $i$, we create a training target as follows
 \end{itemize}
 Training targets were computed with minimum information necessary to be used in the loss function (\ref{sec:loss}) so that the precomputed training targets take up the least memory.
 
-\subsubsection{Loss Computation} \label{sec:loss}
+\subsection{Loss Computation} \label{sec:loss}
 Our loss function is similar to that of \ref{sec:muzero}, but with additional self-consistency loss, terminal action loss, and value loss coefficient
 \begin{align*}
     \mathcal{L}_{t}(\theta)
@@ -410,6 +326,7 @@ and use the same cross-entropy categorization loss
 \begin{align*}
     \mathcal{L}^v(p, q)  & = \mathcal{L}^r(p, q) = - \sum_{p \in \Phi(p), q \in \Phi(q)} p \log{q}  \\
 \end{align*}
+MooZi also trains with a self-consistency loss similar to that described by \citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} and \citeauthor{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} \cite{MasteringAtariGames_Ye.Liu.ea_2021,VisualizingMuZeroModels_deVries.Voskuil.ea_2021}.
 To compute the self-consistency loss $\circled{4}$, we reconstruct the initial inference for the next timestep \(o_{t-L+2}, \dots, o_{t+1}, a_{t-L+1}, \dots, a_{t}\), and compute the cosine distance between the projected one-step hidden state $\varrho(\mathbf{x}^1_t)$ of timestep $t$ and the initial hidden state $\mathbf{x}^0_{t+1}$ of the next timestep $t+1$.
 Formally,
 \begin{align*}
@@ -418,19 +335,20 @@ Formally,
     \circled{4} = \mathcal{L}^s(\mathbf{x^1_t}, \mathbf{x}^0_{t+1})  & = 1 - \frac{\varrho(\mathbf{x}^1_t) \cdot \mathbf{x}^0_{t+1}}{\|\varrho(\mathbf{x}^1_t)\| \| \mathbf{x}^0_{t+1}|\|}
 \end{align*}
 Figure \ref{fig:consistency_loss} illustrates the intuition behind this loss.
-\includeimage{consistency_loss}{
+\includeimage[0.6]{consistency_loss}{
     \textbf{Self-consistency Loss Computation}.
     The hidden state $\mathbf{x}^1_t$ after projection should be similar to the hidden state $\mathbf{x}^0_{t+1}$.
     We assume the next timestep has more information, so we stop gradient from $\mathbf{x^0}_{t+1}$ to push the
     representation of the previous timestep towards the next timestep.
 }
+\note{make this image smaller}
 \circled{5} is a standard $L_2$ regularization loss to prevent network from overfitting,
 and coefficient $c^{L_2}$ is used to control the strength of this regularization.
 The overall loss of a training target is scaled by its importance sampling ratio.
 We also use the gradient scaling described by \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}
 that halves the gradient at the beginning of each dynamics function call \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}.
 
-\subsubsection{Updating the Parameters}
+\subsection{Updating the Parameters}
 We use a standard \textbf{Adam} optimizer developed by \citeauthor{AdamMethodStochastic_Kingma.Ba_2017} \cite{AdamMethodStochastic_Kingma.Ba_2017}.
 We also clip the gradient as described by \citeauthor{DifficultyTrainingRecurrent_Pascanu.Mikolov.ea_} \cite{DifficultyTrainingRecurrent_Pascanu.Mikolov.ea_}.
 The dynamics function $g$ in our learned model is essentially an RNN, so we expect this gradient clipping trick to have a similar effect in our model.
@@ -438,7 +356,7 @@ The dynamics function $g$ in our learned model is essentially an RNN, so we expe
 We use Optax's implementation for both the Adam optimizer and the gradient clipper.
 Moreover, we also use a target network that was used in DQN to stabilize training \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}.
 
-\subsubsection{Reanalyze} \label{sec:reanalyze}
+\subsection{Reanalyze} \label{sec:reanalyze}
 In \ref{sec:muzero_reanalyze}, we reviewed \textbf{MuZero Reanalyze}.
 In our project, we also implement a type of worker process that re-runs search on old trajectories with the latest neural network parameters.
 Given a trajectory sample $\mathcal{T}$, for each timestep $t$ in the trajectory, the reanalyze process is as follows
@@ -451,32 +369,27 @@ Given a trajectory sample $\mathcal{T}$, for each timestep $t$ in the trajectory
 \end{itemize}
 Once the entire trajectory $\mathcal{T}$ is processed, we obtain an updated trajectory $\tilde{\mathcal{T}}$ in which only the value targets and policy targets are replaced.
 
-% \subsubsection{Rollout Workers} \label{sec:rw}
-% \textbf{Rollout workers} are ray actors that store copies of environments or history trajectories and generated data by evaluating policies and interacting with the environments or history trajectories (also see \ref{sec:ray}).
-% A rollout worker does not inherently serve a specific purpose in the system and its behavior is mostly determined by the configuration of it.
-% There are three main types of rollout workers used in MooZi: \textbf{Training Worker}, \textbf{interaction testing rollout worker}, and \textbf{reanalyze rollout worker}.
-
-\subsubsection{Training Worker} \label{sec:train_rw}
+\subsection{Training Worker} \label{sec:train_rw}
 The main goal of \textbf{training workers} is to generate trajectories by interacting with environments for training purposes.
 For each worker, a vectorized environment is created as described in \ref{sec:vec_env}, a history stacker is created as described in \ref{sec:history_stacking}, and a planner was created using MCTS configurations as described in \ref{sec:planner}.
 Each worker also has a delayed copy of the parameters similar to that in IMPALA (\ref{sec:impala} and \cite{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}).
 Step samples and trajectory samples are collected as the planners giving actions and the vectorized environments taking the actions.
-Each worker is allocated with one CPU and a fraction of a GPU (usually $10\% \tilde 20\%$ of a GPU) so neural network inferences could be done on GPU.
+Each worker is allocated with one CPU and a fraction of a GPU (usually $10\% $ to $20\%$ of a GPU) so neural network inferences could be done on GPU.
 Collected trajectory samples are returned as the final output of one run of the worker.
-See \ref{code:interaction_training_rollout_worker} for the pseudo-code of this process.
-The planner of these workers are configured to have more exploration to generate more diverse data.
-The exploration is encouraged by setting a greater \Verb|dirichlet_fraction|, a greater \Verb|dirichlet_alpha|, and a greater \Verb|temperature|. \note{move these parameters into planner section}
-% \includecode{interaction_training_rollout_worker}{Training Worker}
+% See \ref{code:training_worker} for the pseudo-code of this process.
+% The planner of these workers are configured to have more exploration to generate more diverse data.
+% The exploration is encouraged by setting a greater \Verb|dirichlet_fraction|, a greater \Verb|dirichlet_alpha|, and a greater \Verb|temperature|. \note{move these parameters into planner section}
+% \includecode{training_worker}{Training Worker}
 
-\subsubsection{Testing Worker} \label{sec:test_rw}
+\subsection{Testing Worker} \label{sec:test_rw}
 The main goal of \textbf{testing workers} is to generate trajectories by interacting with environments for evaluation.
 These workers are similar to training workers and they hold the same type of data.
-The differences are: testing rollout workers only use a single environment, have less GPU allocation, and only ran once every other $n$ training steps, where $n$ is a configurable number (usually 5).
+The differences are: testing workers only use a single environment, have less GPU allocation, and only ran once every other $n$ training steps, where $n$ is a configurable number (usually 5).
 
-\subsubsection{Reanalyze Worker} \label{sec:re_w}
+\subsection{Reanalyze Worker} \label{sec:re_w}
 The main goal of \textbf{reanalyze workers} is to update search statistics using the reanalyze process described in \ref{sec:reanalyze}, and push updated trajectories to the replay buffer.
 
-\subsubsection{Replay Buffer} \label{sec:replay}
+\subsection{Replay Buffer} \label{sec:replay}
 The \textbf{replay buffer} processes trajectories into training targets and samples trajectories or training targets.
 Since most training targets are expected to be sampled more than once,
 the replay buffer precomputes the training targets for all received trajectory samples in the replay buffer with the process described in \ref{sec:targets}.
@@ -496,9 +409,9 @@ For each training target $i$, the replay buffer also computes the importance sam
 Since the probabilities of targets depends on other targets as well, the importance sampling ratio of targets are not static,
 and have to be recomputed each time a batch is sampled from the replay buffer.
 
-\subsubsection{Parameter Server} \label{sec:param_server}
-The parameter server holds the central copy of the neural network parameters and updates the parameters.
-Once a batch of training targets is received by the parameter server, the loss is computed as described in \ref{sec:loss}.
+\subsection{Parameter Server} \label{sec:param_server}
+The parameter server holds the central copy of the neural network parameters, performs  updates the parameters.
+Once a batch of training targets is received by the parameter server, the loss and gradients are computed as described in \ref{sec:loss}, and
 
 % \begin{itemize}
 %     \item stores a copy of the neural network specification
@@ -510,9 +423,7 @@ Once a batch of training targets is received by the parameter server, the loss i
 
 \section{System in Action}
 % Now we look at how the components run and interact with each other during training.
-\subsection{The Driver}
-\includecode{driver}{\textbf{The driver.}}
-Algorithm \ref{code:driver} is the driver 
+Algorithm \ref{code:driver} is the driver that manages all others processes and dataflow.
 The driver starts by initializing all rollout workers, a parameter server, and a replay buffer.
 At the beginning of a training step, the driver performs lightweight tasks of all processes such as synchronizing parameters.
 During the training step, all processes perform their heavyweight tasks.
@@ -521,6 +432,8 @@ The method calls made by the driver do not block.
 They schedule call events and return immediately rather than waiting for the methods to finish.
 The immediate return values of the calls are \textit{promises} managed by Ray \cite{FuturesPromises__2022}.
 Actors execute their scheduled method calls sequentially once their concrete inputs are ready.
+Figure \ref{fig:training_step} illustrates how tasks are executed in parallel over time.
+\includecode{driver}{\textbf{The driver.}}
 \includeimage[1]{training_step}{
     \textbf{Timeline of training steps.}
     The red bar indicates a synchronization barrier.
@@ -531,8 +444,20 @@ Actors execute their scheduled method calls sequentially once their concrete inp
 MooZi incorporates extensive logging and visualization utilities to help users understand its behavior better.
 All distributed process contains a dedicated log file that records all events within the process.
 Figure \note{add figure here} shows an example of the log files.
-MooZi uses \textbf{TensorBoard} to log informative scalars and vectors, including average returns, distribution of importance sampling ratios, replay buffer saturation status, gradient sizes, and much more \cite{TensorFlowLargeScaleMachine_Abadi.Agarwal.ea_}.
-Figure \note{add figure here} shows a screenshot of the TensorBoard.
+MooZi uses \textbf{TensorBoard} to log informative scalars and vectors \cite{TensorFlowLargeScaleMachine_Abadi.Agarwal.ea_}.
+Figure \ref{fig:tb} shows the MooZi TensorBoard dashboard.
+\includeimage{tb}{
+    \textbf{MooZi Tensorboard dashboard.}
+    MooZi logs over 50 different metrics into this dashboard.
+    These include 29 metrics from the training workers, 3 metrics from the testing logger, 20 metrics from decomposing the loss function, 8 metrics from the parameter optimizer, and optionally shows distributions of parameters from all layers.
+}
+% \begin{figure}
+%     \captionsetup{width=#1\linewidth,}
+%     \centering
+%     \includegraphics[width=#1\textwidth]{assets/#2.png}
+%     \caption[]{#3}
+%     \label{fig:#2}
+% \end{figure}
 MooZi also provides utilities to visualize the behavior of the algorithm.
 Testing workers use the GIF maker tool to create animated records of evaluations.
 Figure \note{add figure here} shows an example of the GIF tiled as a sprite image.

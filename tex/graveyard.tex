@@ -1,0 +1,41 @@
+% \subsubsection{Initial Inference and Recurrent Inference}
+% For the initial inference,
+% \begin{itemize}
+%     \item input features $\psi_t = (o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t -1})$
+%     \item obtain $\mathbf{x}_t^0 = h(\psi_t)$
+%     \item obtain $v^0_t, \mathbf{p}^0_t = f(\mathbf{x}_t^0)$
+%     \item set $\hat{r}_t^0 = 0$
+%     \item return $(\mathbf{x}^0_t, v_t^0, \hat{r}_t^0, \mathbf{p}^0_t)$
+% \end{itemize}
+% For the recurrent inference,
+% \begin{itemize}
+%     \item input features $\mathbf{x}_t^i, a_t^i$
+%     \item obtain $\mathbf{x}_t^{i+1}, \hat{r}_t^{i+1} = g(\mathbf{x}_t^i, a_t^i)$
+%     \item obtain $v^{i+1}_t, \mathbf{p}^{i+1}_t = f(\mathbf{x}_t^{i+1})$
+%     \item return $(\mathbf{x}^{i+1}_t, v_t^{i+1}, \hat{r}_t^{i+1}, \mathbf{p}^{i+1}_t)$
+% \end{itemize}
+
+% \subsection{Rollout Workers} \label{sec:rw}
+% \textbf{Rollout workers} are ray actors that store copies of environments or history trajectories and generated data by evaluating policies and interacting with the environments or history trajectories (also see \ref{sec:ray}).
+% A rollout worker does not inherently serve a specific purpose in the system and its behavior is mostly determined by the configuration of it.
+% There are three main types of rollout workers used in MooZi: \textbf{Training Worker}, \textbf{interaction testing rollout worker}, and \textbf{reanalyze rollout worker}.
+
+\subsection{Our Approach}
+\note{(5 pages)}
+
+% The most significant difference of our approach is the separation of data and process.
+% In the Agent-Environment Interface, both the agent and the environment are assumed to be stateful, which means they could store and process arbitrary data.
+
+% \subsubsection{Generalized Interaction Interface}
+% We propose the \textbf{Generalized Interaction Interface (GII)}.
+% We define the \textbf{tape} $E$ as the data storage of the interface, and a \textbf{law} $L$ as a pure function that operates on the tape.
+% An instance of such interface could consists of exactly one tape and multiple laws, and we define such an instance a \textbf{universe}.
+% A universe \textbf{ticks} by applying the laws on the tape.
+% \note{elaborate formally}
+
+% We implement a simplified version of this interface in \textbf{MooZi}.
+
+% % \note{elaborate on the interface}
+
+% \subsubsection{Advantages}
+% \note{pure functions are efficient}
