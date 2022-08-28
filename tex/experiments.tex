@@ -1,59 +1,67 @@
 \chapter{Experiments}
+\label{sec:exp}
+We run the \textit{MooZi} system on both video games and board games to demonstrate MooZi's ability to learn and perform in both domains.
+We use MinAtar environments (reviewed in Section \ref{sec:min_atar}) as video game environments, and Breakthrough as a board game environment.
+We compare MooZi's performance in MinAtar environments with published result from Gymnax \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022} and MinAtar \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+We evaluate MooZi's performance in Breakthrough by competing MooZi models with different amount of training.
+We analyze MooZi's behavior in these environments and discuss the behavior of the system during training.
+
 \section{Experiment Setup}
-\subsection{Basics}
+\subsection{Basic Configuration}
 \note{can't think of a better title.}
-For all of our experiments, we use unrolled steps $K = 5$, history length $L = 4$, bootstrap steps $N = 10$, a discount of $0.997$, and a support $Z$ from the interval  $[-30, 30]$ ($|Z| = 61$).
-We use a single computer with Intel Xeon CPUs (72 $\times$ 2.3 GHz), Nvidia Tesla V100 GPUs (8 $\times$ 32 GB), and 500 Gigabytes of system memory.
-A running MooZi system roughly uses 50\% to 75\% of the CPUs, 40\% to 60\% of the GPUs, and 25\% of the memory.
+For all of our experiments, we use MooZi with unrolled steps $K = 5$, history length $L = 4$, and bootstrap steps $N = 10$.
+We use a discount of $0.997$ in MinAtar experiments and  and a support $Z$ from the interval  $[-30, 30]$ ($|Z| = 61$).
+We run all experiments on a single computer with Intel Xeon CPUs (72 $\times$ 2.3 GHz), Nvidia Tesla V100 GPUs (8 $\times$ 32 GB), and 500 Gigabytes of system memory.
+Each run roughly consume 50\% of available computation resources of the computer, and we usually run two instances of the system at the same time.
 
 \subsection{Neural Network Configurations}
-We use the residual-blocks-based variant of the network for all of our experiments.
+We use the residual-blocks-based variant (see Section \ref{sec:nn}) of the network for all of our experiments.
 
 \subsubsection{Residual Block}
 We follow the residual block definition by \citeauthor{DeepResidualLearning_He.Zhang.ea_2016} \cite{DeepResidualLearning_He.Zhang.ea_2016}.
-One residual block is defined as follows:
+The computation of one residual block is computed as follows:
 \begin{itemize}
     \item input $x$
     \item save a copy of $x$ to $x'$
     \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, same channels
     \item apply batch normalization on $x$
-    \item apply relu activation on $x$
+    \item apply ReLU activation on $x$
     \item apply a 2-D padded convolution on $x$, with kernel size 3 by 3, same channels
     \item apply batch normalization on $x$
     \item add $x'$ to $x$
-    \item apply relu activation on $x$
+    \item apply ReLU activation on $x$
 \end{itemize}
 
 \subsubsection{The Representation Function}
-The representation function $h$ is defined as follows
+The representation function $\mathbf{x} = h$ is computed as follows:
 \begin{itemize}
-    \item input stacked history $\psi$ of shape $(H, W, C_h)$
-    \item apply a 2-D padded convolution on $\psi$, with kernel size 1 by 1, 32 channels
+    \item input a stacked history $\psi$ of shape $(H, W, C_h)$
+    \item apply a 2-D padded convolution on $\psi$, with kernel size 1 by 1 and 32 channels
     \item apply 6 residual blocks with 32 channels on $\psi$
     \item output the hidden state $\mathbf{x}$ of shape $(H, W, 32)$
 \end{itemize}
 
 \subsubsection{The Prediction Function}
-The prediction function $f$ is parametrized as follows
+The prediction function $\mathbf{p}, v = f(\mathbf{x})$ is computed as follows:
 \begin{itemize}
     \item input hidden state $\mathbf{x}$ of shape $(H, W, 32)$
     \item apply 1 residual block with 32 channels on $\mathbf{x}$
     \item flatten $\mathbf{x}$, now shape $(H * W * 32)$
     \item apply 1 dense layer with output size of 128 on flattened $\mathbf{x}$ to obtain the value head $\mathbf{x}_v$, now shape $(128)$
-    \item apply batch normalization and relu activation on $\mathbf{x}_v$
+    \item apply batch normalization and ReLU activation on $\mathbf{x}_v$
     \item apply 1 dense layer with output size of $|Z|$ on $\mathbf{x}_v$, now shape $(1)$
     \item output the value head $\mathbf{x}_v$ as the value prediction $v$
     \item apply 1 dense layer with output size of 128 on flattened $\mathbf{x}$ to obtain the policy head $\mathbf{x}_p$, now shape $(128)$
-    \item apply batch normalization and relu activation on $\mathbf{x}_p$
-    \item apply 1 dense layer with output size equals to the actin space size on $\mathbf{x}_p$, now shape $(|\mathcal{A}^a|)$
+    \item apply batch normalization and ReLU activation on $\mathbf{x}_p$
+    \item apply 1 dense layer with output size equals to the action space size on $\mathbf{x}_p$, now shape $(|\mathcal{A}^a|)$
     \item output the policy head as the policy prediction $\mathbf{p}$
 \end{itemize}
 
 \subsubsection{The Dynamics Function}
-The dynamics function $g$ is parametrized as follows:
+The dynamics function $\mathbf{x}, \hat{r} = g(\mathbf{x})$ is computed as follows:
 \begin{itemize}
     \item input hidden state $\mathbf{x}$ of shape $(H, W, 32)$, action $a$ as an integer
-    \item encode $a$ as action planes of shape $(H, W, |\mathcal{A}^a|)$ (same procedure as \ref{sec:history_stacking})
+    \item encode $a$ as action planes of shape $(H, W, |\mathcal{A}^a|)$ (same procedure as in Section \ref{sec:history_stacking})
     \item stack $\mathbf{x}$ on top of the encoded action, now shape $(H, W, 32 + |\mathcal{A}^a|)$
 
     \item apply a 2-D padded convolution on $\psi$, with kernel size 1 by 1, 32 channels, now shape $(H, W, 32)$
@@ -62,24 +70,24 @@ The dynamics function $g$ is parametrized as follows:
     \item output the hidden state head $\mathbf{x}_s$ as the next hidden state $\mathbf{x}'$
 
     \item apply 1 dense layer with output size of 128 on $\mathbf{x}$ to obtain the reward head $\mathbf{x}_r$, now shape of $(128)$
-    \item apply batch normalization and relu activation on $\mathbf{x}_r$
-    \item apply 1 dense layer with output size of $Z$ on $\mathbf{x}_r$, now shape of $(|Z|)$
+    \item apply batch normalization and ReLU activation on $\mathbf{x}_r$
+    \item apply 1 dense layer with output size of $|Z|$ on $\mathbf{x}_r$, now shape of $(|Z|)$
     \item output reward head $\mathbf{x}_r$ as the reward prediction $\hat{r}$
 \end{itemize}
 
 \subsubsection{The Projection Function}
-The projection function $\varrho$ is simply one residual block.
+The projection function $\mathbf{x} = \varrho(\mathbf{x})$ is simply one residual block (see Section \ref{sec:nn}).
 
 \subsubsection{Network Training}
-In the loss function (\ref{sec:loss}), we use $c^v = 0.25$, $c^s = 2.0$, and $c^{L_2} = \num{1.0e-4}$.
+In the loss function described in Section \ref{sec:loss}, we use parameters $c^v = 0.25$, $c^s = 2.0$, and $c^{L_2} = \num{1.0e-4}$.
 We use a batch size of 1024, a learning rate of \num{1.0e-2}, and a global norm clipping of \num{5.0}.
-We perform gradient updates with samples four times of the number of step samples generated each training step.
-For example, if we have 30 training workers, each with 16 environments, and each performs 100 environment steps per training step, then the total number step samples generated is $30 * 16 * 100 = 48000$.
-This means we update the gradient using $4 * 48000 = 192000$ sampled training targets from the replay buffer.
+We perform gradient updates with a number of samples that is four times the number of step samples generated in each training step.
+For example, if we have 30 training workers, each with 16 environments, and each performs 100 environment steps per training step, then the total number of step samples generated is $30 * 16 * 100 = 48000$.
+This means that we update the gradient using $4 * 48000 = 192000$ sampled training targets from the replay buffer.
 That is $\frac{192000}{1024} \approx 188$ gradient updates from mini-batches of size 1024 per training step.
-We use a target network similar to DQN (\ref{sec:dqn}) to smooth gradient updates, and we overwrites the target network every other 500 gradient updates.
+% We use a target network (see Section \ref{sec:dqn} and \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}) to smooth gradient updates, and we update the target network every other 500 gradient updates.
 
-\subsection{Planners Configurations} \label{sec:planner_config}
+\subsection{Planner Configurations} \label{sec:planner_config}
 \begin{table}
     \begin{tabular}{@{}|l|l|l|l|l|l|@{}}
         \toprule
@@ -88,126 +96,136 @@ We use a target network similar to DQN (\ref{sec:dqn}) to smooth gradient update
         Reanalyze & 1.75  & 19652 & -           & 0.2             & 50          \\ \midrule
         Testing   & 1.75  & 19652 & 0.25        & 0.1             & 40          \\ \bottomrule
     \end{tabular}
-    % \newline
-    % \vspace*{1 cm}
-    % \newline
-    % \begin{tabular}{@{}|l|l|l|@{}}
-    %     \toprule
-    %            & $c_2$ & Number \\ \midrule
-    %     Shared & 19652 & 1.0    \\ \bottomrule
-    % \end{tabular}
-    \captionsetup{width=\linewidth}
-    \caption{
-        \textbf{Planner configurations.}
-        Reanalyze workers do not sample actions to act so the temperature parameter does not affect their behavior.
-        $c_1$ is the exploration constant in the PUCT formula form \ref{sec:muzero}.
-        A greater $c_1$ favors the less visited actions more.
-        $c_2$ is also an exploration constant in the PUCT formula.
-        We use the same value as \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} because we find it sufficient to tune $c_1$ to balance exploration.
-        The \textit{temperature} controls how action is selected from the distribution of action visit counts from the root nodes.
-        A temperature of 0 means select most visited actions at the root nodes.
-        A temperature of $\infty$ means select actions at random.
-        The \textit{dirichlet noise} controls the exploitation noise added to the actions at the root nodes.
-        A greater dirichlet noise adds more prior probabilities to less explored actions.
-        The \textit{simulations} is the number of simulations the planner performs at each timestep \ref{sec:mcts}.
-        The training workers favor exploration and generate data quickly with less simulations.
-        The testing workers favor exploitation and spend more time on simulations to get better average return.
-        The reanalyze workers do not need to interact with the environment so they spend more time performing simulations.
-    }
+    \captionsetup{width=\linewidth, justification=raggedright}
+    \caption[Planner Configuration]{\textbf{Planner configurations.}}
     \label{tb:planner_args}
 \end{table}
 
 Table \ref{tb:planner_args} shows the configurations of planners from different type of workers.
+Reanalyze workers do not sample actions to act so the temperature parameter does not affect their behavior.
+$c_1$ is the exploration constant in the PUCT formula form \ref{sec:muzero}.
+A greater $c_1$ favors the less visited actions more.
+$c_2$ is also an exploration constant in the PUCT formula.
+We use the same value as \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} because we find it sufficient to tune $c_1$ to balance exploration.
+The \textit{temperature} controls how action is selected from the distribution of action visit counts from the root nodes.
+A temperature of 0 selects most visited action at the root node.
+A temperature of $\infty$ means random action selections.
+The \textit{dirichlet noise} controls the exploration noise added to the actions at the root nodes.
+A greater dirichlet noise adds more prior probability to less explored actions.
+The \textit{simulations} parameter is the number of simulations the planner performs at each timestep (see Section \ref{sec:mcts}).
+The training workers favor exploration and generate data quickly with fewer simulations.
+The testing workers favor exploitation and spend more time on simulations to get better average return.
+The reanalyze workers do not need to interact with the environment so they spend more time performing simulations.
 
-\subsection{Driver Configuration}
+\subsection{Driver Configuration} \label{sec:exp:driver}
 We use 30 training workers, each with 16 copies of the environment.
 For every training step, each training worker performs 100 environment steps.
-Freeway environment has much longer episodes, so each training worker uses 2 environments and performs 2500 environment steps per training step.
-We use 1 testing worker with 1 copy of the environment.
+The \textit{Freeway} environment has much longer episodes, so each training worker uses only 2 environments and performs 2500 environment steps per training step.
+We use 1 testing worker with one copy of the environment.
 For every 10 training steps, the testing worker collects 10 trajectories and logs the average return of the trajectories.
-We do not use the reanalyze except for the experiments in \ref{sec:exp:re}.
-All workers sync with the latest neural network parameters per 10 training steps.
+We only use the reanalyze worker for the experiments in Section \ref{sec:exp:re}.
+All workers sync with the latest neural network parameters every 10 training steps.
 
-\section{MinAtar Games vs PPO}
-We run MooZi using four environments in MinAtar \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+\section{MooZi vs PPO, in MinAtar Environments} \label{sec:exp:minatar}
+We run MooZi using four environments in MinAtar, including \textit{Breakout}, \textit{Space Invaders}, \textit{Freeway}, and \textit{Asterix} \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 All environments produce frames of resolution $10 \times 10$, with four to seven environment channels $C_e$.
-In \textbf{Breakout}, the player moves a paddle left or right on the bottom of the screen to bounce a ball to hit the bricks.
-Reward is $+1$ for each brick broken and $0$ in all other situations.
+In \textit{Breakout}, the player moves a paddle left or right on the bottom of the screen to bounce a ball to hit the bricks.
+The reward is $+1$ for each brick broken and $0$ in all other situations.
 The game ends when the paddle fails to catch the ball.
-In \textbf{Space Invaders}, the player controls a cannon that can move left, move right, or fire the cannon.
-A cluster of enemies move across the screen and fire at the player.
-Reward is $+1$ for each enemy hit by the player and $0$ in all other situations.
-The game ends when the play is hit by an enemy's bullet.
-In \textbf{Freeway}, the player starts at the bottom of the screen, moves up or down once every three frames to travel across a road with traffic.
-Cars are spawn randomly and travel horizontally across the screen, and when they hit the player the player is moved back to its starting position.
-Reward is $+1$ for each time the player successfully travel across the road and $0$ in all other situations.
+In \textit{Space Invaders}, the player controls a cannon that can move left, move right, or fire the cannon.
+A cluster of enemies moves across the screen and they fire at the player.
+The reward is $+1$ for each enemy hit by the player and $0$ in all other situations.
+The game ends when the player is hit by an enemy's bullet.
+In \textit{Freeway}, the player starts at the bottom of the screen and can move up or down once every three frames to travel across a road with traffic, or stay in place.
+Cars spawn randomly and travel horizontally across the screen.
+When they hit the player the player is moved back to its starting position.
+The reward is $+1$ for each time the player successfully travels across the whole road and $0$ in all other situations.
 The game ends after 2500 timesteps.
-In \textbf{Asterix}, the player moves in four directions, and enemies and treasures spawn randomly on the edges.
-Reward is $+1$ if the player obtains a treasure and $0$ in all other situations.
-The game ends when the player bump into an enemy.
+In \textit{Asterix}, the player moves in four directions, and enemies and treasures spawn randomly on the edges.
+The reward is $+1$ if the player obtains a treasure and $0$ in all other situations.
+The game ends when the player bumps into an enemy.
 Enemies have different speed indicated by the color of their tail.
+Figure \ref{fig:minatar} shows a screen shot of the MinAtar environments.
 MuZero is reported to have much better performance in more deterministic environments \cite{VectorQuantizedModels_Ozair.Li.ea_2021}.
-To compare MooZi in more deterministic environments, we compare the results reported by Gymnax, in which algorithms are evaluated in environments with no sticky action.
+To compare MooZi in more deterministic environments, we compare with the results reported by Gymnax, in which algorithms are evaluated in environments with no sticky action.
 We discuss this difference in section \ref{sec:sticky_minatar}.
-Gymnax benchmarked the performance of PPO with three set of hyper-parameters in each of these four games \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022,ProximalPolicyOptimization_Schulman.Wolski.ea_2017}.
+Gymnax benchmarked the performance of PPO with three sets of hyper-parameters in each of these four games \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022,ProximalPolicyOptimization_Schulman.Wolski.ea_2017}.
 We compare our results with the best performing PPO in each of these games.
-The average return uses the planner setting of a test worker (\ref{sec:planner_config}).
+The average return uses the planner setting of a test worker in Section \ref{sec:planner_config}.
 Figure \ref{fig:experiments_minatar_moozi_vs_ppo} shows the result comparisons.
-\note{Do I need to show what the environments look like? Those will be static images so the readers will be clueless still...}
+In \textit{Breakout}, MooZi obtained a near-optimal strategy and the paddle almost never fails to catch the ball.
+There is no default step limits in the environments so we cap the return at 100.
+Similarly in \textit{Space Invaders}, MooZi obtained a near-optimal strategy and we capt the return at 300.
+In \textit{Freeway}, MooZi also obtained a near-optimal strategy.
+Since episode in this environment is much longer than other environments, MooZi cycles through less training steps and save less checkpoints.
+Hence MooZi has much less data points in the line plot for this environment.
+In \textit{Asterix}, both MooZi and PPO do not obtain an optimal strategy, but MooZi have twice as much average return as PPO.
 
-\includeimage{experiments_minatar_moozi_vs_ppo}{
-    \textbf{MinAtar games. MooZi vs PPO.}
-    In \textit{Breakout}, MooZi obtained a near-optimal strategy and the paddle almost never fails to catch the ball.
-    There is no default step limits in the environments so we cap the return at 100.
-    Similarly in \textit{Space Invaders}, MooZi obtained a near-optimal strategy and we capt the return at 300.
-    In \textit{Freeway}, MooZi also obtained a near-optimal strategy.
-    Since episode in this environment is much longer than other environments, MooZi cycles through less training steps and save less checkpoints.
-    Hence MooZi has much less data points in the line plot for this environment.
-    In \textit{Asterix}, both MooZi and PPO do not obtain an optimal strategy, but MooZi have twice as much average return as PPO.
-}
+\includeimage{minatar}{\textbf{MinAtar Environments, from \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.}}{}
+\includeimage{experiments_minatar_moozi_vs_ppo}{\textbf{MinAtar games. MooZi vs PPO.}}{}
 
 \section{Sticky Actions in MinAtar} \label{sec:sticky_minatar}
-MinAtar environments have a default sticky action probabilities of 10\%.
-This means one out of ten timesteps, the environment uses the last taken action to step the environment instead of using the agent output action.
-For example, at time $t$, the agent outputs action $a_t = \text{MoveLeft}$ and moves to the left.
-At time $t+1$, the agent outputs action $a_{t+1} = \text{MoveRight}$.
-However, this time, the environment applies the sticky action and overrides the action $a_{t+1} = \text{MoveLeft}$, and the agent moves to the left even further.
+MinAtar environments have a default sticky action probability of 10\%.
+This means that in one out of ten timesteps, the environment uses the last taken action to step the environment instead of using the agent's output action.
+For example, assume that at time $t$, the agent outputs action $a_t = \text{\textit{MoveLeft}}$ and moves to the left.
+At time $t+1$, the agent outputs action $a_{t+1} = \text{\textit{MoveRight}}$.
+However, if the environment applies the sticky action and overrides the action, then $a_{t+1} = \text{\textit{MoveLeft}}$, and the agent moves to the left even further.
 The presence of a non-zero sticky action probability adds stochasticity to environments and changes the set of optimal polices.
-For example, in Space Invaders, if sticky action probability is 0, then the agent can move away from enemy bullets one frame before the agent is about to get hit.
-However, with a sticky action probability 10\%, moving away one frame in advance means there's a 10\% chance that the agent will die, and moving away two frames in advance means there's a $(10\% * 10\%) = 1\%$ chance that the agent will die two frames later.
-We observe that a MooZi agent trained in Space Invaders with a sticky actions probability moves away from an enemy bullet right after the bullet is visible on the screen.
+For example, in \textit{Space Invaders}, if sticky action probability is 0, then the agent can move away from enemy bullets just in time, one frame before the agent is about to get hit.
+However, with a sticky action probability of 10\%, moving away one frame in advance means there's a 10\% chance that the agent will die, and moving away two frames in advance means there's a $(10\% * 10\%) = 1\%$ chance that the agent will die two frames later.
+We observe that a MooZi agent trained in \textit{Space Invaders} with a 10\% sticky action probability moves away from an enemy bullet right after the bullet becomes visible on the screen.
 \citeauthor{MinAtarAtariInspiredTestbed_Young.Tian_2019} shipped the MinAtar environments with four algorithms including two variants of DQN and two variants of Actor-Critic (AC) method.
-MinAtar's paper only reports Breakout results with sticky action probability of 10\% and Gymnax only reports Breakout results without sticky action probability.
+The MinAtar paper \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019} only reports \textit{Breakout} results with a sticky action probability of 10\%.
+Gymnax only reports \textit{Breakout} results without sticky action probability.
 We compare with MinAtar and Gymnax in their respective testing environments using the same MooZi agent configuration.
 Figure \ref{fig:experiments_breakout_w_wo_sticky_actions} shows the comparison.
+We use the final average returns of PPO and AC reported in Gymnax and MinAtar's paper respectively.
+In \textit{Breakout} with sticky actions, MooZi learns more slowly and the final average return is much lower.
+In \textit{Breakout} without sticky actions, MooZi quickly learns a near-optimal policy and never fails to return the ball.
+In both environments, MooZi out-performs the other algorithm.
 
-\includeimage{experiments_breakout_w_wo_sticky_actions}{
-    \textbf{MinAtar Breakout with or without sticky actions. MooZi vs PPO vs AC.}
-    We use the final average returns of PPO and AC reported in Gymnax and MinAtar's paper respectively.
-    In Breakout with sticky actions, MooZi learns slower and the final average return is much lower.
-    In Breakout without sticky actions, MooZi quickly learns a near-optimal polices and never fails to return the ball.
-    In both environments, MooZi out-performs the other algorithm.
-}
+\includeimage[0.7]{experiments_breakout_w_wo_sticky_actions}{
+    \textbf{MooZi vs PPO vs AC in \textit{Breakout}. Plot of environment frames used in training (x-axis, in unit of \num{1.0e7} frames) vs average return (y-axis).}
+}{}
 
-\section{Search Budget and Testing Strength}
-We use the trained MooZi model in Space Invaders environment to evaluate its strength using different number of simulations.
-We only use model checkpoints from the first 3 million environment frames because after that the agent behaviors optimally even just using the prior to act.
-For each of these checkpoints, we runs a testing worker to collect 30 episodes and we calculate the average return of these episodes.
-The testing worker uses the same planner configuration as the testing worker in \ref{sec:planner_config} except for the number of simulations.
+\section{Testing Strength when Scaling the Search Budget}
+We use the trained MooZi model in the \textit{Space Invaders} environment to evaluate its strength while varying the different number of simulations.
+We only use model checkpoints from the first 3 million environment frames because after that the agent behaviors optimally even when using the prior policy to act.
+For each of these checkpoints, we run a testing worker to collect 30 episodes and compute the average return of these episodes.
+The testing worker uses the same planner configuration as the testing worker in Section \ref{sec:planner_config} except for the number of simulations.
 Figure \ref{fig:experiments_space_invaders_vs_simulations} shows the result.
-
+We observe that with a greater number of simulations, the agent tends to perform better.
+With more training, the agent always perform better.
+The difference of performance due to simulation count seems to be smaller than the difference due to training.
+For example, with 2.5 million frames of training, acting using 64 simulations gives an average return around 70.
+With 3 million frames of training, acting according to the prior (1 simulation) does even better and gives an average return around 75.
+The prior policy, with a bit more training, quickly catches up to or even exceeds the deep search policy with less training.
+This finding aligns with the analysis by \citeauthor{ROLEPLANNINGMODELBASED_Hamrick.Friesen.ea_2021} \cite{ROLEPLANNINGMODELBASED_Hamrick.Friesen.ea_2021}:
+the planner contributes more to the algorithm by \textit{generating better data for training the model} rather than \textit{exploiting the model for better testing}.
 \includeimage[1]{experiments_space_invaders_vs_simulations}{
     \textbf{Agent strength with different number of simulations.}
-    We observe that with a greater number of simulations, the agent tends to perform better.
-    With more training, the agent always perform better.
-    The difference of performance due to simulation count seems to be smaller than the difference due to training.
-    For example, with 2.5 million frames of training, acting using 64 simulations gives an average return around 70.
-    With 3 million frames of training, acting according to the prior (1 simulation) does even better and gives an average return around 75.
-    The prior policy, with a bit more training, quickly catches up to or even exceeds the deep search policy with less training.
-    This finding aligns with the analysis by \citeauthor{ROLEPLANNINGMODELBASED_Hamrick.Friesen.ea_2021} \cite{ROLEPLANNINGMODELBASED_Hamrick.Friesen.ea_2021}:
-    the planner contributes more to the algorithm by \textit{generating better data for training the model} rather than \textit{exploiting the model for better testing}.
-}
+}{}
 
-Gymnax's results were based on environments variants without sticky actions, while the original MinAtar environments have a default sticky action probability of 10\%.
 
-\subsection{Sample Efficiency with Reanalyze} \label{sec:exp:re}
+\subsection{Improving Sample Efficiency with Reanalyze} \label{sec:exp:re}
+We run three sets of parameters of MooZi, each with three experiments in the MinAtar \textit{Asterix} environment.
+We configure training workers and reanalyze workers to generate the exact same amount of training targets for each training step.
+We control the total number of generated training targets and network updates per training step by fixing the sum of number of training workers and reanalyze workers to 20.
+The parameter set \textit{20 : 0} indicates 20 training workers and 0 reanalyze worker.
+This set is the same as the experiments shown in Section \ref{sec:exp:minatar}.
+The parameter set \textit{16 : 4} uses 16 training workers and 4 reanalyze workers.
+Similarly, the parameter set \textit{12 : 8} uses 12 training workers and 8 reanalyze workers.
+We also fix the total environments frames to be 10 million.
+Under this setting, parameter sets with more reanalyze workers take more time to run, as they consume environment frames budget more slowly.
+Figure 
+
+\subsection{Two Player Game Breakthrough through Self-play}
+\subsection{Search Analysis}
+\subsubsection{Q-values}
+\subsubsection{Multi-step Reward}
+\subsubsection{Dummy Action}
+
+\subsection{Visualizing Hidden space of the Learned Representation}
+We visualize the hidden 
+
+\subsubsection{}

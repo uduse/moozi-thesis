@@ -1,4 +1,32 @@
+\setcounter{page}{2}
+
+% FGSR Minimum Thesis Formatting Requirements
+% As of April 3, 2014
+
+% The abstract is a concise and accurate summary of the thesis. It states the problem that was
+% researched, the methods of investigation, and the general conclusions. An abstract must not
+% contain non-text content, such as tables, graphs, complex equations, or illustrations. Even for
+% theses containing journal articles, there is one single abstract for the entire work, included
+% within the preliminary pages (front pages) of the thesis. For any thesis that is permitted to be
+% written in a language other than English, two abstracts must be included; the first in English and
+% the second in the language of the thesis. The font used for the abstract must be at least a 10
+% point font, with the text double-spaced, to ensure readability. A strict maximum word count of 700
+% words applies, regardless of whether the abstract is for a master's or a doctoral degree (many
+% abstracts are 300-500 words).
+
 \begin{abstract}
+    \doublespacing
     \addchaptertocentry{\abstractname}
-    The Thesis Abstract is written here (and usually kept to just this page). The page is kept centered vertically so can expand into the blank space above the title too\ldots
+    
+    \noindent The intent of this thesis is to develop a high-performance open-source system that plans with a learned model and to understand the algorithm through extensive analysis.
+    We formulate the problem of maximizing accumulated rewards in Markov Decision Processes, and we frame playing games as such problems.
+    We develop the MooZi system to solve these problems.
+    MooZi includes
+    (1) a MuZero-based algorithm that plans with a learned model 
+    (2) a distributed system that trains and evaluates the algorithm efficiently, and
+    (3) a collection of tools to visualize and understand the algorithm.
+    We empirically show that MooZi outperforms PPO and AC in both deterministic and non-deterministic MinAtar environments.
+    We also show that MooZi learns to play the two-player board game breakthrough.
+    We use our tools to analyze the learned model by visualizing its search tree and learned representation.
+    We make the MooZi system publicly available to accelerate future research.
 \end{abstract}

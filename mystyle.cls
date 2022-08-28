@@ -26,7 +26,7 @@
 %----------------------------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}[1996/12/01]
-\newcommand{\classname}{MyStyle}
+\newcommand{\classname}{mystyle}
 \ProvidesClass{\classname}[2017/08/27 v1.6 LaTeXTemplates.com]
 \providecommand{\baseclass}{book}
 \RequirePackage{etoolbox}
@@ -186,7 +186,7 @@
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[autostyle=true]{csquotes}
 \usepackage{minted}
-\newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black,inline]{~~ #1}}
+% \newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black,inline]{~~ #1}}
 \tolerance=1
 \emergencystretch=\maxdimen
 \hyphenpenalty=10000
@@ -210,7 +210,7 @@
 \RequirePackage{siunitx} % Required for \SI commands
 
 \RequirePackage{graphicx} % Required to include images
-\graphicspath{{Figures/}{./}} % Specifies where to look for included images
+\graphicspath{{assets/}{./}} % Specifies where to look for included images
 
 \RequirePackage{booktabs} % Required for better table rules
 
@@ -258,7 +258,7 @@
 %	COLOURS
 %----------------------------------------------------------------------------------------
 
-\usepackage{xcolor} % Required for specifying custom colours
+\usepackage[dvipsnames]{xcolor} % Required for specifying custom colours
 
 \colorlet{mdtRed}{red!50!black}
 
@@ -422,7 +422,6 @@ KOMA-script documentation for details.}]{fancyhdr}
 %	ACKNOWLEDGEMENTS PAGE DESIGN
 %----------------------------------------------------------------------------------------
 
-\usepackage{xcolor}
 \colorlet{mdtRed}{red!50!black}
 \newcommand{\acknowledgementname}{Acknowledgements}
 \providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish} {\acknowledgementname}{Acknowledgements} % Acknowledgement text for English countries
@@ -533,11 +532,12 @@ KOMA-script documentation for details.}]{fancyhdr}
 \ifbool{hyperrefsupport}{% If the nohyperref class option has not been specified
 \AtEndPreamble{\RequirePackage{hyperref}
 \hypersetup{pdfpagemode={UseOutlines},
+linktocpage=true,
 bookmarksopen=true,
 bookmarksopenlevel=0,
 hypertexnames=false,
 colorlinks=true,% Set to false to disable coloring links
-citecolor=magenta,% The color of citations
+citecolor=CornflowerBlue,% The color of citations
 linkcolor=red,% The color of references to document elements (sections, figures, etc)
 urlcolor=mdtRed,% The color of hyperlinks (URLs)
 pdfstartview={FitV},

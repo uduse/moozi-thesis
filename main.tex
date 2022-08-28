@@ -1,130 +1,103 @@
 \documentclass[
 11pt, % The default document font size, options: 10pt, 11pt, 12pt
-%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
 english, % ngerman for German
-singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
-%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+% singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+% draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
 %nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
-%liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
-%toctotoc, % Uncomment to add the main table of contents to the table of contents
-%parskip, % Uncomment to add space between paragraphs
+liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+toctotoc, % Uncomment to add the main table of contents to the table of contents
+% parskip, % Uncomment to add space between paragraphs
 %nohyperref, % Uncomment to not load the hyperref package
 headsepline, % Uncomment to get a line under the header
-%chapterinoneline, % Uncomment to place the chapter title next to the number on one line
-%consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+% consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
 ]{mystyle} % The class file specifying the document structure
 
+\PassOptionsToClass{\CurrentOption}{\baseclass}
+
 \usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
 \usepackage{mathpazo} % Use the Palatino font by default
+
 % \usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
-
-
 \geometry{
-	paper=a4paper, % Change to letterpaper for US letter
+	paper=letterpaper, % Change to letterpaper for US letter
 	inner=2.5cm, % Inner margin
-	outer=3.8cm, % Outer margin
+	outer=2.5cm, % Outer margin
 	bindingoffset=.5cm, % Binding offset
-	top=1.5cm, % Top margin
-	bottom=1.5cm, % Bottom margin
-	%showframe, % Uncomment to show how the type block is set on the page
+	top=2cm, % Top margin
+	bottom=2.5cm, % Bottom margin
+	% showframe, % Uncomment to show how the type block is set on the page
 }
-
-
 
 \usepackage{amsfonts}
 \usepackage{amsmath}
-\usepackage{xcolor}
-\usepackage{todonotes}
 \usepackage{pythonhighlight}
-\usepackage{fancyvrb}
-\usepackage{hyperref}
-\hypersetup{linktocpage}
 
 % define command for grey colored text
-% \newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
+\newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
 \usepackage[font=small,labelfont=bf]{caption}
 
 \newcommand{\includecode}[2]{
 \begin{listing}[H]
-    \inputminted[frame=single, framesep=5pt, fontsize=\scriptsize]{python}{src/#1.py}
+    \inputminted[frame=single, framesep=5pt, fontsize=\footnotesize]{python}{src/#1.py}
     \caption[]{#2}
     \label{code:#1}
 \end{listing}   
 }
 \renewcommand\listingscaption{Algorithm}
 
-\newcommand{\includeimage}[3][1]{
+\newcommand{\includeimage}[4][1]{
 \begin{figure}
     \captionsetup{width=\textwidth}
     \centering
     \includegraphics[width=#1\textwidth, height=#1\textheight, keepaspectratio]{assets/#2.png}
-    \caption[]{#3}
+    \caption[#3]{#3#4}
     \label{fig:#2}
 \end{figure}
 }
 
 \newcommand{\argmax}[1]{\operatorname*{argmax}_{#1}}
 
-\usepackage{tikz}
-\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
-            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+% \usepackage{tikz}
+% \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+%             \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+\newcommand*\circled[1]{(#1)}
 
 % bibilography management
 \usepackage[style=numeric]{biblatex}
 \addbibresource{main.bib}
 
-% ====================================================================
-% THESIS INFORMATION
-% ====================================================================
-\thesistitle{High Performance Game-playing System that Plans with a Learned Model} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
-\supervisor{Martin Müller} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
-\examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
-\degree{Master of Science (Thes)} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
-\author{Zeyi Wang} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
-\addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
-
-\subject{Artificial Intelligence} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
-\keywords{} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
-\university{\href{https://www.ualberta.ca/index.html}{University of Alberta}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
-\department{\href{https://www.ualberta.ca/computing-science/index.html}{Department or Computing Science}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
-% \group{\href{http://researchgroup.university.com}{Research Group Name}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
-% \faculty{\href{http://faculty.university.com}{Faculty Name}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
-
-\AtBeginDocument{
-\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
-\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
-\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
-}
+\input{tex/info.tex}
 
 \begin{document}
-\listoftodos
 
+\frontmatter
+\pagestyle{plain}
 \include{tex/title.tex}
 \include{tex/abstract.tex}
 \include{tex/preface.tex}
 \include{tex/dedication.tex}
 \include{tex/declaration.tex}
 \tableofcontents
-% \include{tex/summary_of_notation.tex}
-
-\listoftables % Prints the list of tables
-\listoffigures % Prints the list of figures
+\listoftables
+\listoffigures
 \include{tex/symbols.tex}
 
-
-\mainmatter % Begin numeric (1,2,3...) page numbering
-\pagestyle{thesis} % Return the page headers back to the "thesis" style
+\mainmatter
+\pagestyle{thesis}
 \include{tex/introduction.tex}
 \include{tex/literature_review.tex}
 \include{tex/problem_definition.tex}
 \include{tex/method.tex}
 \include{tex/experiments.tex}
-
-\chapter{Conclusion}
-\note{(3 pages)}
-\chapter{Future Work}
-\note{(1 page)}
+\include{tex/conclusion.tex}
+% \include{tex/future_workrs.tex}
 
 % \appendix
 
@@ -136,21 +109,3 @@ headsepline, % Uncomment to get a line under the header
 \printbibliography
 
 \end{document}
-
-% \subsection*{Artificial Intelligence}
-
-% % Artificial Intelligence (AI) is a branch of computer science that emphasizes the use of computer algorithms to solve problems likes humans.
-% To define the goals and methods of Artificial Intelligence (AI), we first need to define what is \textit{intelligence}.
-% Though there is no consensus on the exact definition of intelligence, here we adopt the definition by John McCarthy:
-% \begin{quote}
-%     Intelligence is the computational part of the ability to achieve goals in the world.
-% \end{quote}
-% The goal of AI is to develop computer algorithms that can solve problems and achieve goals in complex environments.
-% A diverse range of methods are designed as AI algorithms since the term has been coined.
-% \note{A simple list of AI algorithms, such as A*, symbolic}
-
-
-% \subsection*{Game Artificial Intelligence}
-% Perfect vs in-Perfect information
-% \subsection*{Planning}
-% lookahead search: A*, DFS, BFS

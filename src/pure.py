@@ -23,4 +23,4 @@ x = jnp.ones((n, 1))
 params = model.init(jax.random.PRNGKey(0), x)
 
 # perform the forward pass
-out = model.apply(params, x)
+y = model.apply(params, x)

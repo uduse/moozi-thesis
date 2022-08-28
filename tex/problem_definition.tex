@@ -2,52 +2,70 @@
 
 \section{Markov Decision Process and Agent-Environment Interface} \label{sec:markov}
 A RL problem is usually represented as a \textbf{Markov Decision Process (MDP)}.
-MDP is four-tuple $(\mathcal{S}, \mathcal{A}, R, P)$.
+MDP is defined as a four-tuple $(\mathcal{S}, \mathcal{A}, R, P)$.
 $\mathcal{S}$ is a set of states that forms the \textbf{state space}.
-$\mathcal{A}$, is a set of actions that forms the \textbf{action space};
-$P(s, a, s') = Pr[ s_{t+1} = s' \mid  s_t = s, a_t = a]$ is the \textbf{transition probability function}.
+$\mathcal{A}$ is a set of actions that forms the \textbf{action space};
+$P(s' | s, a) = \operatorname{Pr}[ s_{t+1} = s' \mid  s_t = s, a_t = a]$ is the \textbf{transition probability function}.
 $R(s, a, s')$ is the \textbf{reward function}.
-We use the \textbf{agent-environment interface} to solve a problem formulated as an MDP.
-Figure \ref{fig:agent_environment_interface} illustrates the agent-environment interface.
+We use the \textbf{agent-environment interface} (as in Figure \ref{fig:agent_environment_interface}) to solve a problem formulated as an MDP.
 The MDP is represented as the \textbf{environment}.
 The decision maker that interacts with the environment is called the \textbf{agent}.
 At each time step $t$, the agent starts at state $s_t \in \mathcal{S}$, takes an action $a_t \in \mathcal{A}$,
 transitions to state $s_{t+1} \in \mathcal{S}$ based on the transition probability function $P(s_{t+1} \mid s_t, a_t)$
-and receives a reward $R(S_t, A_t, S_{t+1})$.
+and receives a reward $R(s_t, a_t, s_{t+1})$.
 These interactions yield a sequence of actions, states, and rewards $s_{0}, a_{0}, r_{1}, s_{1}, a_{1}, r_{2}, \dots$.
 We call this sequence a \textbf{trajectory}.
 When a trajectory ends at a terminal state $s_T$ at time $t = T$, this sequence is completed and we called it an \textbf{episode}.
 Figure \ref{fig:agent_environment_interface} illustrates the interaction between the agent and the environment.
 
-\includeimage[0.7]{agent_environment_interface}{
-    \textbf{The Agent-Environment Interface, from \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}}.
-}
-\note{my notation is messed up but I will fix them later for sure.}
+\includeimage[0.7]{agent_environment_interface}{\textbf{The Agent-Environment Interface, from \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}}.}{}
 
 
 \section{Policies and Value Functions} \label{sec:policies_and_functions}
 At each state $s$, then agent takes an action based on a \textbf{policy} $\pi(a \mid s)$.
-This policy represents the conditional probability of the agent taking an action given a state $\pi(a \mid s) = Pr[ a_{t} = a \mid  s_t = s]$.
-The agent maximizes the expected discounted sum of rewards from the current state $s_t$ following the policy $\pi$
-\begin{align*}
-    \label{eq:maximize_reward_undiscounted}
-    \text{maximize} ~~~~  & \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] , ~~~~ \forall s \in \mathcal{S}  \\
-    G_t                   & = \sum_{k=0}^{T} \gamma^{k} r_{t+k+1} ~~~~ .
-\end{align*}
+This policy represents the conditional probability of the agent taking an action given a state, and $\pi(a \mid s) = Pr[ a_{t} = a \mid  s_t = s]$.
+The objective of the agent is to maximize the expected discounted sum of rewards from the current state $s_t$ following the policy $\pi$
+\begin{align}
+    \text{maximize} ~~~~  & \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] , ~~~~ \forall s \in \mathcal{S} \label{eq:maximize_return} \\
+    G_t                   & = \sum_{k=0}^{T} \gamma^{k} r_{t+k+1} ~~~~ . 
+\end{align}
 Here $\gamma$ is the discount factor to favor short-term rewards.
-$G$ is the discounted sum of rewards, or, equivalently, the discounted return.
-We represent the maximization target above as the \textbf{value function} $V$ 
+$G$ is the discounted sum of rewards, or, equivalently, the discounted \textbf{return}.
+We represent the maximization target above as the \textbf{value function} $V$
 \begin{align*}
     V_\pi(s) = \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] ~~.
 \end{align*}
-The value function tells us how good a state is following the policy $\pi$.
+The value function indicates how good a state is following the policy $\pi$.
 Similarly, we define the \textbf{state-action value function}
 \begin{align*}
     Q_\pi(s, a) = \mathbb{E}_{\pi}\left[ G_t \mid s_t = s, a_t = a \right]  \\
 \end{align*}
-that tells us how good a state and action pair is.
+that indicates how good a state and action pair is.
+We define the $N$-step return as a proxy of the true return, bootstrapped from a value function of a future state
+\begin{align*}
+    G^N_t = \sum_{k=0}^{N - 1} \gamma^{k} r_{t+k+1} + \gamma^{N} V(s_{t+N}) ~~ .
+\end{align*}
 
+\section{Partially Observable Markov Decision Process} \label{sec:pomdp}
+A generalization of MDP is a Partially Observable Markov Decision Process (POMDP) \cite{OptimalControlMarkov_Astrom_1965}.
+In addition to the four-tuples of MDP, POMDP also defines $\Omega$, a set of observations $o$ that forms the \textbf{observation space}; and $O(o \mid s, a) = \operatorname{Pr}[o_t \mid s_t = s, a_t = a]$, the conditional probability of observing $o_t$ given the last taken action $a_t$ and state $s_t$.
+In an agent-environment interface with a POMDP represented environment, the true environment state $s_t$ at each timestep is hidden from the agent and the agent only receives a partial observation $o_t$.
 
+\section{Game Playing}
+We can represent board games and video games as POMDPs and solve them by developing an agent.
+Many board games, such as Go and chess, are fully observable and we treat them as the special case where $o_t = s_t$.
+Video games, however, are partially observable since frames rendered on the screen do not contain all information of the program's running memory.
+In Go, chess, and Shogi, the only reward is given from the last timestep based on the game result, and the reward is one if $\{-1, 0, +1\}$.
+In Atari games, environments produce intermediate rewards based on game progression, and the scale and density of the rewards varies from game to game.
+In all cases, the goal of the agent is to maximize the expected return as described in equation \ref{eq:maximize_return}.
+
+% \section{Models of Environments}
+% A \textbf{perfect model} is a subroutine the agent has access to that fully represents the environment dynamics.
+% For example, an board game agent has a perfect model if it has access to a full implementation of the game.
+% The agent uses the perfect model to try out actions and the perfect model tells the agent the exact state changes after applying the actions.
+% In 
+
+% \section{General Game Playing}
 
 % \note{also describes policy $\pi$}
 % \note{address this is the most common formulation and how different libraries implement the interface}

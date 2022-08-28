@@ -1,66 +1,6 @@
-\begin{symbols}{lll} % Include a list of Symbols (a three column table)
-
-    $a$ & distance & \si{\meter} \\
-    $P$ & power & \si{\watt} (\si{\joule\per\second}) \\
-    %Symbol & Name & Unit \\
-
-    \addlinespace % Gap to separate the Roman symbols from the Greek
-
-    $\omega$ & angular frequency & \si{\radian} \\
-
-\end{symbols}
-
-
-\begin{tabular}{| r  l  r |}
-    \hline
-    \textbf{Symbol} & \textbf{Description}                   & \textbf{Reference}                       \\
-    \hline
-    $s$             & state                                  & \ref{sec:markov}                         \\
-    $a$             & action                                 & \ref{sec:markov}                         \\
-    $r$             & reward                                 & \ref{sec:markov}                         \\
-    $t$             & timestep                               & \ref{sec:markov}                         \\
-    $T$             & terminal timestep                      & \ref{sec:markov}                         \\
-    $\gamma$        & discount                               & \ref{sec:markov}                         \\
-    $o$             & partially observable environment frame                                            \\
-    $G$             & N-step return                          & \ref{sec:policies_and_functions}         \\
-    $G^N$           & N-step return                          & \ref{sec:policies_and_functions}         \\
-    $V$             & value function                         & \ref{sec:policies_and_functions}         \\
-    $Q$             & state-action value function            & \ref{sec:policies_and_functions}         \\
-    $\delta$        & TD-error or value diff                 & \ref{sec:replay}                         \\
-    $\mathcal{A}^e$ & environment action space               & \ref{sec:a_aug}                          \\
-    $\mathcal{A}^a$ & agent action space                     & \ref{sec:a_aug}                          \\
-    $\mathcal{S}$   & state space                                                                       \\
-    $\mathcal{O}$   & observation space                                                                 \\
-    $\mathcal{T}_t$ & step sample                            & \ref{sec:targets}                        \\
-    $\mathcal{T}$   & trajectory sample                                                                 \\
-    $\mathcal{L}$   & loss function                                                                     \\
-
-    \hline
-    $\mathbf{x}$    & hidden state                                                                      \\
-    $h$             & representation function                                                           \\
-    $g$             & dynamics function                                                                 \\
-    $f$             & prediction function                                                               \\
-    $\varrho$       & projection function                                                               \\
-    $v^i$           & value prediction                                                                  \\
-
-    \hline
-    $B$             & batch size                                                                        \\
-    $H$             & height                                 & \ref{sec:env_bridge}                     \\
-    $W$             & width                                  & \ref{sec:env_bridge}                     \\
-    $C_e$           & environment channels                   & \ref{sec:env_bridge}                     \\
-    $C_h$           & history channels                       & \ref{sec:history_stacking}               \\
-    $C_x$           & hidden space channels                  &                                          \\
-    $K$             & number of unrolled steps               & \ref{sec:targets}                        \\
-    $L$             & history length                         & \ref{sec:targets}                        \\
-    $N$             & bootstrap length for N-step return     & \ref{sec:targets}                        \\
-    $A$             & dimension of action                                                               \\
-    \hline
-    $Z$             & support of the scalar transformation   & \ref{sec:scalar_transform}, \ref{sec:nn} \\
-\end{tabular}
-
 \begin{symbols}{| r  l  r |}
     \hline
-    \textbf{Symbol} & \textbf{Description}                   & \textbf{Reference}                       \\
+    \textbf{Symbol} & \textbf{Description}                   & \textbf{Section}                       \\
     \hline
     $s$             & state                                  & \ref{sec:markov}                         \\
     $a$             & action                                 & \ref{sec:markov}                         \\
@@ -68,7 +8,7 @@
     $t$             & timestep                               & \ref{sec:markov}                         \\
     $T$             & terminal timestep                      & \ref{sec:markov}                         \\
     $\gamma$        & discount                               & \ref{sec:markov}                         \\
-    $o$             & partially observable environment frame                                            \\
+    $o$             & partially observable environment frame & \ref{sec:pomdp}                          \\
     $G$             & N-step return                          & \ref{sec:policies_and_functions}         \\
     $G^N$           & N-step return                          & \ref{sec:policies_and_functions}         \\
     $V$             & value function                         & \ref{sec:policies_and_functions}         \\
@@ -76,31 +16,33 @@
     $\delta$        & TD-error or value diff                 & \ref{sec:replay}                         \\
     $\mathcal{A}^e$ & environment action space               & \ref{sec:a_aug}                          \\
     $\mathcal{A}^a$ & agent action space                     & \ref{sec:a_aug}                          \\
-    $\mathcal{S}$   & state space                                                                       \\
-    $\mathcal{O}$   & observation space                                                                 \\
+    $\mathcal{S}$   & state space                            & \ref{sec:markov}                         \\
+    $\mathcal{O}$   & observation space                      & \ref{sec:markov}                         \\
     $\mathcal{T}_t$ & step sample                            & \ref{sec:targets}                        \\
-    $\mathcal{T}$   & trajectory sample                                                                 \\
-    $\mathcal{L}$   & loss function                                                                     \\
+    $\mathcal{T}$   & trajectory sample                      & \ref{sec:targets}                        \\
+    $\mathcal{L}$   & loss function                          & \ref{sec:loss}                           \\
 
     \hline
-    $\mathbf{x}$    & hidden state                                                                      \\
-    $h$             & representation function                                                           \\
-    $g$             & dynamics function                                                                 \\
-    $f$             & prediction function                                                               \\
-    $\varrho$       & projection function                                                               \\
-    $v^i$           & value prediction                                                                  \\
+    $\mathbf{x}$    & hidden state                           & \ref{sec:nn}                             \\
+    $h$             & representation function                & \ref{sec:nn}                             \\
+    $g$             & dynamics function                      & \ref{sec:nn}                             \\
+    $f$             & prediction function                    & \ref{sec:nn}                             \\
+    $\varrho$       & projection function                    & \ref{sec:nn}                             \\
+    $v$             & value prediction                       & \ref{sec:nn}                             \\
+    $\hat{r}$       & reward prediction                      & \ref{sec:nn}                             \\
+    $\mathbf{p}$    & policy prediction                      & \ref{sec:nn}                             \\
+    $Z$             & support of the scalar transformation   & \ref{sec:scalar_transform}, \ref{sec:nn} \\
 
     \hline
-    $B$             & batch size                                                                        \\
+    $B$             & batch size                             & \ref{sec:history_stacking}               \\
     $H$             & height                                 & \ref{sec:env_bridge}                     \\
     $W$             & width                                  & \ref{sec:env_bridge}                     \\
     $C_e$           & environment channels                   & \ref{sec:env_bridge}                     \\
     $C_h$           & history channels                       & \ref{sec:history_stacking}               \\
-    $C_x$           & hidden space channels                  &                                          \\
+    % $C_x$           & hidden space channels                  &                                          \\
     $K$             & number of unrolled steps               & \ref{sec:targets}                        \\
     $L$             & history length                         & \ref{sec:targets}                        \\
     $N$             & bootstrap length for N-step return     & \ref{sec:targets}                        \\
-    $A$             & dimension of action                                                               \\
+    % $A$             & dimension of action                                                               \\
     \hline
-    $Z$             & support of the scalar transformation   & \ref{sec:scalar_transform}, \ref{sec:nn} \\
 \end{symbols}

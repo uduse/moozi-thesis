@@ -1,42 +1,44 @@
 \chapter{Introduction} \label{sec:intro}
 
+\note{add references}
 \textbf{Deep Learning (DL)} is a branch of \textbf{Artificial Intelligence (AI)} that emphasizes the use of neural networks to fit any arbitrary function represented by a dataset.
 The training of a neural network is done by computing a loss function from a batch of data, back-propagate gradients with respect to the loss, and updates weights and biases based on the gradients.
 Deep learning techniques have been widely adopted in many domains, including computer vision, natural language processing, and robotics.
 
-\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes on solving decision making problems through trials and errors with delayed rewards.
-RL had most success in the domain of \textbf{game playing}, in which the algorithm is represented as an \textbf{agent} and interacts with the game environments, such as boardgames and Atari games.
+\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes solving decision making problems with delayed rewards through trials and errors.
+RL had most success in the domain of \textbf{game playing} \cite{MasteringGameGo_Silver.Schrittwieser.ea_2017}, in which the algorithm is represented as an \textbf{agent} and interacts with game environments, such as board games and Atari games.
 An extension to game playing is \textbf{general game playing (GGP)}, whose goal is to design a single agent that can play many different games without having much prior knowledge of the games.
 
-\textbf{Deep Reinforcement Learning (DRL)} is a rising branch that combines DL and RL to solve decision making problems.
-In a DRL system, the RL techniques lay out the structure of the algorithm such as the use the \textbf{agent-environment interface}, a value function, a reward signal, e.t.c., while the DL techniques are used approximate specific functions and learn representations.
+\textbf{Deep Reinforcement Learning (DRL)} is a rising research area that combines DL and RL to solve decision making problems.
+In a DRL system, the RL techniques lay out the structure of the algorithm such as the use of the \textbf{agent-environment interface}, a value function, a reward signal, e.t.c., while the DL techniques are used to approximate value functions and learn representations.
 
 \textbf{Planning} refers to any computational process that analyzes generated actions and their consequences in an environment.
-In the RL terms, planning specifically means the use of a model to improve a policy.
-In boardgames where perfect models are accessible, planning with these models yield great performance.
-The most significant achievement of planning with a perfect model is AlphaGo beating human champion in Computer Go.
-However, how to plan in games where no perfect models available remains a challenging problem to researchers.
+In RL terms, planning means the use of a model to improve a policy.
+In board games where perfect models are accessible, planning with these models yields great performance.
+The most significant achievement of planning with a perfect model is AlphaGo beating human champions in Computer Go.
+However, how to plan in games where no perfect models are available remains a challenging problem to researchers.
 
-A \textbf{distributed system} is a computer system that uses multiple processes with various purposes to complete tasks.
+A \textbf{concurrent computing system} utilizes concurrency through multiple processes or computer nodes to complete tasks.
 DRL systems for solving large problems are both data and compute intensive.
-Utilizing concurrency to increase efficiency and throughput for these DRL systems are sometimes necessary.
-Building a distributed system to achieve such concurrency is a common practice in the industry but requires significant engineering effort.
+Utilizing concurrency to increase efficiency and throughput for these DRL systems is sometimes necessary.
+Building a concurrent computing system to achieve such concurrency is a common practice in the industry, but requires significant engineering effort.
 
 \section{Motivation}
-\citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed MuZero, an algorithm that plans with a learned model (\ref{sec:muzero}).
-This algorithm achieved the state-of-the-art in playing both Atari games and boardgames.
+\citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed MuZero \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, an algorithm that plans with a learned model (reviewed in section \ref{sec:muzero}).
+This algorithm achieved state-of-the-art performance in playing both Atari games and board games.
 However, the source code of the algorithm is not publicly available, and the pseudo-code provided with the paper isn't sufficient to reproduce the full algorithm.
-Moreover, MuZero requires much more computations than other model-free RL algorithms, and an inefficient implementation will drastically slows down experimentation.
-We need an efficient and publicly available implementation of an algorithm that plans with a learned model.
-This helps researchers understand how does the algorithm plan with its learned model, and facilitates future research.
+Moreover, MuZero requires much more computation than other RL algorithms, and an inefficient implementation will drastically slow down experimentation.
+The algorithm learns a model using a neural network, and such a model, like other applications using neural networks, is impossible to understand with a casual glance of the learned weights.
+We need a publicly available efficient implementation of an algorithm that plans with a learned model and tools that help us understand the learned model.
+This helps researchers understand how the algorithm plans with its learned model, and facilitates future research.
 
-\section{Contribution}
+\section{Contributions of this Thesis}
 In this thesis we present the project \textbf{MooZi}, a system that play games by planning with a learned model.
 This project includes:
 \begin{itemize}
-    \item A collection of environments bridges that connect the system to various common RL environments.
-    \item Neural networks that learns representation and can be used for planning.
+    \item A collection of environment bridges that connect the system to common RL environments such as MinAtar \cite{MasteringAtariGames_Ye.Liu.ea_2021}, Atari \cite{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013a}, and OpenSpiel \cite{OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020}.
+    \item Neural networks that learn a representation and can be used for planning.
     \item A MCTS based planner that uses the learned model to perform planning.
-    \item A distributed training system that efficiently trains the algorithm.
-    \item A thesis with empirical studies and analysis.
+    \item A concurrent computing system that efficiently trains the model.
+    \item Empirical studies and analysis of the system using MinAtar and OpenSpiel.
 \end{itemize}

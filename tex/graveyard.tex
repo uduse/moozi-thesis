@@ -39,3 +39,8 @@
 
 % \subsubsection{Advantages}
 % \note{pure functions are efficient}
+
+% See \ref{code:training_worker} for the pseudo-code of this process.
+% The planner of these workers are configured to have more exploration to generate more diverse data.
+% The exploration is encouraged by setting a greater \Verb|dirichlet_fraction|, a greater \Verb|dirichlet_alpha|, and a greater \Verb|temperature|. \note{move these parameters into planner section}
+% \includecode{training_worker}{Training Worker}
