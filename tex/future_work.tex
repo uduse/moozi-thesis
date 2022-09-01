@@ -1,0 +1,16 @@
+\chapter{Future Work}
+% \moozi currently works well on 
+\moozi is an on-going project and we aim to generalize \moozi even further and support more games.
+We reported results from applying \moozi on \textit{Breakthrough}, but \moozi can run on all other two-player perfect-information deterministic games in OpenSpiel.
+We will run MooZi on all such games and hopefully using a single set of hyperparameter.
+On the planning side, it's important to handle environment stochasticity to support non-deterministic video games and board games.
+Prior work extended the MuZero algorithm with encoded random nodes \cite{VectorQuantizedModels_Ozair.Li.ea_2021,PLANNINGSTOCHASTICENVIRONMENTS_Antonoglou.Schrittwieser.ea_2022}, and it will be our top priority to extend \moozi to support stochastic environments in a similar fashion.
+Additionally, \moozi current doesn't support continuous action space and has poor support for large discrete action space.
+We can extend \moozi to support continuous action space using \textit{Sampled MuZero} \cite{LearningPlanningComplex_Hubert.Schrittwieser.ea_2021}, and reduce the memory footprint by packing them with library that specializes in handling sparse N-dimensional arrays.
+Moreover, \moozi currently handles training targets as episodes.
+Games such as \textit{Freeway} that has extremely long episodes will require special handling by setting the number of environment interactions the workers make per training step to a even larger number.
+We will unify the handling of such games using fixed sized sequences to place trajectory samples.
+Processing fix-sized sequences is also more JAX-friendly, and further speeds up the system by making search targets (\(\mathbf{p}^{*}\) and $v^{*}$) stay on GPUs or TPUs in their lifetime.
+% We can extend the use of dummy action by 
+
+
