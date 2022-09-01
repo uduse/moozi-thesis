@@ -1,0 +1,52 @@
+\chapter{Conclusion}
+
+% Chapter 6 Conclusions: This chapter should summarize the achievements of your thesis and discuss their impact on the research questions you raised in Chapter 1. Use the distinctive phrasing "An original contribution of this thesis is" to identify your original contributions to research. If you solved the specific problem described in Chapter 1, you should explicitly say so here. If you did not, you should also make this clear. You should indicate open issues and directions for further or future work in this area with your estimates of relevance to the field, importance and amount of work required.
+
+% In this thesis, we addressed the problem of recognition of structures in images using graph
+% representations and inexact graph matching. One of the main contributions of our work is to
+% express this task as a combinatorial optimization problem with constraints, and to propose
+% methods to solve it based on EDAs and their parallelization.
+% A discussion on different representations of individuals has been provided. In particular,
+% we proposed representations in both the discrete and continuous domains. Some of the
+% constraints imposed to the matching could be introduced directly in the representations.
+% Different types of fitness functions have been presented. Our contribution here is twofold.
+% First an experimental comparison of their behavior has been performed, and second new
+% fitness functions based on probability theory have been designed.
+% The main focus of our thesis was on the optimization itself. A new approach based
+% on estimation of distribution algorithms was introduced for solving the graph matching
+% problem. Its foundations rely on an evolutionary computation paradigm that applies learning
+% and simulation of probabilistic graphical models (i.e. Bayesian networks in the discrete
+% domain and Gaussian networks in the continuous one) as an important part of the search
+% process. Our contribution in this part was to adapt these algorithms to the inexact graph
+% matching problem with constraints, which to our knowledge have never been addressed
+% before. In particular we proposed original solutions to take the constraints into account.
+% This contribution can certainly be exploited in other combinatorial optimization problems
+% with constraints, thereby enlarging the potential application field of EDAs.
+% Finally another contribution relies in the parallelization of EDAs. Up-to-date parallelization techniques have been applied to these algorithms, resulting in two different programs
+% suitable for execution on multiprocessors with shared memory and cluster of workstations
+% under windows or GNU-Linux systems. The use of shared memory libraries with threads
+% –using pthreads– as well as high-level parallelization libraries based on message passing –such
+% as MPI– have been analyzed in detail. The particular case of EBNABIC has been detailed,
+% and each of its steps has been analyzed in terms of parallelization and computation costs. A
+% parallel version of this algorithm is proposed for the BIC metric. This contribution allows
+% now to use EDAs to solve problems with higher complexity.
+% 149
+% 8.2 Future work
+% From an experimental point of view, our contribution lies in the comparison of the performance of EDAs in both discrete and continuous domains with other evolutionary computation techniques such as genetic algorithms and evolutionary strategies. These experiments
+% were performed for the different types of individual representations, different types of fitness
+% functions, and applied to synthetic and real graph matching problems. Results show that
+% our approach obtains better results and that converge to a solution by having to evaluate
+% less individuals than other more usual evolutionary computation methods such as genetic
+% algorithms. These differences in the results have been proved to be statistically significant
+% after applying non-parametric tests.
+
+In this thesis, we present \moozi, a high performance game-playing system that plans with a learned model.
+
+We developed a MuZero-based learning algorithm using the JAX ecosystem.
+We parallelized the algorithm using Ray and a hierarchical control architecture.
+We empirically showed that \moozi learns a model and plans with the model in two different domains.
+In \textit{MinAtar} environments, the agent fight enemies or collect resources and gain rewards along the way.
+In these environments, \moozi achieved a greater average return than PPO and AC.
+In a two-players board game, the goal of the agent is to beating the other agent in opposition.
+We trained \moozi in \textit{Breakthrough}, and \moozi improves itself through self-play.
+We also developed tools for understanding the learned model of MooZi and we analyzed an example of \moozi planning with the learned model.  

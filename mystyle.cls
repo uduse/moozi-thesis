@@ -186,7 +186,6 @@
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[autostyle=true]{csquotes}
 \usepackage{minted}
-% \newcommand{\note}[1]{\todo[color=yellow!40,bordercolor=none,linecolor=black,inline]{~~ #1}}
 \tolerance=1
 \emergencystretch=\maxdimen
 \hyphenpenalty=10000

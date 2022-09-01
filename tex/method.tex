@@ -109,9 +109,10 @@ For all these wrapped environments, our bridges produce a flat structure for eac
           in the shape $(H, W, C_e)$. $H$ is the height, $W$ is the width, and $C_e$ is the number of channels.
           \subitem $b^{\text{first}}_{t}$: A boolean indicating the episode start.
           \subitem $b^{\text{last}}_{t}$: A boolean indicating the episode end.
+          \subitem $b^{\text{player}_{t}}$: A boolean indicating the current player. A boolean is sufficient because \moozi currently only supports environments with at most two players.
           \subitem $r_t$: A float indicating the reward of taking the given action.
           \subitem $m^{A^a}_t$: A bit mask indicating legal action indices. Valid
-          action indices are $1$ and invalid actions indices are $0$ (see Section \ref{sec:a_aug}).
+          action indices are $1$ and invalid actions indices are $0$ for non-terminal states (see Section \ref{sec:a_aug}).
           %   \note{remove this as it's not use}
 \end{itemize}
 
@@ -213,19 +214,6 @@ We process history as images this way to utilize neural network architectures th
     \textit{Stack Planes}: Stack all planes together, creating an image with 12 channels and the same resolution as the observations.
 }
 
-\subsection{Planner} \label{sec:planner}
-% The planner prepares inputs for the search, performs the search, collects search statistics, sends an action to the environment.
-The planner component $\mathcal{P}$ takes a stacked history as its input (\ref{sec:history_stacking}), performs a search, collects search statistics, and outputs a action and search statistics
-\begin{align*}
-    a_t, v^*_t, \mathbf{p}^*_t = \mathcal{P}(o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t - 1}) ~~ .
-\end{align*}
-Here $v^*_t$ is the search-updated value estimate of the root, $\mathbf{p}^*_t$ is the search-updated action visits at the root, and $a_t$ is action to take.
-Training workers (\ref{sec:train_rw}) use the full planner.
-Testing workers only use the action output from the planner.
-The planner used this way is synonymous to a policy $\pi$.
-Reanalyze workers only use the output statistics from the planner.
-Inside of the planner, we use the MuZero variant of MCTS described in \ref{sec:mcts} \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022} \cite{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022}.
-
 \subsection{MooZi Neural Network} \label{sec:nn}
 MooZi uses the JAX and Haiku libraries to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2019,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
 We also consulted other open-source projects that use neural networks to play games \cite{MuZeroGeneral_Duvaud.AureleHainaut_2022, MasteringAtariGames_Ye.Liu.ea_2021, AcceleratingSelfPlayLearning_Wu_2020}.
@@ -257,13 +245,40 @@ For acting, the neural network additionally applies the softmax function to the 
 The linear combination of the distribution and their corresponding integer values are computed and fed through the inverse transformation \( \phi^{-1}\) to produce scalar values.
 This means from the perspective of the planner (\ref{sec:planner}), the scalar estimations made by the model are in same shape and scale as those produce by the environment.
 
+\subsection{Planner} \label{sec:planner}
+% The planner prepares inputs for the search, performs the search, collects search statistics, sends an action to the environment.
+The planner component $\mathcal{P}$ takes a stacked history as its input (\ref{sec:history_stacking}), performs a search, collects search statistics, and outputs a action and search statistics
+\begin{align*}
+    a_t, v^*_t, \mathbf{p}^*_t = \mathcal{P}(o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t - 1}) ~~ .
+\end{align*}
+Here $v^*_t$ is the search-updated value estimate of the root, $\mathbf{p}^*_t$ is the search-updated action visits at the root, and $a_t$ is action to take.
+Training workers (\ref{sec:train_rw}) use the full planner.
+Testing workers only use the action output from the planner.
+The planner used this way is synonymous to a policy $\pi$.
+Reanalyze workers only use the output statistics from the planner.
+The planner uses the MuZero variant of MCTS described in \ref{sec:mcts} \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022} \cite{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022}.
+\note{New: Planner handling two-players games.}
+The planner uses the a boolean flag $b^{\text{player}}$ from the environment bridge output (described in Section \ref{sec:env_bridge}) to indicate the current player.
+In a single-player environment, this boolean flag does not affect the search.
+In a two-players environment, the planner performs a \textit{logical NOT} that flips the player along with the dynamics function \(g\) for each node expansion.
+As described in Section \ref{sec:nn}, the model is trained from the perspective of the first player.
+The planner re-orients the value and reward predictions $v, \hat{r}$ of each node based on the player of that node.
+\moozi assumes the two-players game is zero-sum, so this re-orientation is a simple sign flip.
+Once the values are correctly oriented from the perspective of the node's player, the planner uses a discount factor $\gamma = -1$ to search with alternating objective. 
+The planner also applies the legal actions mask $m^{A_a}$ so that only legal actions can be taken.
+
+\note{This trick is really hard to explain.
+If \(Q(s, a) = \hat{r} + \gamma v(s')\), and \(\gamma = -1\), then the selection is carried out in a Negamax fasion.
+Additionally, the backpropagation (especially the reward) will be oriented correctly for the player also in a Negamax fashion.
+Maybe this is not strictly Negamax, but the main idea is to "use a discount of -1 to always do a minimization over the negative values of children".}
+
 \subsection{Training Target Generation} \label{sec:targets}
-% The agent interacted with the environment by taking actions.
+\note{New: \(b^{\text{player}}\) to indicate the current player}
 At each timestep $t$, the environment provides a tuple of data as described in section (\ref{sec:env_bridge}).
 The agent interacts with the environment by performing a tree search and taking action $a_t$.
 The search statistics of the tree search are also saved, including the updated value estimate of the root action $\hat{v}_t$,
 and the updated action probability distribution $\hat{p}_t$.
-This completes one \textbf{step sample} $\mathcal{T}_t$ for timestep $t$, which is a tuple $(o_t, a_t, b^{\text{first}}_{t}, b^{\text{last}}_{t}, r_t, m^{A_a}_t, \hat{v}_t, \hat{p}_t)$.
+This completes one \textbf{step sample} $\mathcal{T}_t$ for timestep $t$, which is a tuple $(o_t, a_t, b^{\text{first}}_{t}, b^{\text{last}}_{t}, b^{\text{player}}, r_t, m^{A_a}_t, \hat{v}_t, \hat{p}_t)$.
 Once an episode concludes ($b^{\text{last}}_{T} = 1)$, all recorded step samples are gathered and stacked together.
 This yields a final trajectory sample $\mathcal{T}$ that has a similar shape to a step sample but with an extra batch dimension size $T$.
 For example, $T$ observations are stacked from shape $(H, W, C_e)$ to shape $(T, H, W, C_e)$.
@@ -273,6 +288,7 @@ The reanalyze workers generate trajectories with the same signature, but through
 Each trajectory sample with $T$ step samples is processed into $T$ training targets.
 We define $K$ as the number of unrolled steps for training.
 The larger the $K$, the deeper the search tree we train the model to align with real trajectories.
+Training targets are computed with the minimum information necessary for the loss function computation in (see Section \ref{sec:loss}) so that the precomputed training targets take up the least memory.
 We create a training target at timestep $i$ as follows:
 \begin{itemize}
     \item Observations $o_{i - L + 1}, \dots, o_{i + 1}$ where $L$ is the history stacking size.
@@ -292,12 +308,15 @@ We create a training target at timestep $i$ as follows:
     \item N-step returns $G^N_{i}, \dots, G^N_{i + K}$.
           Each N-step return is computed based on the formula
           \begin{align*}
-              G^N_{t} = \sum_{i = 0}^{N - 1}{\gamma^i r_{t+i+1}} + \gamma^Nv^*_{t + N}
+              G^N_{t} = \sum_{i = 0}^{N - 1}{\gamma^i r_{t+i+1}} + \gamma^Nv^*_{t + N} ~~ .
           \end{align*}
+
+    \item The current player $b^{\text{player}}$.
 
     \item The importance sampling ratio $\rho = 1$. This is a placeholder value for future override based on replay buffer sampling weights (see Section \ref{sec:replay}).
 \end{itemize}
-Training targets are computed with the minimum information necessary for the loss function computation in (see Section \ref{sec:loss}) so that the precomputed training targets take up the least memory.
+In both single-player and two-players environments, we train the neural network from the perspective of the first player.
+This means MooZi only supports zero-sum two-player environments because the value of the second player can be obtained by taking the negative of the value of the first player.
 
 \subsection{Loss Computation} \label{sec:loss}
 Our loss function is similar to the MuZero (see Section \ref{sec:muzero}), but with additional self-consistency loss term, terminal action loss, and value loss coefficient:
@@ -335,7 +354,7 @@ To compute the self-consistency loss $\circled{4}$, we reconstruct the initial i
 Formally,
 \begin{align*}
     \text{cosine distance} ~ (\mathbf{a}, \mathbf{b})
-                                                                     & = 1 - \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|}  \\
+                                                       & = 1 - \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|}  \\
     \mathcal{L}^s(\mathbf{x^1_t}, \mathbf{x}^0_{t+1})  & = 1 - \frac{\varrho(\mathbf{x}^1_t) \cdot \mathbf{x}^0_{t+1}}{\|\varrho(\mathbf{x}^1_t)\| \| \mathbf{x}^0_{t+1}|\|}
 \end{align*}
 Figure \ref{fig:consistency_loss} illustrates the intuition behind this loss.
@@ -374,6 +393,9 @@ Given a trajectory sample $\mathcal{T}$, for each timestep $t$ in the trajectory
 \end{itemize}
 Once the entire trajectory $\mathcal{T}$ is processed, we obtain an updated trajectory $\tilde{\mathcal{T}}$ in which only the value targets and policy targets are replaced.
 The updated trajectories are processed into training targets by the replay buffer, and used in training the same way as normally collected trajectories.
+
+% \subsection{Handling both Single-player and Two-players Environments}
+% There are 
 
 \subsection{Training Worker} \label{sec:train_rw}
 The main goal of \textbf{training workers} is to generate trajectories by interacting with environments for training purposes.

@@ -313,7 +313,6 @@ Similar to the double Q update above, a double Q update for neural networks is f
     \mathcal{L}(\theta^B)  & \propto \mathbb{E}_\pi \left[ r + \gamma Q_{\theta^A}\left(s', \argmax{a'}{Q_{\theta^B}(s', a')} \right) - Q_{\theta^B}(s, a) \right] ~~ .
 \end{align*}
 Here $Q_{\theta^A}$ and $Q_{\theta^B}$ are two sets of parameters of the same neural network architecture.
-\note{This paragraph looks redundant. Should I trim this into two sentences instead?}
 
 \subsection{Experience Replay}
 \citeauthor{PrioritizedExperienceReplay_Schaul.Quan.ea_2016} studied the role of a experience replay in DQN and developed the \textbf{prioritized experience replay} method \cite{PrioritizedExperienceReplay_Schaul.Quan.ea_2016}.
@@ -334,7 +333,6 @@ In \textbf{rank-based sampling}, the same temporal differences are calculated, b
     \text{score($i$)}  & = \left|\delta_{i}\right|+\epsilon  \\
     p_{i}              & = \frac{1}{\operatorname{rank}(\operatorname{score}(i))}
 \end{align*}
-\note{This formula looks redundant. Should I cut it?}
 \citeauthor{DistributedPrioritizedExperience_Horgan.Quan.ea_2018} followed up by implementing a distributed version of prioritized experience replay \cite{DistributedPrioritizedExperience_Horgan.Quan.ea_2018}.
 \citeauthor{RECURRENTEXPERIENCEREPLAY_Kapturowski.Ostrovski.ea_2019} investigated the challenges of using experience replays for RNN-based agents and developed \textbf{Recurrent Replay Distributed DQN} \cite{RECURRENTEXPERIENCEREPLAY_Kapturowski.Ostrovski.ea_2019}.
 

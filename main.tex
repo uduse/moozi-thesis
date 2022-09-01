@@ -4,7 +4,7 @@ oneside, % Two side (alternating margins) for binding by default, uncomment to s
 english, % ngerman for German
 % singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
 onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
-% draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
 %nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
 liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
 toctotoc, % Uncomment to add the main table of contents to the table of contents
@@ -40,8 +40,8 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \usepackage{pythonhighlight}
 
 % define command for grey colored text
-\newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
 \usepackage[font=small,labelfont=bf]{caption}
+\KOMAoptions{draft=false}
 
 \newcommand{\includecode}[2]{
 \begin{listing}[H]
@@ -62,11 +62,13 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \end{figure}
 }
 
-\newcommand{\argmax}[1]{\operatorname*{argmax}_{#1}}
+\usepackage{todonotes}
 
-% \usepackage{tikz}
-% \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
-%             \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+\newcommand{\note}[1]{\todo[bordercolor=none,linecolor=black,inline]{~~ #1}}
+% \newcommand{\note}[1]{ \textit{\textcolor{gray}{... #1 ...}} }
+\newcommand{\argmax}[1]{\operatorname*{argmax}_{#1}}
+\newcommand{\argmin}[1]{\operatorname*{argmin}_{#1}}
+
 \newcommand*\circled[1]{(#1)}
 
 % bibilography management
@@ -75,7 +77,13 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \input{tex/info.tex}
 
+\usepackage{xspace}
+
+\newcommand{\moozi}{\textit{MooZi}\xspace}
+
 \begin{document}
+
+\listoftodos
 
 \frontmatter
 \pagestyle{plain}
@@ -97,7 +105,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \include{tex/method.tex}
 \include{tex/experiments.tex}
 \include{tex/conclusion.tex}
-% \include{tex/future_workrs.tex}
+\include{tex/future_work.tex}
 
 % \appendix
 
