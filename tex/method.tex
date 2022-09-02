@@ -264,13 +264,16 @@ In a two-players environment, the planner performs a \textit{logical NOT} that f
 As described in Section \ref{sec:nn}, the model is trained from the perspective of the first player.
 The planner re-orients the value and reward predictions $v, \hat{r}$ of each node based on the player of that node.
 \moozi assumes the two-players game is zero-sum, so this re-orientation is a simple sign flip.
-Once the values are correctly oriented from the perspective of the node's player, the planner uses a discount factor $\gamma = -1$ to search with alternating objective. 
-The planner also applies the legal actions mask $m^{A_a}$ so that only legal actions can be taken.
+Once the values are oriented from the perspective of the current players of the nodes, the planner searches in a Negamax fashion by selecting nodes that maximizes the negation of $Q$ values of the edges.
+We use a discount factor $\gamma = -1$ as an implementation trick to achieve Negamax search in the planner. \note{How to cite Negamax?}
+The planner also applies the legal actions mask $m^{A_a}$ on root prior policy so only legal actions will be chosen.
+At the last timestep $T$ of any environment, the only legal action will be the dummy action.
+The planner still runs a search but will be forced to take the dummy action at the end.
 
-\note{This trick is really hard to explain.
-If \(Q(s, a) = \hat{r} + \gamma v(s')\), and \(\gamma = -1\), then the selection is carried out in a Negamax fasion.
-Additionally, the backpropagation (especially the reward) will be oriented correctly for the player also in a Negamax fashion.
-Maybe this is not strictly Negamax, but the main idea is to "use a discount of -1 to always do a minimization over the negative values of children".}
+% \note{This trick is really hard to explain.
+% If \(Q(s, a) = \hat{r} + \gamma v(s')\), and \(\gamma = -1\), then the selection is carried out in a Negamax fasion.
+% Additionally, the backpropagation (especially the reward) will be oriented correctly for the player also in a Negamax fashion.
+% Maybe this is not strictly Negamax, but the main idea is to "use a discount of -1 to always do a minimization over the negative values of children".}
 
 \subsection{Training Target Generation} \label{sec:targets}
 \note{New: \(b^{\text{player}}\) to indicate the current player}

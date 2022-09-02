@@ -4,7 +4,7 @@ oneside, % Two side (alternating margins) for binding by default, uncomment to s
 english, % ngerman for German
 % singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
 onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
-draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+% draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
 %nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
 liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
 toctotoc, % Uncomment to add the main table of contents to the table of contents
@@ -53,7 +53,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \renewcommand\listingscaption{Algorithm}
 
 \newcommand{\includeimage}[4][1]{
-\begin{figure}
+\begin{figure}[h]
     \captionsetup{width=\textwidth}
     \centering
     \includegraphics[width=#1\textwidth, height=#1\textheight, keepaspectratio]{assets/#2.png}
@@ -80,6 +80,8 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \usepackage{xspace}
 
 \newcommand{\moozi}{\textit{MooZi}\xspace}
+
+% \includeonly{tex/conclusion.tex}
 
 \begin{document}
 
