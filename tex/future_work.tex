@@ -1,7 +1,7 @@
 \chapter{Future Work}
 % \moozi currently works well on 
 \moozi is an on-going project and we aim to generalize \moozi even further and support more games.
-We reported results of \moozi in \textit{Breakthrough}, but \moozi supports all other two-player perfect-information deterministic games in OpenSpiel.
+We reported results of \moozi in \textit{Breakthrough}, but \moozi supports all other two-player perfect-information deterministic games in \textit{OpenSpiel}.
 We will run \moozi in all such games and at the same time find a single set of hyperparameter that works well.
 Currently \moozi assumes the environment dynamics to be deterministic.
 A promising direction is to handle stochasticity and support non-deterministic video games and board games.
@@ -9,9 +9,10 @@ Prior work extended the \textit{MuZero} algorithm with encoded random nodes \cit
 \moozi currently does not support continuous action space and has poor support for large discrete action space.
 We can extend \moozi to support continuous action space using \textit{Sampled MuZero} \cite{LearningPlanningComplex_Hubert.Schrittwieser.ea_2021}.
 We can support large discrete action space better by reducing memory footprint through packing data with library that specializes in handling sparse N-dimensional arrays.
+\moozi already supports planning with Gumbel \cite{PolicyImprovementPlanning_Danihelka.Guez.ea_2022} through MCTX.
+We conducted preliminary experiments and we will follow up with a set of more rigorous experiments.
 Moreover, \moozi currently interweaves handling episodes and timesteps.
 Games such as \textit{Freeway} that has extremely long episodes require a large number of environment interactions per training step to generate at least one episode.
-\note{multiple players}
 We will unify the handling of long episodes by slicing episodes into fix-sized sequences.
 Moreover, experience represented as fix-sized sequences can be implemented using native JAX and speed up the system by making search targets (\(\mathbf{p}^{*}\) and $v^{*}$) stay on GPUs or TPUs in their lifetime.
 In short, we will make \moozi more general as well as more efficient.

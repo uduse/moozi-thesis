@@ -28,7 +28,7 @@ We visualize the computation graph of it in Figure \ref{fig:pure}.
     To complete a forward pass, we need both concrete neural network parameters \textit{args[0]} ($\mathbf{A}, \mathbf{b}$) and a concrete input value \textit{args[1]} ($\mathbf{x}$).
 }
 Using these pure functions separates the \textit{algorithm} of the agent and the \textit{state} of the agent both conceptually and in implementation.
-The \textit{algorithm} part of the agent can be abstracted into a computation graph that can be compiled and optimized using a specialized compiler, such as XLA \ref{TensorFlowLargescaleMachine_Abadi.Agarwal.ea_2015}, for hardware acceleration (see Section \ref{sec:jax_and_podracer}).
+The \textit{algorithm} part of the agent can be abstracted into a computation graph that can be compiled and optimized using a specialized compiler, such as XLA \cite{TensorFlowLargescaleMachine_Abadi.Agarwal.ea_2015}, for hardware acceleration (see Section \ref{sec:jax_and_podracer}).
 The \textit{state} part of the agent can be efficiently handled by tools specialized in data manipulations and transferring such as Ray (see Section \ref{sec:ray}).
 This way, our system efficiently performs inferences on accelerators (such as GPUs and TPUs) and transfers data on CPUs.
 % \note{I think this section is too verbose. I should probably cut it to half a page.}
@@ -40,14 +40,14 @@ Here we describe key features of our system which improve its efficiency.
 The first one is system parallelization.
 The computation throughput of a single process is simply not enough for DRL systems.
 In the published results of MuZero by \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, the agent generated over 20 billion environment frames for training.
-For a non parallelized system, consider Gymnax's efficient MinAtar implementation where each environment step takes about 1 millisecond \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022}.
+For a non parallelized system, consider Gymnax's efficient \textit{MinAtar} implementation where each environment step takes about 1 millisecond \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022}.
 A single process would take more than 200 days just to step the environment, without considering the model training cost.
 As a result, we have to build a distributed system to increase total throughput through parallelism.
 
 The second key feature of our system is the environment transition speed.
 In Atari games, especially Atari games in ALE (\ref{sec:ale}), taking one environment step invokes a full-fledged Atari emulator in the backend, which is much more time consuming than neural network inference.
 Board games, especially those are implemented in high performance languages, are much faster.
-We use MinAtar (reviewed in Section \ref{sec:min_atar}) for simpler variants of Atari games, and OpenSpiel for efficient implementations of board games to reduce the time spent on environment transitions \cite{OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+We use \textit{MinAtar} (reviewed in Section \ref{sec:min_atar}) for simpler variants of Atari games, and \textit{OpenSpiel} for efficient implementations of board games to reduce the time spent on environment transitions \cite{OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 
 The third key feature is efficient acting with interdependent inferences.
 DRL systems such as IMPALA assume that the policy output can be computed by a single forward pass of a neural network.
@@ -76,22 +76,38 @@ Ray tasks and actors merely respond to instructions, process input and return ou
 We illustrate \moozi's architecture in Figure \ref{fig:moozi_architecture}.
 \note{I recently simplied the names of the workers. I will update this graph later.}
 
-\includeimage[0.8]{moozi_architecture}{
-    \textbf{The \moozi Architecture.}
-}{
-    The \textit{Driver} is the entry point of the program (\ref{sec:driver}).
-    The \textit{Parameter Server} stores the latest copy of the network weights and performs batched updates to them (see Section \ref{sec:param_server}).
-    The \textit{Replay Buffer} stores generated trajectories and processes these trajectories into training targets (see Section \ref{sec:replay}).
-    A \textit{Training Worker} is a ray actor responsible for generating experiences by interacting with the environment (see Section \ref{sec:train_rw}).
-    A \textit{Testing Worker} is a ray actor responsible for evaluating the system by interacting with the environment (see Section \ref{sec:test_rw}).
-    A \textit{Reanalyze Worker} is a ray actor that updates search statistics for history trajectories (see Section \ref{sec:re_w}).
-}
+\begin{figure}[htbp]
+    \captionsetup{width=\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth, height=0.8\textheight,keepaspectratio]{assets/moozi_architecture.pdf}
+    \caption[\textbf{The \moozi Architecture.}]{
+        \textbf{The \moozi Architecture.}
+        The \textit{Driver} is the entry point of the program (\ref{sec:driver}).
+        The \textit{Parameter Server} stores the latest copy of the network weights and performs batched updates to them (see Section \ref{sec:param_server}).
+        The \textit{Replay Buffer} stores generated trajectories and processes these trajectories into training targets (see Section \ref{sec:replay}).
+        A \textit{Training Worker} is a ray actor responsible for generating experiences by interacting with the environment (see Section \ref{sec:train_rw}).
+        A \textit{Testing Worker} is a ray actor responsible for evaluating the system by interacting with the environment (see Section \ref{sec:test_rw}).
+        A \textit{Reanalyze Worker} is a ray actor that updates search statistics for history trajectories (see Section \ref{sec:re_w}).
+    }
+    \label{fig:moozi_architecture}
+\end{figure}
+
+% \includeimage[0.8]{moozi_architecture}{
+%     \textbf{The \moozi Architecture.}
+% }{
+%     The \textit{Driver} is the entry point of the program (\ref{sec:driver}).
+%     The \textit{Parameter Server} stores the latest copy of the network weights and performs batched updates to them (see Section \ref{sec:param_server}).
+%     The \textit{Replay Buffer} stores generated trajectories and processes these trajectories into training targets (see Section \ref{sec:replay}).
+%     A \textit{Training Worker} is a ray actor responsible for generating experiences by interacting with the environment (see Section \ref{sec:train_rw}).
+%     A \textit{Testing Worker} is a ray actor responsible for evaluating the system by interacting with the environment (see Section \ref{sec:test_rw}).
+%     A \textit{Reanalyze Worker} is a ray actor that updates search statistics for history trajectories (see Section \ref{sec:re_w}).
+% }
 
 \section{The \moozi System Components}
 \subsection{Environment Bridges} \label{sec:env_bridge}
 Environment bridges unify environments which are defined in different libraries to a shared interface used by \moozi.
 In software engineering terms, environment bridges follow the \textbf{bridge design pattern} \cite{BridgePattern__2022}.
-In our project we implement environment bridges for three types of environments that are commonly used in RL research: OpenAI Gym, OpenSpiel, and MinAtar \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+In our project we implement environment bridges for three types of environments that are commonly used in RL research: \textit{OpenAI Gym}, \textit{OpenSpiel}, and \textit{MinAtar} \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 % The bridges wrap these environments into the \textbf{The DeepMind RL Environment API} \cite{DmEnvDeepMind__2022}.
 % In this format, each environment step outputs a four-tuple (\textit{step type}, $r$, $\gamma$, $o$), where $r, \gamma, o$ are reward, discount, and partial observation respectively.
 % The \textit{step type} is an enumerated value which indicates the type of timestep.
@@ -215,7 +231,7 @@ We process history as images this way to utilize neural network architectures th
 }
 
 \subsection{\moozi Neural Network} \label{sec:nn}
-\moozi uses the JAX and Haiku libraries to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2019,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
+\moozi uses the JAX and Haiku libraries to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2018,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
 We also consulted other open-source projects that use neural networks to play games \cite{MuZeroGeneral_Duvaud.AureleHainaut_2022, MasteringAtariGames_Ye.Liu.ea_2021, AcceleratingSelfPlayLearning_Wu_2020}.
 \moozi implements two neural network variants, one is based on multilayer-perceptrons (contribution of Jiuqi Wang) and the other one is based on residual blocks \cite{DeepResidualLearning_He.Zhang.ea_2016}.
 These two implementations share the same interface and can be used interchangeably.
@@ -226,7 +242,7 @@ The learned model is used to construct the root node of a tree search using the 
 We call this process the \textbf{initial inference}.
 The learned model is also used to create tree edges and child nodes using the dynamics function $g$ and the prediction function $f$.
 We call this process the \textbf{recurrent inference}.
-The initial and recurrent inference terminology is also used in MuZero's public pseudo-code and MCTX's source code \cite{MasteringChessShogi_Silver.Hubert.ea_2017,MctxMCTSinJAX__2022}.
+The initial and recurrent inference terminology is also used in MuZero's public pseudo-code and MCTX's source code \cite{MasteringChessShogi_Silver.Hubert.ea_2017,MctxMCTSinJAX_IvoDanihelka_2022}.
 For convenience, the initial and the recurrent inference both produce a tuple of $(\mathbf{x}, v, \hat{r}, \mathbf{p})$, where $\mathbf{x}$ is the hidden state, $v$ is the value prediction, $\hat{r}$ is the reward prediction, and $\mathbf{p}$ is the policy prediction.
 The reward prediction $\hat{r}$ is set to 0 for the initial inference.
 During training, $v$ and $\hat{r}$ are logits with size $|Z|$ .
@@ -256,7 +272,7 @@ Training workers (\ref{sec:train_rw}) use the full planner.
 Testing workers only use the action output from the planner.
 The planner used this way is synonymous to a policy $\pi$.
 Reanalyze workers only use the output statistics from the planner.
-The planner uses the MuZero variant of MCTS described in \ref{sec:mcts} \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022} \cite{POLICYIMPROVEMENTPLANNING_Danihelka.Guez.ea_2022}.
+The planner uses the MuZero variant of MCTS described in \ref{sec:mcts} \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{MctxMCTSinJAX_IvoDanihelka_2022} \cite{MctxMCTSinJAX_IvoDanihelka_2022,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018,PolicyImprovementPlanning_Danihelka.Guez.ea_2022}.
 \note{New: Planner handling two-players games.}
 The planner uses the a boolean flag $b^{\text{player}}$ from the environment bridge output (described in Section \ref{sec:env_bridge}) to indicate the current player.
 In a single-player environment, this boolean flag does not affect the search.
@@ -460,8 +476,8 @@ Figure \ref{fig:training_step} illustrates how tasks are executed in parallel ov
 \includeimage[0.7]{tb_2}{\textbf{\moozi \textit{Tensorboard} dashboard.}}{}
 
 \includeimage{sprite_trimmed}{\textbf{
-    \moozi produces trajectories in \textit{Asterix} as GIFs with annotations, presented here as a tiled image of every other four frames.
-}}{
+        \moozi produces trajectories in \textit{Asterix} as GIFs with annotations, presented here as a tiled image of every other four frames.
+    }}{
     \textit{R} is the reward $r_{t-1}$ given from the last timestep.
     \textit{V} is the value prediction $v^*_t$ after search.
     \textit{P} is the prior policy $\mathbf{p}^0_t$ at the root before search.

@@ -1,8 +1,8 @@
 \chapter{Experiments}
 \label{sec:exp}
 We run the \moozi system on both video games and board games to demonstrate \moozi's ability to learn and perform in both domains.
-We use MinAtar environments (reviewed in Section \ref{sec:min_atar}) as video game environments, and Breakthrough as a board game environment.
-We compare \moozi's performance in MinAtar environments with published result from Gymnax \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022} and MinAtar \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+We use \textit{MinAtar} environments (reviewed in Section \ref{sec:min_atar}) as video game environments, and Breakthrough as a board game environment.
+We compare \moozi's performance in \textit{MinAtar} environments with published result from Gymnax \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022} and \textit{MinAtar} \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 We evaluate \moozi's performance in Breakthrough by competing \moozi models with different amount of training.
 We analyze \moozi's behavior in these environments and discuss the behavior of the system during training.
 
@@ -10,7 +10,7 @@ We analyze \moozi's behavior in these environments and discuss the behavior of t
 \subsection{Basic Configuration}
 For all of our experiments, we use \moozi with unrolled steps $K = 5$, history length $L = 4$, and bootstrap steps $N = 10$.
 We use a discount of $0.997$ and a support $Z$ from the interval  $[-30, 30]$ ($|Z| = 61$).
-MuZero by \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} only used transformation $\Phi$ in Atari environments \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, but we discovered the same support works well for both MinAtar environments and \textit{Breakthrough}, so we do not make such distinction.
+MuZero by \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} only used transformation $\Phi$ in Atari environments \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, but we discovered the same support works well for both \textit{MinAtar} environments and \textit{Breakthrough}, so we do not make such distinction.
 We run all experiments on a single computer with Intel Xeon CPUs (72 $\times$ 2.3 GHz), Nvidia Tesla V100 GPUs (8 $\times$ 32 GB), and 500 Gigabytes of system memory.
 Each run roughly consume 50\% of available computation resources of the computer, and we usually run two instances of the system at the same time.
 
@@ -130,7 +130,8 @@ For every 10 training steps, the testing worker collects 10 trajectories and log
 We only use the reanalyze worker for the experiments in Section \ref{sec:exp:re}.
 All workers sync with the latest neural network parameters every 10 training steps.
 
-\section{\moozi vs PPO, in MinAtar Environments} \label{sec:exp:minatar}
+\section{\moozi vs PPO, in \textit{MinAtar} Environments} \label{sec:exp:minatar}
+
 We run \moozi using four environments in MinAtar, including \textit{Breakout}, \textit{Space Invaders}, \textit{Freeway}, and \textit{Asterix} \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 All environments produce frames of resolution $10 \times 10$, with four to seven environment channels $C_e$.
 In \textit{Breakout}, the player moves a paddle left or right on the bottom of the screen to bounce a ball to hit the bricks.
@@ -149,6 +150,12 @@ In \textit{Asterix}, the player moves in four directions, and enemies and treasu
 The reward is $+1$ if the player obtains a treasure and $0$ in all other situations.
 The game ends when the player bumps into an enemy.
 Enemies have different speed indicated by the color of their tail.
+
+
+\includeimage[0.7]{minatar}{\textbf{
+        \textit{MinAtar} Environments, from \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+    }}{}
+
 Figure \ref{fig:minatar} shows a screen shot of the MinAtar environments.
 MuZero is reported to have much better performance in more deterministic environments \cite{VectorQuantizedModels_Ozair.Li.ea_2021}.
 To compare \moozi in more deterministic environments, we compare with the results reported by Gymnax, in which algorithms are evaluated in environments with no sticky action.
@@ -156,6 +163,7 @@ We discuss this difference in section \ref{sec:sticky_minatar}.
 Gymnax benchmarked the performance of PPO with three sets of hyper-parameters in each of these four games \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022,ProximalPolicyOptimization_Schulman.Wolski.ea_2017}.
 We compare our results with the best performing PPO in each of these games.
 The average return uses the planner setting of a test worker in Section \ref{sec:planner_config}.
+
 Figure \ref{fig:experiments_minatar_moozi_vs_ppo} shows the result comparisons.
 In \textit{Breakout}, \moozi obtained a near-optimal strategy and the paddle almost never fails to catch the ball.
 There is no default step limits in the environments so we cap the return at 100.
@@ -167,14 +175,28 @@ In \textit{Asterix}, both \moozi and PPO do not obtain an optimal strategy, but 
 In all environments, a single run takes about 10 hours.
 Gymnax does not provide their runtime statistics, but we presume their result is at least an order of magnitude faster that ours since they do not use planning in acting.
 
-\includeimage[0.6]{minatar}{\textbf{MinAtar Environments, from \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.}}{}
-\includeimage[0.6]{experiments_minatar_moozi_vs_ppo}{\textbf{MinAtar games. \moozi vs PPO.}}{}
+\includeimage[0.6]{experiments_minatar_moozi_vs_ppo}{\textbf{
+        Evaluation of \moozi vs PPO in \textit{MinAtar} games, including \textit{Breakout}, \textit{Space Invaders}, \textit{Freeway}, and \textit{Asterix}.}
+}{
+    The \textit{x} axis shows number of environment frames used in training.
+    The \textit{y} axis shows the average return of the algorithm in the environment.
+}
+
+\note{update this graph}
 
 \section{Sticky Actions in MinAtar} \label{sec:sticky_minatar}
-\includeimage[0.6]{experiments_breakout_w_wo_sticky_actions}{
-    \textbf{\moozi vs PPO vs AC in \textit{Breakout}. Plot of environment frames used in training (x-axis, in unit of \num{1.0e7} frames) vs average return (y-axis).}
-}{}
-MinAtar environments have a default sticky action probability of 10\%.
+
+\includeimage[0.6]{experiments_breakout_w_wo_sticky_actions}{\textbf{
+        Evaluation of \moozi vs PPO vs AC in two variants of \textit{Breakout}.
+    }}
+{
+    The \textit{x} axis shows number of environment frames used in training, in unit of \num{1.0e7} frames.
+    The \textit{y} axis shows the average return of the algorithm in the environment.
+    \textit{Top}: Non-deterministic variant of \textit{Breakout} with sticky actions.
+    \textit{Bottom}: Deterministic variant of \textit{Breakout} without sticky actions.
+}
+
+\textit{MinAtar} environments have a default sticky action probability of 10\%.
 This means that in one out of ten timesteps, the environment uses the last taken action to step the environment instead of using the agent's output action.
 For example, assume that at time $t$, the agent outputs action $a_t = \text{\textit{MoveLeft}}$ and moves to the left.
 At time $t+1$, the agent outputs action $a_{t+1} = \text{\textit{MoveRight}}$.
@@ -184,11 +206,11 @@ For example, in \textit{Space Invaders}, if sticky action probability is 0, then
 However, with a sticky action probability of 10\%, moving away one frame in advance means there's a 10\% chance that the agent will die, and moving away two frames in advance means there's a $(10\% * 10\%) = 1\%$ chance that the agent will die two frames later.
 We observe that a \moozi agent trained in \textit{Space Invaders} with a 10\% sticky action probability moves away from an enemy bullet right after the bullet becomes visible on the screen.
 \citeauthor{MinAtarAtariInspiredTestbed_Young.Tian_2019} shipped the MinAtar environments with four algorithms including two variants of DQN and two variants of Actor-Critic (AC) method.
-The MinAtar paper \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019} only reports \textit{Breakout} results with a sticky action probability of 10\%.
+The \textit{MinAtar} paper \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019} only reports \textit{Breakout} results with a sticky action probability of 10\%.
 Gymnax only reports \textit{Breakout} results without sticky action probability.
-We compare with MinAtar and Gymnax in their respective testing environments using the same \moozi agent configuration.
+We compare with \textit{MinAtar} and Gymnax in their respective testing environments using the same \moozi agent configuration.
 Figure \ref{fig:experiments_breakout_w_wo_sticky_actions} shows the comparison.
-We use the final average returns of PPO and AC reported in Gymnax and MinAtar's paper respectively.
+We use the final average returns of PPO and AC reported in Gymnax and \textit{MinAtar}'s paper respectively.
 In \textit{Breakout} with sticky actions, \moozi learns more slowly and the final average return is much lower.
 In \textit{Breakout} without sticky actions, \moozi quickly learns a near-optimal policy and never fails to return the ball.
 In both environments, \moozi out-performs the other algorithm.
@@ -204,21 +226,24 @@ The difference of performance due to simulation count seems to be smaller than t
 For example, with 2.5 million frames of training, acting using 64 simulations gives an average return around 70.
 With 3 million frames of training, acting according to the prior (1 simulation) does even better and gives an average return around 75.
 The prior policy, with a bit more training, quickly catches up to or even exceeds the deep search policy with less training.
-This finding aligns with the analysis by \citeauthor{ROLEPLANNINGMODELBASED_Hamrick.Friesen.ea_2021} \cite{ROLEPLANNINGMODELBASED_Hamrick.Friesen.ea_2021}:
+This finding aligns with the analysis by \citeauthor{RolePlanningModelbased_Hamrick.Friesen.ea_2022} \cite{RolePlanningModelbased_Hamrick.Friesen.ea_2022}:
 the planner contributes more to the algorithm by \textit{generating better data for training the model} rather than \textit{exploiting the model for better testing}.
 \includeimage[1]{experiments_space_invaders_vs_simulations}{
     \textbf{Agent strength with different number of simulations.}
-}{}
+}{
+    The \textit{x} axis shows number of environment frames used in training, in unit of \num{1.0e6} frames.
+    The \textit{y} axis shows the average return of the algorithm.
+}
 
 
 \section{Improving Sample Efficiency with Reanalyze in \textit{Asterix}} \label{sec:exp:re}
 
-\includeimage{reana}{
-    \textbf{
+\includeimage{reana}{\textbf{
         \moozi with reanalyze workers in \textit{Asterix}.
     }}
 {
-    Plot of environment frames used in training (x-axis, in unit of \num{1.0e6} frames) vs average return (y-axis in log scale).
+    The \textit{x} axis shows number of environment frames used in training, in unit of \num{1.0e6} frames.
+    The \textit{y} axis show the average return of the algorithm in log scale.
 }
 
 We run three sets of parameters of \moozi, each with three experiments in the \textit{Asterix} environment.
@@ -286,7 +311,7 @@ The original \textit{Breakthrough} is played on a $7 \times 7$ board, in our exp
 Each piece can move forward, diagonally forward, or capture an enemy piece diagonally forward.
 The player first reaches the home row of its opponent wins.
 Figure \ref{fig:breakthrough} illustrates the starting board used in our experiment and the movement rules.
-We use the OpenSpiel's implementation of \textit{Breakthrough}.
+We use the \textit{OpenSpiel}'s implementation of \textit{Breakthrough}.
 The action space size of the environment is around 300, and a typical state have five to twelve legal actions.
 
 \includeimage[0.9]{breakthrough_elo}{\textbf{
@@ -304,7 +329,7 @@ We initialize the Elo of each checkpoint to zero and compute the new Elo rating 
 The steady Elo rating increase shows the model learns reliably through self-play.
 
 \section{Analysis of Planning in \textit{Breakthrough}}
-\includeimage[0.7]{half_tree}
+\includeimage[0.9]{half_tree}
 {
     \textbf{\moozi planning with a learned model in \textit{Breakthrough}.}}
 {
@@ -320,7 +345,7 @@ We call a search tree node without a corresponding legal game state a \textit{de
 Node \textit{A} is a node in the search tree with its corresponding legal game state rendered as a board position.
 Node \textit{B} is a \textit{delusion} that created by the learned model by taking action 41 that's not legal in the game state corresponding to node \textit{A}.
 Node \textit{C} is not a \textit{delusion} because action 101 is one of the legal actions in the game state of node \textit{A}.
-The search cannot different \textit{delusional} node from valid nodes, and the value predictions of node \textit{B} and node \textit{C} are both used to update their parent node \textit{A} through backpropagation.
+The search cannot differentiate \textit{delusional} nodes from valid nodes, and the value predictions of node \textit{B} and node \textit{C} are both used to update their parent node \textit{A} through backpropagation.
 One special case of a \textit{delusion} is when the search takes the dummy action after a terminal state.
 Even though the dummy action is not a legal action in the game, it represents a valid prediction that the game ends.
 
@@ -348,7 +373,7 @@ This example shows that a well-learned model learns game dynamics far beyond fiv
         The hidden space of the learned representation visualized through \textit{t-distributed stochastic neighbor embedding (t-SNE)}.
     }}{
     \textit{Top}: colored by the value predictions after search $v^{*}$.
-    \textit{Middle}: colored by the move number $t$.
+    \textit{Middle}: colored by the move number (also timestep) $t$.
     \textit{Bottom}: colored by the player index.
 }
 
