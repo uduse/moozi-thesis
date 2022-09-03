@@ -1,14 +1,14 @@
 \chapter{Experiments}
 \label{sec:exp}
-We run the \textit{MooZi} system on both video games and board games to demonstrate MooZi's ability to learn and perform in both domains.
+We run the \moozi system on both video games and board games to demonstrate \moozi's ability to learn and perform in both domains.
 We use MinAtar environments (reviewed in Section \ref{sec:min_atar}) as video game environments, and Breakthrough as a board game environment.
-We compare MooZi's performance in MinAtar environments with published result from Gymnax \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022} and MinAtar \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
-We evaluate MooZi's performance in Breakthrough by competing MooZi models with different amount of training.
-We analyze MooZi's behavior in these environments and discuss the behavior of the system during training.
+We compare \moozi's performance in MinAtar environments with published result from Gymnax \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022} and MinAtar \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+We evaluate \moozi's performance in Breakthrough by competing \moozi models with different amount of training.
+We analyze \moozi's behavior in these environments and discuss the behavior of the system during training.
 
 \section{Experiment Setup}
 \subsection{Basic Configuration}
-For all of our experiments, we use MooZi with unrolled steps $K = 5$, history length $L = 4$, and bootstrap steps $N = 10$.
+For all of our experiments, we use \moozi with unrolled steps $K = 5$, history length $L = 4$, and bootstrap steps $N = 10$.
 We use a discount of $0.997$ and a support $Z$ from the interval  $[-30, 30]$ ($|Z| = 61$).
 MuZero by \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} only used transformation $\Phi$ in Atari environments \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, but we discovered the same support works well for both MinAtar environments and \textit{Breakthrough}, so we do not make such distinction.
 We run all experiments on a single computer with Intel Xeon CPUs (72 $\times$ 2.3 GHz), Nvidia Tesla V100 GPUs (8 $\times$ 32 GB), and 500 Gigabytes of system memory.
@@ -130,8 +130,8 @@ For every 10 training steps, the testing worker collects 10 trajectories and log
 We only use the reanalyze worker for the experiments in Section \ref{sec:exp:re}.
 All workers sync with the latest neural network parameters every 10 training steps.
 
-\section{MooZi vs PPO, in MinAtar Environments} \label{sec:exp:minatar}
-We run MooZi using four environments in MinAtar, including \textit{Breakout}, \textit{Space Invaders}, \textit{Freeway}, and \textit{Asterix} \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+\section{\moozi vs PPO, in MinAtar Environments} \label{sec:exp:minatar}
+We run \moozi using four environments in MinAtar, including \textit{Breakout}, \textit{Space Invaders}, \textit{Freeway}, and \textit{Asterix} \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 All environments produce frames of resolution $10 \times 10$, with four to seven environment channels $C_e$.
 In \textit{Breakout}, the player moves a paddle left or right on the bottom of the screen to bounce a ball to hit the bricks.
 The reward is $+1$ for each brick broken and $0$ in all other situations.
@@ -151,28 +151,28 @@ The game ends when the player bumps into an enemy.
 Enemies have different speed indicated by the color of their tail.
 Figure \ref{fig:minatar} shows a screen shot of the MinAtar environments.
 MuZero is reported to have much better performance in more deterministic environments \cite{VectorQuantizedModels_Ozair.Li.ea_2021}.
-To compare MooZi in more deterministic environments, we compare with the results reported by Gymnax, in which algorithms are evaluated in environments with no sticky action.
+To compare \moozi in more deterministic environments, we compare with the results reported by Gymnax, in which algorithms are evaluated in environments with no sticky action.
 We discuss this difference in section \ref{sec:sticky_minatar}.
 Gymnax benchmarked the performance of PPO with three sets of hyper-parameters in each of these four games \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022,ProximalPolicyOptimization_Schulman.Wolski.ea_2017}.
 We compare our results with the best performing PPO in each of these games.
 The average return uses the planner setting of a test worker in Section \ref{sec:planner_config}.
 Figure \ref{fig:experiments_minatar_moozi_vs_ppo} shows the result comparisons.
-In \textit{Breakout}, MooZi obtained a near-optimal strategy and the paddle almost never fails to catch the ball.
+In \textit{Breakout}, \moozi obtained a near-optimal strategy and the paddle almost never fails to catch the ball.
 There is no default step limits in the environments so we cap the return at 100.
-Similarly in \textit{Space Invaders}, MooZi obtained a near-optimal strategy and we capt the return at 300.
-In \textit{Freeway}, MooZi also obtained a near-optimal strategy.
-Since episode in this environment is much longer than other environments, MooZi cycles through less training steps and save less checkpoints.
-Hence MooZi has much less data points in the line plot for this environment.
-In \textit{Asterix}, both MooZi and PPO do not obtain an optimal strategy, but MooZi have twice as much average return as PPO.
+Similarly in \textit{Space Invaders}, \moozi obtained a near-optimal strategy and we capt the return at 300.
+In \textit{Freeway}, \moozi also obtained a near-optimal strategy.
+Since episode in this environment is much longer than other environments, \moozi cycles through less training steps and save less checkpoints.
+Hence \moozi has much less data points in the line plot for this environment.
+In \textit{Asterix}, both \moozi and PPO do not obtain an optimal strategy, but \moozi have twice as much average return as PPO.
 In all environments, a single run takes about 10 hours.
 Gymnax does not provide their runtime statistics, but we presume their result is at least an order of magnitude faster that ours since they do not use planning in acting.
 
 \includeimage[0.6]{minatar}{\textbf{MinAtar Environments, from \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.}}{}
-\includeimage[0.6]{experiments_minatar_moozi_vs_ppo}{\textbf{MinAtar games. MooZi vs PPO.}}{}
+\includeimage[0.6]{experiments_minatar_moozi_vs_ppo}{\textbf{MinAtar games. \moozi vs PPO.}}{}
 
 \section{Sticky Actions in MinAtar} \label{sec:sticky_minatar}
 \includeimage[0.6]{experiments_breakout_w_wo_sticky_actions}{
-    \textbf{MooZi vs PPO vs AC in \textit{Breakout}. Plot of environment frames used in training (x-axis, in unit of \num{1.0e7} frames) vs average return (y-axis).}
+    \textbf{\moozi vs PPO vs AC in \textit{Breakout}. Plot of environment frames used in training (x-axis, in unit of \num{1.0e7} frames) vs average return (y-axis).}
 }{}
 MinAtar environments have a default sticky action probability of 10\%.
 This means that in one out of ten timesteps, the environment uses the last taken action to step the environment instead of using the agent's output action.
@@ -193,7 +193,7 @@ In \textit{Breakout} with sticky actions, \moozi learns more slowly and the fina
 In \textit{Breakout} without sticky actions, \moozi quickly learns a near-optimal policy and never fails to return the ball.
 In both environments, \moozi out-performs the other algorithm.
 \section{Testing Strength when Scaling the Search Budget in \textit{Asterix}}
-We use the trained MooZi model in the \textit{Space Invaders} environment to evaluate its strength while varying the different number of simulations.
+We use the trained \moozi model in the \textit{Space Invaders} environment to evaluate its strength while varying the different number of simulations.
 We only use model checkpoints from the first 3 million environment frames because after that the agent behaviors optimally even when using the prior policy to act.
 For each of these checkpoints, we run a testing worker to collect 30 episodes and compute the average return of these episodes.
 The testing worker uses the same planner configuration as the testing worker in Section \ref{sec:planner_config} except for the number of simulations.
@@ -221,7 +221,7 @@ the planner contributes more to the algorithm by \textit{generating better data 
     Plot of environment frames used in training (x-axis, in unit of \num{1.0e6} frames) vs average return (y-axis in log scale).
 }
 
-We run three sets of parameters of MooZi, each with three experiments in the \textit{Asterix} environment.
+We run three sets of parameters of \moozi, each with three experiments in the \textit{Asterix} environment.
 We configure training workers and reanalyze workers to generate the exact same amount of training targets for each training step.
 We control the total number of generated training targets and network updates per training step by fixing the sum of number of training workers and reanalyze workers to 20.
 The parameter set \textit{20 : 0} indicates 20 training workers and 0 reanalyze worker.
@@ -230,7 +230,7 @@ The parameter set \textit{16 : 4} uses 16 training workers and 4 reanalyze worke
 Similarly, the parameter set \textit{12 : 8} uses 12 training workers and 8 reanalyze workers.
 We also fix the total environments frames to be 10 million.
 Parameter sets with more reanalyze workers take more time to run, as they consume environment frames budget more slowly.
-Figure \ref{fig:reana} shows the performance of MooZi with Reanalyze workers.
+Figure \ref{fig:reana} shows the performance of \moozi with Reanalyze workers.
 % In the early stage of the training, runs with more reanalyze workers yield higher average returns using the same amount of environment frames.
 % However, this effect diminish as the training progress and completely vanish in the late stage of the training.
 The parameter set with 8 reanalyze workers used 3 million environment frames to reach an average return that takes the parameter set with 0 reanalyze workers 5 million environment frames.
@@ -243,10 +243,12 @@ However, in the later stage of the training, training targets stabilize and its 
 
 \section{Analysis of Planning in \textit{Space Invaders}}
 \includeimage{minatar_search}{\textbf{
-        MooZi acting in \textit{Space Invaders} environment by planning with a learned model.
-        \textit{Left}: The observation \(o_t\) and the agent's statistics.
-        \textit{Right}: The search tree built by planning with the agent's learned model.
-    }}{}
+        \moozi acting in \textit{Space Invaders} environment by planning with a learned model.
+    }}
+{
+    \textit{Left}: The observation \(o_t\) and the agent's statistics.
+    \textit{Right}: The search tree built by planning with the agent's learned model.
+}
 We show an example of \moozi acting in the \textit{Space Invaders} environment by planning with a learned model in Figure \ref{fig:minatar_search}.
 The left hand side shows the latest environment observation $o_t$.
 We also annotate agent statistics on top of the image.
@@ -271,9 +273,12 @@ The training target created from this interaction will also shift the prior of t
 
 
 \section{Learning through Self-play in \textit{Breakthrough}} \label{sec:exp:breakthrough}
-\includeimage[0.9]{breakthrough}{
-    \textbf{\textit{Left}: Breakthrough ($5 \times 5$) starting board. \textit{Right}: Breakthrough movement rule.}
-}{}
+\includeimage[0.9]{breakthrough}{\textbf{
+        Board game \textit{Breakthrough}.
+    }}{
+    \textit{Left}: \textit{Breakthrough} ($5 \times 5$) starting board used in our experiment.
+    \textit{Right}: \textit{Breakthrough} movement rule.
+}
 
 We evaluate \moozi in the board game \textit{Breakthrough}.
 \textit{Breakthrough} is played by two players, zero-sum, deterministic, and with perfect information for both players.
@@ -285,7 +290,7 @@ We use the OpenSpiel's implementation of \textit{Breakthrough}.
 The action space size of the environment is around 300, and a typical state have five to twelve legal actions.
 
 \includeimage[0.9]{breakthrough_elo}{\textbf{
-        \moozi Evaluation of \moozi throughout training in \textit{Breakthrough}.
+        Evaluation of \moozi throughout training in \textit{Breakthrough}.
     }}
 {
     The \textit{x} axis shows number of training steps of 23 model checkpoints.
@@ -306,7 +311,7 @@ The steady Elo rating increase shows the model learns reliably through self-play
     On nodes: \textit{I} means node index, \textit{R} means reward prediction \(\hat{r}\), \textit{V} means value prediction $v$, and \textit{N} means node visit count.
     On edges: \textit{A} means action index, \textit{p} means prior probability, \textit{Q} means $Q$ value.
 }
-Figure \ref{fig:half_tree} shows an example of MooZi planning in a two-players game using the learned model in \textit{Breakthrough}.
+Figure \ref{fig:half_tree} shows an example of \moozi planning in a two-players game using the learned model in \textit{Breakthrough}.
 We use a game implementation as the perfect model, and rollout perfect game states using the actions sampled by the search to create a perfect game state tree.
 We overlap the \moozi search tree and the perfect game state tree to create the visualization in the figure.
 The learned model only knows the legal actions at the root level, so it is possible for the planner to create nodes using illegal actions beyond the root level.
@@ -336,6 +341,23 @@ The planner uses the learned model to unroll from the starting state \textit{D} 
 Moreover, this search tree satisfies all the following conditions: (1) every node is either associated with a legal game state, or correctly predicts game termination (2) every predicted reward is within 1\% margin of the actual reward of the associated game state (3) every node after a terminal node takes the dummy action and predicts a zero value and a zero reward.
 This example shows that a well-learned model learns game dynamics far beyond five steps and can be used almost like a perfect model.
 
-\section{Visualizing Hidden space of the Learned Representation}
-We visualize the learned representation of MooZi by projecting hidden states into a lower dimension using dimension reduction techniques such as \textbf{principal component analysis (PCA)} and \textbf{t-distributed stochastic neighbor embedding (t-SNE)}.
-We use one test worker to collect 20 trajectories in environment.
+
+\section{Visualizing Hidden space of the Learned Representation} \label{sec:exp:tsne}
+
+\includeimage{tsne_2}{\textbf{
+        The hidden space of the learned representation visualized through \textit{t-distributed stochastic neighbor embedding (t-SNE)}.
+    }}{
+    \textit{Top}: colored by the value predictions after search $v^{*}$.
+    \textit{Middle}: colored by the move number $t$.
+    \textit{Bottom}: colored by the player index.
+}
+
+We visualize the learned representation of \moozi by projecting hidden states into a lower dimension using dimension reduction technique \textit{t-distributed stochastic neighbor embedding (t-SNE)} \cite{VisualizingDataUsing_Maaten.Hinton_2008}.
+We use a semi-trained (100K training steps) \textit{Breakthrough} model and a planner with more exploration (\textit{dirichlet fraction} = 0.5) to make the data more diverse.
+We collect data by running self-play for 5K steps and for each timestep $t$ we record the value prediction after search $v^{*}$, hidden state at the root $\mathbf{x}^0$, and the current player $b^{\text{player}}$.
+We run \textit{t-SNE} using only the hidden states to generate a two-dimensional embedding for each data point.
+Figure \ref{fig:tsne_2} illustrates a shared embedding colored based on their values, move numbers (timestep $t$), and player indices in three subplots.
+The bottom subplot shows hidden states are most distinct by their corresponding players.
+This is reasonable because the entire search is pivoted from the root player's point-of-view.
+The middle subplot shows a sense of ``game progression'' within clusters.
+Combining the middle and the top subplots, we observe that as the game progresses, the value predictions diverge to two extremes.

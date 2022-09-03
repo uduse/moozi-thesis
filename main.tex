@@ -44,7 +44,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \KOMAoptions{draft=false}
 
 \newcommand{\includecode}[2]{
-\begin{listing}[H]
+\begin{listing}[htbp]
     \inputminted[frame=single, framesep=5pt, fontsize=\footnotesize]{python}{src/#1.py}
     \caption[]{#2}
     \label{code:#1}
@@ -53,7 +53,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 \renewcommand\listingscaption{Algorithm}
 
 \newcommand{\includeimage}[4][1]{
-\begin{figure}[h]
+\begin{figure}[htbp]
     \captionsetup{width=\textwidth}
     \centering
     \includegraphics[width=#1\textwidth, height=#1\textheight, keepaspectratio]{assets/#2.png}
@@ -71,7 +71,6 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \newcommand*\circled[1]{(#1)}
 
-% bibilography management
 \usepackage[style=numeric]{biblatex}
 \addbibresource{main.bib}
 
@@ -81,7 +80,7 @@ chapterinoneline, % Uncomment to place the chapter title next to the number on o
 
 \newcommand{\moozi}{\textit{MooZi}\xspace}
 
-% \includeonly{tex/conclusion.tex}
+% \includeonly{tex/method.tex, tex/experiments.tex}
 
 \begin{document}
 

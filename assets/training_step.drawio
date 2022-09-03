@@ -1,1 +1,133 @@
-<mxfile host="Electron" modified="2022-08-28T19:49:43.945Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/19.0.3 Chrome/102.0.5005.63 Electron/19.0.3 Safari/537.36" etag="muSjA27PJNNdndI-kFb6" version="19.0.3" type="device"><diagram id="DuCAm9275b7ddMfAd-bc" name="Page-1">7Vxbc9o4FP41PLJjy5jLY4Ck2247yZak2bcdxZZBjWyxsgghv34lI+OLxCUJOAGcdibo2D6y9H3SuYk0nEH4/IXB6eQH9RFpAMt/bjjDBgCgZ7fFLylZLCW2+LeUjBn2lSwTjPALUkJLSWfYR3HhRk4p4XhaFHo0ipDHCzLIGJ0XbwsoKfY6hWOkCUYeJLr0Hvt8spR2XSuT/4nweJL2bFvqSgjTm5WKeAJ9Ol+Kknucy4YzYJTy5afweYCInL10XpaKrtZcXb0YQxHf5QHr5XZw+dc1+fvh9+zbPbq7aIW4CRQaT5DM1Ii/oAgxyJGQ3jL4W0wqZQvRGMFwSgQUy8HwRTpD8wnmaDSFnmzPBQ0aTn/CQyJatvgY0IhfwRATyYDBj7sRYjho/qQhjNRVBbrdEm1I8FjIhwQFYlD9WKjF0fh70hp2pSSdRUs0GJ1FPvJVa8ygj8VkDCihLHk3p5f8iGsEPiDSh97jOHkmvSWikei6z9Ezv5ZdcfmStlRGV00gmzFn9BGlj/kogDPCc30OMRMThal89zmK+eqRlDRWOlg1cQq+J8RE52sRtVc8ESsM0RDxBAr1QK+tuKYWl6MYYM0zpoL0nkmOpY6SQbU4xivVGX/EB0UhM52+4ulocffv1+tfdx3fJ3iCRldN+8jYZEBEm34DSGsRsVufDRF9fd9N/fPFo63j4XSrxKO1Ho8byKDoBLFTRwG0DCi4VaLgaijcMOqhOM4vCyyXw2C1NuQlyMaInzw8XQM8rSrhaevwIBZQFgrhpZTCxNSeNgwtS4fBPpTtiPg/30bN0S/vv+cZGfov/RveMlhzbcpR5F9ILzvzpXITXvSAbOu9GMjLJc8tot+lZ6c63OzlFX24xDu0xM/OUCK/ECroQOaAMu1mqYwhIvj7VAwwTOCpHm4oFm+S8cQp8aRTwj+mM+Yh9VQ+INiiaLUtp4p4st1pihIurYb9dnrprknF9Kr5lKjZF5/KiqrmU0+3GqlHJY04Yk/yQ4lhMvQz0aqEdYAJKYnSzYktEenLnR57kFwoeYiFPZM3msxSMXJ9PW33aXia9nb3bLVXVGN4LA3Kn2hKoHzp/iwIahwLOG7w22xQKW66xyC8aRwJx0lI7yl7rJEzIWdKE1SMnB6X3qKY18C9bus0+uzVbp16aLvJq/IIjGPsJdhBxnVxDt1s4hOsHxH3Jjuh4M2E6c0DtsXHPxrXSQvZ2m91ncAWRQd2nWw94r6OVI4w3b5HHE11KgkglMecp0oKqieAEzvHhhXOUIxf4EOiT9JjKoeYDNrtN9zhVm5tdtGXVynzESvvShkNwQ47w+a1pifxVTlKDayRr/iY9hHrD6vbcwsUSKPvd1K0aXcKau1eUQMNghgdhlMdjVPnVQxwP7IYYIakq0GSZp/bAgIZ/z7E8tc5omMoDYBepejoAezp1wbKMBhrA4eq0JjTUnrwecbFAQ0fU3HArhQfPcg8g+pAGYePrw6A10UadXmgmpikt690bllR5eUB3X/cxK86kn1XEWBfkWzvgyNZoLu4dSS7NZJdrbVzj2SNhyQdjVI/EYwgWbxIYp10dvRt5xM3hFQHS2sbkTOEVG+wIbrrUokBSd7hCssRD7MzqKm/5JgBK9mTneCqKFlasgxu2Z/Y+dwC6GzRtD8bYz40rUeItzhEJ2lSnN0PLpstRemI+vpV+hEmBfQ+yKQYgtiGsN7ivzvwqcwiJI3tRmWfZIIzTmO1H73CXuW3MbCj1dnjKfhOiRvAcTWr0zZlKGz3UGYH6B7D0eRZ6y9Y5IKZ8hcsqswRm5l1DOfHawqtp5Apv32wIpCZQkd9+L3m1gZumXLzlcZb4ChO7tccWs8hY13hUPU3c7ZFj67iReTt4Au/NsGy3Wf+tBmW9IHy0V1bR+9Q39wxg6fHNTV460p6nw48UIO3875ZHXiimf2VgGUCIvtjC87l/w==</diagram></mxfile>
+<mxfile host="65bd71144e" scale="5" border="0">
+    <diagram id="DuCAm9275b7ddMfAd-bc" name="Page-1">
+        <mxGraphModel dx="2071" dy="1151" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="IipSyU_IOVU7ddliheSF-1" value="Generate Trajectory Samples" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="140" y="320" width="260" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="IipSyU_IOVU7ddliheSF-2" value="Update Trajectory Samples" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="140" y="360" width="380" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="IipSyU_IOVU7ddliheSF-4" value="Update Parameters" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="140" y="240" width="310" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="IipSyU_IOVU7ddliheSF-5" value="Process Trajectories, Sample Targets" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="140" y="280" width="340" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="IipSyU_IOVU7ddliheSF-6" value="Perform Evaluation" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="140" y="400" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-1" value="" style="endArrow=none;html=1;strokeWidth=10;fontFamily=Verdana;fontSize=14;align=left;fontColor=none;noLabel=1;labelBackgroundColor=none;strokeColor=#BF3D65;fontStyle=0" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="130" y="470" as="sourcePoint"/>
+                        <mxPoint x="130" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-2" value="" style="endArrow=none;html=1;strokeWidth=6;fontFamily=Verdana;fontSize=14;fontColor=none;noLabel=1;labelBackgroundColor=none;strokeColor=#808080;fontStyle=0;dashed=1;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="530" y="470" as="sourcePoint"/>
+                        <mxPoint x="530" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-9" value="Parameter Server" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="-10" y="240" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-10" value="Replay Buffer" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-11" value="Training Worker" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry y="320" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-14" value="Testing Worker" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="-10" y="400" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-15" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=1;sketch=0;fontFamily=Verdana;curved=0;fontSize=14;align=left;fontStyle=0" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="140" y="460" as="sourcePoint"/>
+                        <mxPoint x="520" y="460" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-16" value="One Training Step" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Verdana;labelBackgroundColor=none;labelBorderColor=none;fontSize=20;fontStyle=0" parent="ntXJS-SVcqxulDdzBPt4-15" vertex="1" connectable="0">
+                    <mxGeometry x="0.0895" y="-1" relative="1" as="geometry">
+                        <mxPoint x="-17" y="19" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-17" value="Generate Trajectory Samples" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="420" y="320" width="260" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-18" value="Update&amp;nbsp;Trajectory Samples" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="540" y="360" width="290" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-19" value="Update Parameters" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="470" y="240" width="380" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-20" value="Process Trajectories, Sample Targets" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="280" width="310" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-27" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=1;sketch=0;fontFamily=Verdana;curved=0;fontSize=14;align=left;fontStyle=0" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="540" y="460" as="sourcePoint"/>
+                        <mxPoint x="850" y="460" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-28" value="One Training Step" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Verdana;labelBackgroundColor=none;labelBorderColor=none;fontSize=20;fontStyle=0" parent="ntXJS-SVcqxulDdzBPt4-27" vertex="1" connectable="0">
+                    <mxGeometry x="0.0895" y="-1" relative="1" as="geometry">
+                        <mxPoint x="-17" y="19" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-3" value="Reanalyze Worker" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="-20" y="360" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-19" value="" style="endArrow=classic;startArrow=none;html=1;rounded=1;sketch=0;fontFamily=Verdana;curved=0;fontSize=14;align=left;startFill=0;strokeWidth=3;fontStyle=0" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="130" y="549" as="sourcePoint"/>
+                        <mxPoint x="1020" y="549" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-20" value="Time" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Verdana;labelBackgroundColor=none;labelBorderColor=none;fontSize=30;fontStyle=0" parent="0zTCEKOlQbjuJWeUA4mi-19" vertex="1" connectable="0">
+                    <mxGeometry x="0.0895" y="-1" relative="1" as="geometry">
+                        <mxPoint x="-29" y="19" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-30" value="sync" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="110" y="210" width="40" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-32" value="sync" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Verdana;fontSize=14;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="841" y="210" width="40" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="710" y="220" width="630" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-21" value="$$\dots$$" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=120;fontFamily=Verdana;fontStyle=0" parent="4" vertex="1">
+                    <mxGeometry width="630" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="" style="group" vertex="1" connectable="0" parent="4">
+                    <mxGeometry x="185" y="20" width="320" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-22" value="Generate Trajectory Samples" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;shadow=0;rounded=0;gradientColor=#999999;labelBackgroundColor=none;textOpacity=10;opacity=20;strokeColor=default;gradientDirection=west;strokeWidth=0;fontStyle=0" parent="3" vertex="1">
+                    <mxGeometry y="80" width="260" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-23" value="Update&amp;nbsp;Trajectory Samples" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;shadow=0;rounded=0;gradientColor=#999999;labelBackgroundColor=none;textOpacity=10;opacity=20;strokeColor=default;gradientDirection=west;strokeWidth=0;fontStyle=0" parent="3" vertex="1">
+                    <mxGeometry y="120" width="290" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-24" value="Update Parameters" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;shadow=0;rounded=0;gradientColor=#999999;labelBackgroundColor=none;textOpacity=10;opacity=20;strokeColor=default;gradientDirection=west;strokeWidth=0;fontStyle=0" parent="3" vertex="1">
+                    <mxGeometry width="260" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-25" value="Process Trajectories, Sample Targets" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;shadow=0;rounded=0;gradientColor=#999999;labelBackgroundColor=none;textOpacity=10;opacity=20;strokeColor=default;gradientDirection=west;strokeWidth=0;fontStyle=0" parent="3" vertex="1">
+                    <mxGeometry y="40" width="320" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="0zTCEKOlQbjuJWeUA4mi-26" value="Perform Evaluation" style="whiteSpace=wrap;html=1;fontFamily=Verdana;fontSize=14;align=left;spacingLeft=8;shadow=0;rounded=0;gradientColor=#999999;labelBackgroundColor=none;textOpacity=10;opacity=20;strokeColor=default;gradientDirection=west;strokeWidth=0;fontStyle=0" parent="3" vertex="1">
+                    <mxGeometry y="160" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ntXJS-SVcqxulDdzBPt4-25" value="" style="endArrow=none;html=1;strokeWidth=10;fontFamily=Verdana;fontSize=14;align=left;fontColor=none;noLabel=1;labelBackgroundColor=none;strokeColor=#BF3D65;fontStyle=0" parent="4" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="150" y="250" as="sourcePoint"/>
+                        <mxPoint x="150" y="20" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -1,8 +1,8 @@
 \chapter{Method} \label{sec:method}
 \section{Design Philosophy}
 \subsection{Use of Pure Functions}
-One of the most notable differences of the MooZi implementation compared to other implementations is the use of pure functions.
-In MooZi, we separate the storage of data and the handling of data whenever possible, especially for the parts with heavy computations.
+One of the most notable differences of the \moozi implementation compared to other implementations is the use of pure functions.
+In \moozi, we separate the storage of data and the handling of data whenever possible, especially for the parts with heavy computations.
 We use \textbf{JAX} and \textbf{Haiku} \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018} to implement neural network related modules (see Section \ref{sec:jax_and_podracer}).
 These libraries separate the \textbf{specification} and the \textbf{parameters} of a neural network.
 The \textbf{specification} of a neural network is a pure function that is internally represented by a fixed computation graph.
@@ -61,35 +61,35 @@ Therefore, our project studies the behavior of the system through extensive logg
 % We will show we use these tools to understand the learned model in section \ref{sec:logging}.
 
 \section{Architecture Overview}
-In MooZi, we use the \textbf{Ray} library designed by \citeauthor{RayDistributedFramework_Moritz.Nishihara.ea_2018} \cite{RayDistributedFramework_Moritz.Nishihara.ea_2018} for orchestrating distributed processes.
+In \moozi, we use the \textbf{Ray} library designed by \citeauthor{RayDistributedFramework_Moritz.Nishihara.ea_2018} \cite{RayDistributedFramework_Moritz.Nishihara.ea_2018} for orchestrating distributed processes.
 We also adopt the terminology used by Ray.
 In a distributed system with \textbf{centralized control}, a single \textbf{driver} process is responsible for operating all other processes.
 Other processes are either \textbf{tasks} or \textbf{actors}.
 \textbf{Tasks} are stateless functions that take inputs and return outputs.
 \textbf{Actors} are stateful objects that can perform multiple tasks.
 In the RL literature, \textbf{actor} is also a commonly used term for describing the process that holds a copy of the network weights and interacts with an environment \cite{SEEDRLScalable_Espeholt.Marinier.ea_2020, IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}.
-Even though MooZi does not adopt this concept of a RL actor, we will use the terms \textbf{Ray task} and \textbf{Ray actor} to avoid confusion.
+Even though \moozi does not adopt this concept of a RL actor, we will use the terms \textbf{Ray task} and \textbf{Ray actor} to avoid confusion.
 In contrast to distributed systems with \textbf{distributed control}, ray tasks and actors are reactive and do not have busy loops.
 The driver controls when a ray task or actor is activated, what data is used as input, and where the output go.
 The driver orchestrates the data and control flow of the entire system.
 Ray tasks and actors merely respond to instructions, process input and return output on command.
-We illustrate MooZi's architecture in Figure \ref{fig:moozi_architecture}.
+We illustrate \moozi's architecture in Figure \ref{fig:moozi_architecture}.
 \note{I recently simplied the names of the workers. I will update this graph later.}
 
-\includeimage[1]{moozi_architecture}{
-    \textbf{The MooZi Architecture.}
+\includeimage[0.8]{moozi_architecture}{
+    \textbf{The \moozi Architecture.}
 }{
-    The \textit{driver} is the entrance point of the program and is responsible for setting up configurations.
-    The \textit{parameter server} stores the latest copy of the network weights and performs batched updates to them (see Section \ref{sec:param_server}).
-    The \textit{replay buffer} stores generated trajectories and processes these trajectories into training targets (see Section \ref{sec:replay}).
-    A \textit{training worker} is a ray actor responsible for generating experiences by interacting with the environment (see Section \ref{sec:train_rw}).
-    A \textit{testing worker} is a ray actor responsible for evaluating the system by interacting with the environment (see Section \ref{sec:test_rw}).
-    A \textit{reanalyze worker} is a ray actor that updates search statistics for history trajectories (see Section \ref{sec:re_w}).
+    The \textit{Driver} is the entry point of the program (\ref{sec:driver}).
+    The \textit{Parameter Server} stores the latest copy of the network weights and performs batched updates to them (see Section \ref{sec:param_server}).
+    The \textit{Replay Buffer} stores generated trajectories and processes these trajectories into training targets (see Section \ref{sec:replay}).
+    A \textit{Training Worker} is a ray actor responsible for generating experiences by interacting with the environment (see Section \ref{sec:train_rw}).
+    A \textit{Testing Worker} is a ray actor responsible for evaluating the system by interacting with the environment (see Section \ref{sec:test_rw}).
+    A \textit{Reanalyze Worker} is a ray actor that updates search statistics for history trajectories (see Section \ref{sec:re_w}).
 }
 
-\section{The MooZi System Components}
+\section{The \moozi System Components}
 \subsection{Environment Bridges} \label{sec:env_bridge}
-Environment bridges unify environments which are defined in different libraries to a shared interface used by MooZi.
+Environment bridges unify environments which are defined in different libraries to a shared interface used by \moozi.
 In software engineering terms, environment bridges follow the \textbf{bridge design pattern} \cite{BridgePattern__2022}.
 In our project we implement environment bridges for three types of environments that are commonly used in RL research: OpenAI Gym, OpenSpiel, and MinAtar \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 % The bridges wrap these environments into the \textbf{The DeepMind RL Environment API} \cite{DmEnvDeepMind__2022}.
@@ -157,13 +157,13 @@ This dummy action is used to construct history observations when the horizon ext
 For example, if the history horizon is 3, we need the last three frames and actions to construct the input observation to the policy.
 However, if the current timestep is 0, the agent hasn't taken any actions yet.
 We use zeroed frames with the same shape as history frames, and the dummy action as history actions.
-Moreover, MooZi's planner (see Section \ref{sec:planner}) does not have access to a perfect model, and it does not know when a node represents a terminal state.
+Moreover, \moozi's planner (see Section \ref{sec:planner}) does not have access to a perfect model, and it does not know when a node represents a terminal state.
 Node expansions do not stop at terminal states and the tree search can simulate multiple steps beyond the end.
 Search performed in these invalid subtrees not only wastes precious search budget, but also back-propagates value and reward estimates that are not learned from generated experience.
 We address this issue by letting the model learn a policy that always takes the dummy action beyond a terminal state.
 This learned dummy action acts as a switch that, once taken, treats all nodes in its subtree as absorbing states and edges that have zero value and reward respectively.
 This discourages the planner from searching in invalid regions and improves search performance for near-end game states.
-To formally differentiate these two types of action spaces, we denote the original environment action space $\mathcal{A}^e$ and the augmented action space $\mathcal{A}^a$, withnd
+To formally differentiate these two types of action spaces, we denote the original environment action space $\mathcal{A}^e$ and the augmented action space $\mathcal{A}^a$, with
 \begin{align*}
     \mathcal{A}^a  & = \mathcal{A}^e \cup \lbrace a^\text{dummy} \rbrace  \\
     a_{i}          & = a^\text{dummy} ~~~~ \forall i < 0                  & \text{(before the first timestep)}  \\
@@ -178,7 +178,7 @@ The optimal policy might not be representable by a policy $\pi(a \mid o_t)$ that
 Most Atari games are such partially observable environments.
 In DQN, \citeauthor{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013} alleviated this problem by augmenting the inputs of the policy network from a single frame observation to a stacked history of four frames so that the policy network had a signature of $\pi(a \mid o_{t-3}, o_{t-2}, o_{t-1}, o_t)$ (Section \ref{sec:dqn}, \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}).
 AlphaZero and MuZero use not only a stacked history of environment frames, but also a history of past actions.
-MooZi uses the last $L$ environment frames and taken actions, so the signature of the learned model through the policy head of the prediction function is $\mathbf{p} = f(a \mid o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t-1})$.
+\moozi uses the last $L$ environment frames and taken actions, so the signature of the learned model through the policy head of the prediction function is $\mathbf{p} = f(a \mid o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t-1})$.
 The greater $L$ is, the better the stacked observation represents a full state.
 In a deterministic environment with a fixed starting state, the stacked history represents a full environment state when $L = \infty$.
 On the other hand, $L = 1$ is sufficient for fully-observable perfect information environments.
@@ -214,14 +214,14 @@ We process history as images this way to utilize neural network architectures th
     \textit{Stack Planes}: Stack all planes together, creating an image with 12 channels and the same resolution as the observations.
 }
 
-\subsection{MooZi Neural Network} \label{sec:nn}
-MooZi uses the JAX and Haiku libraries to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2019,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
+\subsection{\moozi Neural Network} \label{sec:nn}
+\moozi uses the JAX and Haiku libraries to build the neural network \cite{HaikuSonnetJAX_Hennigan.Cai.ea_2020,CompilingMachineLearning_Frostig.Johnson.ea_2019,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018}.
 We also consulted other open-source projects that use neural networks to play games \cite{MuZeroGeneral_Duvaud.AureleHainaut_2022, MasteringAtariGames_Ye.Liu.ea_2021, AcceleratingSelfPlayLearning_Wu_2020}.
-MooZi implements two neural network variants, one is based on multilayer-perceptrons (contribution of Jiuqi Wang) and the other one is based on residual blocks \cite{DeepResidualLearning_He.Zhang.ea_2016}.
+\moozi implements two neural network variants, one is based on multilayer-perceptrons (contribution of Jiuqi Wang) and the other one is based on residual blocks \cite{DeepResidualLearning_He.Zhang.ea_2016}.
 These two implementations share the same interface and can be used interchangeably.
 
 Similar to MuZero described in Section \ref{sec:muzero}, the model has a representation function $h$, a dynamics function $g$, and a prediction function $f$.
-Additionally, MooZi has a \textbf{projection function} $\varrho$ for training with the self-consistency loss (see Section \ref{sec:loss}).
+Additionally, \moozi has a \textbf{projection function} $\varrho$ for training with the self-consistency loss (see Section \ref{sec:loss}).
 The learned model is used to construct the root node of a tree search using the representation function $h$ and the prediction function $f$.
 We call this process the \textbf{initial inference}.
 The learned model is also used to create tree edges and child nodes using the dynamics function $g$ and the prediction function $f$.
@@ -267,13 +267,7 @@ The planner re-orients the value and reward predictions $v, \hat{r}$ of each nod
 Once the values are oriented from the perspective of the current players of the nodes, the planner searches in a Negamax fashion by selecting nodes that maximizes the negation of $Q$ values of the edges.
 We use a discount factor $\gamma = -1$ as an implementation trick to achieve Negamax search in the planner. \note{How to cite Negamax?}
 The planner also applies the legal actions mask $m^{A_a}$ on root prior policy so only legal actions will be chosen.
-At the last timestep $T$ of any environment, the only legal action will be the dummy action.
-The planner still runs a search but will be forced to take the dummy action at the end.
-
-% \note{This trick is really hard to explain.
-% If \(Q(s, a) = \hat{r} + \gamma v(s')\), and \(\gamma = -1\), then the selection is carried out in a Negamax fasion.
-% Additionally, the backpropagation (especially the reward) will be oriented correctly for the player also in a Negamax fashion.
-% Maybe this is not strictly Negamax, but the main idea is to "use a discount of -1 to always do a minimization over the negative values of children".}
+At the last timestep $T$ of any environment, the only legal action will be the dummy action and the planner will be forced to take it.
 
 \subsection{Training Target Generation} \label{sec:targets}
 \note{New: \(b^{\text{player}}\) to indicate the current player}
@@ -319,7 +313,7 @@ We create a training target at timestep $i$ as follows:
     \item The importance sampling ratio $\rho = 1$. This is a placeholder value for future override based on replay buffer sampling weights (see Section \ref{sec:replay}).
 \end{itemize}
 In both single-player and two-players environments, we train the neural network from the perspective of the first player.
-This means MooZi only supports zero-sum two-player environments because the value of the second player can be obtained by taking the negative of the value of the first player.
+This means \moozi only supports zero-sum two-player environments because the value of the second player can be obtained by taking the negative of the value of the first player.
 
 \subsection{Loss Computation} \label{sec:loss}
 Our loss function is similar to the MuZero (see Section \ref{sec:muzero}), but with additional self-consistency loss term, terminal action loss, and value loss coefficient:
@@ -352,7 +346,7 @@ and use the same cross-entropy categorization loss
 \begin{align*}
     \mathcal{L}^v(p, q)  & = \mathcal{L}^r(p, q) = - \sum_{p \in \Phi(p), q \in \Phi(q)} p \log{q}  \\
 \end{align*}
-MooZi also trains with a self-consistency loss similar to that described by \citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} and \citeauthor{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} \cite{MasteringAtariGames_Ye.Liu.ea_2021,VisualizingMuZeroModels_deVries.Voskuil.ea_2021}.
+\moozi also trains with a self-consistency loss similar to that described by \citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} and \citeauthor{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} \cite{MasteringAtariGames_Ye.Liu.ea_2021,VisualizingMuZeroModels_deVries.Voskuil.ea_2021}.
 To compute the self-consistency loss $\circled{4}$, we reconstruct the initial inference for the next timestep \(o_{t-L+2}, \dots, o_{t+1}, a_{t-L+1}, \dots, a_{t}\), and compute the cosine distance between the projected one-step hidden state $\varrho(\mathbf{x}^1_t)$ of timestep $t$ and the initial hidden state $\mathbf{x}^0_{t+1}$ of the next timestep $t+1$.
 Formally,
 \begin{align*}
@@ -441,9 +435,9 @@ and have to be recomputed each time a batch is sampled from the replay buffer.
 The parameter server holds the central copy of the neural network parameters, and performs updates the parameters.
 Once a batch of training targets is received by the parameter server, the loss and gradients are computed as described in Section \ref{sec:loss}, and the parameters are updated.
 
-\section{The MooZi System in Action}
+\section{The \moozi System in Action} \label{sec:driver}
 % Now we look at how the components run and interact with each other during training.
-In MooZi, Algorithm \ref{code:driver} is the driver that manages all others processes and dataflow.
+In \moozi, Algorithm \ref{code:driver} is the driver that manages all others processes and dataflow.
 The driver starts by initializing all rollout workers, a parameter server, and a replay buffer.
 At the beginning of a training step, the driver performs lightweight tasks of all processes such as synchronizing parameters and tally statistics.
 During the training step, all processes perform their heavyweight tasks such as generating trajectories or updating parameters.
@@ -462,16 +456,28 @@ Figure \ref{fig:training_step} illustrates how tasks are executed in parallel ov
 }
 
 \section{Logging and Visualization} \label{sec:logging}
-MooZi incorporates extensive logging and visualization utilities to help users understand its behavior better.
-All distributed processes maintain a dedicated log file that records all events within the process.
-Figure \note{add figure here} shows an example of the log files.
-MooZi uses \textbf{TensorBoard} \cite{TensorFlowLargescaleMachine_Abadi.Agarwal.ea_2015} to log informative scalar and vector quantities.
-Figure \ref{fig:tb} shows the MooZi TensorBoard dashboard.
-\includeimage{tb}{\textbf{MooZi Tensorboard dashboard.}}{
-    MooZi logs over 50 different metrics into this dashboard.
-    These include 29 metrics from the training workers, 3 metrics from the testing logger, 20 metrics from components of the loss function, 8 metrics from the parameter optimizer.
-    Optionally, the dashboard shows distributions of parameters from all neural network layers.
+
+\includeimage[0.7]{tb_2}{\textbf{\moozi \textit{Tensorboard} dashboard.}}{}
+
+\includeimage{sprite_trimmed}{\textbf{
+    \moozi produces trajectories in \textit{Asterix} as GIFs with annotations, presented here as a tiled image of every other four frames.
+}}{
+    \textit{R} is the reward $r_{t-1}$ given from the last timestep.
+    \textit{V} is the value prediction $v^*_t$ after search.
+    \textit{P} is the prior policy $\mathbf{p}^0_t$ at the root before search.
+    \textit{N} are the visit counts at the root after search.
+    \textit{$\pi$} is the policy target $\mathbf{p}^*_t$ of the timestep.
+    \textit{Q} are the $Q$ values.
+    \textit{A} is the index of the action to take.
 }
-MooZi also provides utilities to visualize the behavior of the algorithm.
-Testing workers use the GIF maker tool to create animated records of evaluations.
-Figure \note{add figure here} shows an example of the GIF tiled as a sprite image.
+
+\moozi incorporates extensive logging and visualization utilities to help users understand its behavior better.
+All distributed processes maintain a dedicated log file that records all important events within the process.
+\moozi uses \textit{TensorBoard} \cite{TensorFlowLargescaleMachine_Abadi.Agarwal.ea_2015} to log informative scalar and vector quantities.
+Figure \ref{fig:tb_2} shows the \moozi TensorBoard dashboard.
+\moozi logs over 50 different metrics into this dashboard.
+These include 29 metrics from the training workers, 3 metrics from the testing logger, 20 metrics from components of the loss function, 8 metrics from the parameter optimizer.
+Optionally, the dashboard shows distributions of parameters from all neural network layers.
+\moozi also provides utilities to visualize the behavior of the algorithm (shown in Section \ref{sec:exp:breakthrough} and Section \ref{sec:exp:tsne}).
+The test worker saves trajectories as annotated GIFs that's easy to play and analyze on a frame-to-frame basis.
+Figure \ref{fig:sprite_trimmed} shows an example of the GIF tiled as a image.
