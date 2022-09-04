@@ -387,7 +387,7 @@ The constants in the loss functions depend on system configuration, and the cons
 
 \subsection{Updating Neural Network Parameters}
 We use a standard \textbf{Adam} optimizer developed by \citeauthor{AdamMethodStochastic_Kingma.Ba_2017} \cite{AdamMethodStochastic_Kingma.Ba_2017}.
-We also clip the gradient as described by \citeauthor{DifficultyTrainingRecurrent_Pascanu.Mikolov.ea_} \cite{DifficultyTrainingRecurrent_Pascanu.Mikolov.ea_}.
+We also clip the gradient as described by \citeauthor{DifficultyTrainingRecurrent_Pascanu.Mikolov.ea_2013} \cite{DifficultyTrainingRecurrent_Pascanu.Mikolov.ea_2013}.
 The dynamics function $g$ in our learned model is essentially an RNN, so we expect this gradient clipping trick to have a similar effect in our model.
 \textbf{Optax}, developed by \citeauthor{OptaxComposableGradient_MatteoHessel.DavidBudden.ea_2020}, is a library for gradient manipulations implemented in JAX \cite{OptaxComposableGradient_MatteoHessel.DavidBudden.ea_2020}.
 We use Optax's implementation for both the Adam optimizer and the gradient clipper.

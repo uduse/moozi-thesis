@@ -38,7 +38,7 @@ For example, A* requires a heuristic, and an optimal solution under stochastic e
 It is computationally infeasible on large problems.
 To address this problem, \citeauthor{RealtimeHeuristicSearch_Korf_1990} framed the problem of \textbf{Real-Time Heuristic Search},
 where the agent has to make a decision in each timestep with bounded computation, and developed the \textbf{Real-Time-A*} algorithm as a modified version of A* with bounded computation per step \cite{RealtimeHeuristicSearch_Korf_1990}.
-Tree-based search algorithms such as \textbf{MiniMax} and \textbf{Alpha-Beta Pruning} were developed to play and solve two-player games \cite{AnalysisAlphaBetaPriming_Knuth.Moore_1975}.
+Tree-based search algorithms such as \textbf{MiniMax} and \textbf{Alpha-Beta Pruning} were developed to play and solve two-player games \cite{AnalysisAlphabetaPruning_Knuth.Moore_1975}.
 Monte Carlo techniques are designed to handle complex environments.
 
 \section{Monte Carlo Methods}
@@ -333,11 +333,11 @@ In \textbf{rank-based sampling}, the same temporal differences are calculated, b
     \text{score($i$)}  & = \left|\delta_{i}\right|+\epsilon  \\
     p_{i}              & = \frac{1}{\operatorname{rank}(\operatorname{score}(i))}
 \end{align*}
-\citeauthor{DistributedPrioritizedExperience_Horgan.Quan.ea_2018} followed up by implementing a distributed version of prioritized experience replay \cite{DistributedPrioritizedExperience_Horgan.Quan.ea_2018}.
-\citeauthor{RECURRENTEXPERIENCEREPLAY_Kapturowski.Ostrovski.ea_2019} investigated the challenges of using experience replays for RNN-based agents and developed \textbf{Recurrent Replay Distributed DQN} \cite{RECURRENTEXPERIENCEREPLAY_Kapturowski.Ostrovski.ea_2019}.
+\citeauthor{DistributedPrioritizedExperience_Horgan.Quan.ea_2022} followed up by implementing a distributed version of prioritized experience replay \cite{DistributedPrioritizedExperience_Horgan.Quan.ea_2022}.
+\citeauthor{RecurrentExperienceReplay_Kapturowski.Ostrovski.ea_2022} investigated the challenges of using experience replays for RNN-based agents and developed \textbf{Recurrent Replay Distributed DQN} \cite{RecurrentExperienceReplay_Kapturowski.Ostrovski.ea_2022}.
 
 \subsection{Network Architectures}
-\citeauthor{DuelingNetworkArchitectures_Wang.Schaul.ea_} studied an alternative neural network architecture for ALE learning \cite{DuelingNetworkArchitectures_Wang.Schaul.ea_}.
+\citeauthor{DuelingNetworkArchitectures_Wang.Schaul.ea_2016} studied an alternative neural network architecture for ALE learning \cite{DuelingNetworkArchitectures_Wang.Schaul.ea_2016}.
 \textbf{Dueling Q-network} retains the input and output specifications of the Q-network used in DQN and structurally represented the learning of the advantage function $A(s, a)$ defined as
 \begin{align*}
     A(s, a) = Q(s, a) - V(s)
@@ -397,7 +397,7 @@ To take advantage of this property, one common approach is to enforce temporal c
 \Citeauthor{VisualizingMuZeroModels_deVries.Voskuil.ea_2021} visualized the latent space of a learned model of MuZero in a 3D space, in which a hidden state is a point in the space \cite{VisualizingMuZeroModels_deVries.Voskuil.ea_2021}.
 As MuZero applies recurrent inferences to a hidden state, the transitions can be traced as a 1-D path in the 3D space.
 The consistency loss they developed creates a smoother path in the 3D space and improves performance.
-\Citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} developed a project-then-predict structure similar to a Siamese network to enforce consistency \cite{MasteringAtariGames_Ye.Liu.ea_2021,SiameseNeuralNetworks_Koch.Zemel.ea_}.
+\Citeauthor{MasteringAtariGames_Ye.Liu.ea_2021} developed a project-then-predict structure similar to a Siamese network to enforce consistency \cite{MasteringAtariGames_Ye.Liu.ea_2021,SiameseNeuralNetworks_Koch.Zemel.ea_2015}.
 
 \section{Deep Reinforcement Learning Systems} \label{sec:drl_systems}
 Deep reinforcement learning systems involve irregular computation patterns and complicated hardware interactions between CPUs and AI accelerators.
