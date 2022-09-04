@@ -74,8 +74,8 @@ The driver controls when a ray task or actor is activated, what data is used as 
 The driver orchestrates the data and control flow of the entire system.
 Ray tasks and actors merely respond to instructions, process input and return output on command.
 We illustrate \moozi's architecture in Figure \ref{fig:moozi_architecture}.
-\note{I recently simplied the names of the workers. I will update this graph later.}
 
+\note{New: Architecture chart.}
 \begin{figure}[htbp]
     \captionsetup{width=\textwidth}
     \centering
@@ -105,6 +105,8 @@ We illustrate \moozi's architecture in Figure \ref{fig:moozi_architecture}.
 
 \section{The \moozi System Components}
 \subsection{Environment Bridges} \label{sec:env_bridge}
+\note{New: \(b^{\text{player}}\) to indicate the current player}
+
 Environment bridges unify environments which are defined in different libraries to a shared interface used by \moozi.
 In software engineering terms, environment bridges follow the \textbf{bridge design pattern} \cite{BridgePattern__2022}.
 In our project we implement environment bridges for three types of environments that are commonly used in RL research: \textit{OpenAI Gym}, \textit{OpenSpiel}, and \textit{MinAtar} \cite{OpenAIGym_Brockman.Cheung.ea_2016,OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020,MinAtarAtariInspiredTestbed_Young.Tian_2019}.
@@ -262,7 +264,8 @@ The linear combination of the distribution and their corresponding integer value
 This means from the perspective of the planner (\ref{sec:planner}), the scalar estimations made by the model are in same shape and scale as those produce by the environment.
 
 \subsection{Planner} \label{sec:planner}
-% The planner prepares inputs for the search, performs the search, collects search statistics, sends an action to the environment.
+\note{New: Handling two players in the planner.}
+
 The planner component $\mathcal{P}$ takes a stacked history as its input (\ref{sec:history_stacking}), performs a search, collects search statistics, and outputs a action and search statistics
 \begin{align*}
     a_t, v^*_t, \mathbf{p}^*_t = \mathcal{P}(o_{t - L + 1}, \dots, o_t, a_{t - L}, \dots, a_{t - 1}) ~~ .
@@ -273,7 +276,6 @@ Testing workers only use the action output from the planner.
 The planner used this way is synonymous to a policy $\pi$.
 Reanalyze workers only use the output statistics from the planner.
 The planner uses the MuZero variant of MCTS described in \ref{sec:mcts} \ref{sec:muzero} with the help from \textbf{MCTX} by \citeauthor{MctxMCTSinJAX_IvoDanihelka_2022} \cite{MctxMCTSinJAX_IvoDanihelka_2022,JAXComposableTransformations_JamesBradbury.RoyFrostig.ea_2018,PolicyImprovementPlanning_Danihelka.Guez.ea_2022}.
-\note{New: Planner handling two-players games.}
 The planner uses the a boolean flag $b^{\text{player}}$ from the environment bridge output (described in Section \ref{sec:env_bridge}) to indicate the current player.
 In a single-player environment, this boolean flag does not affect the search.
 In a two-players environment, the planner performs a \textit{logical NOT} that flips the player along with the dynamics function \(g\) for each node expansion.
@@ -286,7 +288,6 @@ The planner also applies the legal actions mask $m^{A_a}$ on root prior policy s
 At the last timestep $T$ of any environment, the only legal action will be the dummy action and the planner will be forced to take it.
 
 \subsection{Training Target Generation} \label{sec:targets}
-\note{New: \(b^{\text{player}}\) to indicate the current player}
 At each timestep $t$, the environment provides a tuple of data as described in section (\ref{sec:env_bridge}).
 The agent interacts with the environment by performing a tree search and taking action $a_t$.
 The search statistics of the tree search are also saved, including the updated value estimate of the root action $\hat{v}_t$,
@@ -472,6 +473,7 @@ Figure \ref{fig:training_step} illustrates how tasks are executed in parallel ov
 }
 
 \section{Logging and Visualization} \label{sec:logging}
+\note{New: Add figures in Section \ref{sec:logging}}
 
 \includeimage[0.7]{tb_2}{\textbf{\moozi \textit{Tensorboard} dashboard.}}{}
 

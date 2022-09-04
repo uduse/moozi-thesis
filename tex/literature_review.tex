@@ -75,10 +75,10 @@ The selection process starts at the root node and repeats until a leaf node in t
 At each level of the tree, a child node is selected based on a selection formula such as UCT or PUCT.
 A selection formula usually has two parts: the exploitation part based on the evaluation function $E$, and the exploration bonus function $B$.
 For actions $(s, a), a \in \mathcal{A}$ of a parent state $s$ , the selection $I(s)$ is defined as
-\begin{align*}
+\begin{align}
     I(s) = \argmax{a \in \mathcal{A}}{\left[ E(s, a) + B(s, a) \right]}
     \label{eq:mcts_selection}
-\end{align*}
+\end{align}
 
 The evaluation function $E$ can be based on the value of the child, the accumulated reward of the child, or the prior selection probability based on the policy $\pi(a \mid s)$.
 The exploration bonus function $B$ is usually based on the visit count of the child and the parent.
@@ -148,7 +148,7 @@ AlphaGo combines the policy network $p_{\rho}$ and the value network $V_{\theta}
 AlphaGo uses a MCTS variant called PUCT similar to that described in \ref{sec:mcts}.
 In the search tree, each edge $(s, a)$ stores an action value $Q(s, a)$, a visit count $N(s, a)$, and a prior probability $P(s, a)$.
 At each time step, the search starts at the root node and simulates until the budget runs out.
-In the select phase of each simulation, an action is selected for each traversed node using the same base formula (\ref{eq:mcts_selection}).
+In the select phase of each simulation, an action is selected for each traversed node using the same base formula in Equation \ref{eq:mcts_selection}.
 In AlphaGo, the exploitation score of the selection formula is the estimated average value of the next state after taking the actions, namely $Q(s, a)$.
 In AlphaGo's PUCT formula, The exploration bonus of edge $(s, a)$ is based on the prior probability $P$ and decays as its visit count $N$ grows.
 As before, the action taken at time $t$ maximizes the sum of the exploitation score and the exploration bonus

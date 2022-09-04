@@ -1,6 +1,6 @@
 \chapter{Introduction} \label{sec:intro}
+\note{New: Added some references in intro.}
 
-\note{add references}
 \textbf{Deep Learning (DL)} is a branch of \textbf{Artificial Intelligence (AI)} that emphasizes the use of neural networks to fit any arbitrary function represented by a dataset.
 The training of a neural network is done by computing a loss function from a batch of data, back-propagate gradients with respect to the loss, and updates weights and biases based on the gradients.
 Deep learning techniques have been widely adopted in many domains, including computer vision, natural language processing, and robotics.
@@ -12,16 +12,16 @@ An extension to game playing is \textbf{general game playing (GGP)}, whose goal 
 \textbf{Deep Reinforcement Learning (DRL)} is a rising research area that combines DL and RL to solve decision making problems.
 In a DRL system, the RL techniques lay out the structure of the algorithm such as the use of the \textbf{agent-environment interface}, a value function, a reward signal, e.t.c., while the DL techniques are used to approximate value functions and learn representations \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
 
-\textbf{Planning} refers to any computational process that analyzes generated actions and their consequences in an environment.
+\textbf{Planning} refers to any computational process that analyzes generated actions and their consequences in an environment \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
 In RL terms, planning means the use of a model to improve a policy.
 In board games where perfect models are accessible, planning with these models yields great performance.
-The most significant achievement of planning with a perfect model is AlphaGo beating human champions in Computer Go.
+The most significant achievement of planning with a perfect model is AlphaGo beating human champions in Computer Go \cite{MasteringGameGo_Silver.Schrittwieser.ea_2017}.
 However, how to plan in games where no perfect models are available remains a challenging problem to researchers.
 
 A \textbf{distributed system} utilizes concurrency through multiple processes or computer nodes to complete tasks.
 DRL systems for solving large problems are both data and compute intensive.
 Utilizing concurrency to increase efficiency and throughput for these DRL systems is sometimes necessary.
-    Building a distributed system to achieve such concurrency is a common practice in the industry, but requires significant engineering effort.
+Building a distributed system to achieve such concurrency is a common practice in the industry, but requires significant engineering effort.
 
 \section{Motivation}
 \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed MuZero \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, an algorithm that plans with a learned model (reviewed in section \ref{sec:muzero}).
