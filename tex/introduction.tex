@@ -2,15 +2,15 @@
 \note{New: Added some references in intro.}
 
 \textbf{Deep Learning (DL)} is a branch of \textbf{Artificial Intelligence (AI)} that emphasizes the use of neural networks to fit any arbitrary function represented by a dataset.
-The training of a neural network is done by computing a loss function from a batch of data, back-propagate gradients with respect to the loss, and updates weights and biases based on the gradients.
+The training of a neural network is done as follows: compute a loss function from a batch of data, back-propagate gradients with respect to the loss, and update weights and biases based on the gradients.
 Deep learning techniques have been widely adopted in many domains, including computer vision, natural language processing, and robotics.
 
-\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes solving decision making problems with delayed rewards through trials and errors.
+\textbf{Reinforcement Learning (RL)} is a branch of AI that emphasizes solving decision making problems with delayed rewards through trial and error.
 RL had most success in the domain of \textbf{game playing} \cite{MasteringGameGo_Silver.Schrittwieser.ea_2017}, in which the algorithm is represented as an \textbf{agent} and interacts with game environments, such as board games and Atari games.
-An extension to game playing is \textbf{general game playing (GGP)}, whose goal is to design a single agent that can play many different games without having much prior knowledge of the games.
+An extension to game playing is \textbf{general game playing (GGP)} \cite{GeneralGamePlaying__}, with its goal of designing a single agent that can play many different games without having much prior knowledge of the games.
 
-\textbf{Deep Reinforcement Learning (DRL)} is a rising research area that combines DL and RL to solve decision making problems.
-In a DRL system, the RL techniques lay out the structure of the algorithm such as the use of the \textbf{agent-environment interface}, a value function, a reward signal, e.t.c., while the DL techniques are used to approximate value functions and learn representations \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
+\textbf{Deep Reinforcement Learning (DRL)} is a popular research area that combines DL and RL to solve decision making problems.
+In a DRL system, the RL techniques lay out the structure of the algorithm such as the use of the \textbf{agent-environment interface}, a value function, a reward signal, etc., while the DL techniques are used to approximate value functions and learn representations \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
 
 \textbf{Planning} refers to any computational process that analyzes generated actions and their consequences in an environment \cite{ReinforcementLearningIntroduction_Sutton.Barto_2018}.
 In RL terms, planning means the use of a model to improve a policy.
@@ -21,24 +21,25 @@ However, how to plan in games where no perfect models are available remains a ch
 A \textbf{distributed system} utilizes concurrency through multiple processes or computer nodes to complete tasks.
 DRL systems for solving large problems are both data and compute intensive.
 Utilizing concurrency to increase efficiency and throughput for these DRL systems is sometimes necessary.
-Building a distributed system to achieve such concurrency is a common practice in the industry, but requires significant engineering effort.
+Building a distributed system to achieve such concurrency is a common practice in industry, but requires significant engineering effort.
 
 \section{Motivation}
-\citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed MuZero \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, an algorithm that plans with a learned model (reviewed in section \ref{sec:muzero}).
-This algorithm achieved state-of-the-art performance in playing both Atari games and board games.
+\citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed MuZero \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}, an algorithm that plans with a learned model (reviewed in Section \ref{sec:muzero}).
+This algorithm achieved state-of-the-art performance in both Atari games and board games.
 However, the source code of the algorithm is not publicly available, and the pseudo-code provided with the paper isn't sufficient to reproduce the full algorithm.
 Moreover, MuZero requires much more computation than other RL algorithms, and an inefficient implementation will drastically slow down experimentation.
 The algorithm learns a model using a neural network, and such a model, like other applications using neural networks, is impossible to understand with a casual glance of the learned weights.
 We need a publicly available efficient implementation of an algorithm that plans with a learned model and tools that help us understand the learned model.
-This helps researchers understand how the algorithm plans with its learned model, and facilitates future research.
+This helps researchers understand how the algorithm and facilitates future research.
 
 \section{Contributions of this Thesis}
-In this thesis we present the project \textbf{\moozi}, a system that play games by planning with a learned model.
+In this thesis we present the project \textbf{\moozi}, a system that plays games by planning with a learned model.
 This project includes:
 \begin{itemize}
     \item A collection of environment bridges that connect the system to common RL environments such as \textit{MinAtar} \cite{MasteringAtariGames_Ye.Liu.ea_2021}, Atari \cite{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013}, and \textit{OpenSpiel} \cite{OpenSpielFrameworkReinforcement_Lanctot.Lockhart.ea_2020}.
     \item Neural networks that learn a representation and can be used for planning.
     \item A MCTS based planner that uses the learned model to perform planning.
     \item A concurrent computing system that efficiently trains the model.
-    \item Empirical studies and analysis of the system using \textit{MinAtar} and \textit{OpenSpiel}.
+    \item Empirical studies and analysis of the system using environments from \textit{MinAtar} and \textit{OpenSpiel}.
 \end{itemize}
+The source code of the project can be found on GitHub at \url{https://github.com/uduse/moozi}.

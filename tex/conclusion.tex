@@ -3,12 +3,12 @@
 
 In this thesis, we present \moozi, a high-performance game-playing system that plans with a learned model.
 We developed a \textit{MuZero}-based learning algorithm and parallelized the algorithm using a hierarchical control.
-We empirically showed that \moozi learns a model and plans with the model in two different domains.
-In \textit{MinAtar} environments, the agent fight enemies or collect resources and gain rewards along the way.
-In these environments, \moozi achieved a greater average return than the Proximal Policy Optimization algorithm in four deterministic \textit{MinAtar} environments including \textit{Breakout}, \textit{Space Invaders}, \textit{Asterix}, and \textit{Freeway}.
+We empirically showed that \moozi learns a model and plans with the model in both single-agent and two-player domains.
+In \textit{MinAtar} environments, the agent fights enemies or collects resources and gains rewards along the way.
+In these environments, \moozi achieved a greater average return than the Proximal Policy Optimization algorithm in five deterministic \textit{MinAtar} environments including \textit{Breakout}, \textit{Space Invaders}, \textit{Asterix}, \textit{Freeway}, and \textit{Seaquest}.
 \moozi also achieved a greater average return than the Actor-Critic algorithm in the non-deterministic \textit{MinAtar} environment \textit{Breakout} with sticky-actions.
-In a two-players board game, the goal of the agent is to beat the other agent in competition.
-We trained \moozi in two-players board game \textit{Breakthrough} and showed \moozi learned master the game through self-play.
+In a two-player board game, the goal of the agent is to beat the other agent in competition.
+We trained \moozi in the two-player board game of \textit{Breakthrough} and showed that \moozi learned to master the game through self-play.
 We visualized and analyzed the search trees in both domains to demonstrate how \moozi plans with a learned model.
 We showed an example where the learned model fully captures game dynamics beyond its training horizon.
 We projected the learned representation into a lower dimension and showed how the hidden states travel in the space as game progresses.

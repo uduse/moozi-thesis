@@ -22,8 +22,8 @@ Figure \ref{fig:agent_environment_interface} illustrates the interaction between
 
 
 \section{Policies and Value Functions} \label{sec:policies_and_functions}
-At each state $s$, then agent takes an action based on a \textbf{policy} $\pi(a \mid s)$.
-This policy represents the conditional probability of the agent taking an action given a state, and $\pi(a \mid s) = Pr[ a_{t} = a \mid  s_t = s]$.
+At each state $s$, the agent takes an action based on a \textbf{policy} $\pi(a \mid s)$.
+This policy represents the conditional probability of the agent taking an action given a state, $\pi(a \mid s) = Pr[ a_{t} = a \mid  s_t = s]$.
 The objective of the agent is to maximize the expected discounted sum of rewards from the current state $s_t$ following the policy $\pi$
 \begin{align}
     \text{maximize} ~~~~  & \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] , ~~~~ \forall s \in \mathcal{S} \label{eq:maximize_return} \\
@@ -35,7 +35,7 @@ We represent the maximization target above as the \textbf{value function} $V$
 \begin{align*}
     V_\pi(s) = \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] ~~.
 \end{align*}
-The value function indicates how good a state is following the policy $\pi$.
+The value function indicates how good a state is when following the policy $\pi$.
 Similarly, we define the \textbf{state-action value function}
 \begin{align*}
     Q_\pi(s, a) = \mathbb{E}_{\pi}\left[ G_t \mid s_t = s, a_t = a \right]  \\
@@ -57,7 +57,7 @@ Many board games, such as Go and chess, are fully observable and we treat them a
 Video games, however, are partially observable since frames rendered on the screen do not contain all information of the program's running memory.
 In Go, chess, and Shogi, the only reward is given from the last timestep based on the game result, and the reward is one if $\{-1, 0, +1\}$.
 In Atari games, environments produce intermediate rewards based on game progression, and the scale and density of the rewards varies from game to game.
-In all cases, the goal of the agent is to maximize the expected return as described in equation \ref{eq:maximize_return}.
+In all cases, the goal of the agent is to maximize the expected return as described in Equation \ref{eq:maximize_return}.
 
 % \section{Models of Environments}
 % A \textbf{perfect model} is a subroutine the agent has access to that fully represents the environment dynamics.

@@ -356,6 +356,7 @@ KOMA-script documentation for details.}]{fancyhdr}
 \newcommand{\abstractname}{Abstract}
 \providecaptionname{german,ngerman,austrian,naustrian}{\byname}{von}
 \providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish}{\byname}{by}
+
 \ifbool{consistentlayout}{
 	\DeclareDocumentEnvironment{abstract}{ O{} }{%
 		\addchap*{\abstractname}%
@@ -417,6 +418,19 @@ KOMA-script documentation for details.}]{fancyhdr}
 	\vfill\null
 }
 
+\DeclareDocumentEnvironment{preface}{ O{\null\vfill} }{
+	\checktoopen
+	\tttypeout{Preface}
+	#1%added to be able to have abstract more than one page long
+	\thispagestyle{plain}
+	\begin{center}
+		{\huge\textit{Preface} \par}
+	\end{center}
+}
+{
+	\vfill\null
+}
+
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS PAGE DESIGN
 %----------------------------------------------------------------------------------------
@@ -433,14 +447,17 @@ KOMA-script documentation for details.}]{fancyhdr}
 	}
 }
 {
-	\DeclareDocumentEnvironment{acknowledgements}{}{%
+	\DeclareDocumentEnvironment{acknowledgements}{ O{\null\vfill}}{%
 		\checktoopen
 		\tttypeout{\acknowledgementname}
+		#1 %added to be able to have abstract more than one page long
 		\thispagestyle{plain}
-		\begin{center}{\huge\textit{\acknowledgementname}\par}\end{center}
+		\begin{center}
+			{\huge\textit{\acknowledgementname}\par}
+		\end{center}
 	}
 	{
-		\vfil\vfil\null
+		\vfill\null
 	}
 }
 

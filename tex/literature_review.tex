@@ -8,7 +8,7 @@ Here we adopt the definition by \citeauthor{ReinforcementLearningIntroduction_Su
 
 \textbf{Planning} refers to any process by which the agent updates the action selection policy $\pi(a \mid s)$ or the value function $V_\pi(s)$.
 We will focus on the case of improving the policy in our discussion.
-We view the planning process as an operator $\mathcal{I}$ that takes the policy as input and outputs an improved policy $\mathcal{I}\pi$.
+We view the planning process as an operator $\mathcal{I}$ that takes the policy \(\pi\) as input and outputs an improved policy $\mathcal{I}\pi$.
 
 Planning methods can be categorized based on the target state $s$ they aim to improve.
 If the method improves the policy for arbitrary states, we call it \textbf{background planning}.
@@ -20,7 +20,7 @@ Typical background planning methods include \textbf{dynamic programming} and \te
 In the case of dynamic programming, a full sweep of the state space is performed and all states are updated.
 In the case of Dyna, a subset of the state space is selected for update.
 
-An other type of planning focuses on improving the policy of the current state $s_t$.
+Another type of planning focuses on improving the policy of the current state $s_t$.
 We call this \textbf{decision-time planning}.
 That is, for any timestep $t$:
 \begin{align*}
@@ -29,10 +29,10 @@ That is, for any timestep $t$:
 
 Algorithms such as AlphaGo use both types of planning when they use self-play for training.
 For decision-time planing, a tree search is performed at the root node and updates the policy of the current state.
-For background planning, a neural network uses past experience to train and updates policy for all states.
+For background planning, a neural network uses past experience to train and update policy for all states.
 
 An early example of the use of search as a planning method is the \textbf{A*} algorithm.
-In 1968, \citeauthor{FormalBasisHeuristic_Hart.Nilsson.ea_1968} designed the A* algorithm for finding a shortest path from a start vertex to a target vertex \cite{FormalBasisHeuristic_Hart.Nilsson.ea_1968}.
+In 1968, \citeauthor{FormalBasisHeuristic_Hart.Nilsson.ea_1968} designed this algorithm for finding a shortest path from a start vertex to a target vertex \cite{FormalBasisHeuristic_Hart.Nilsson.ea_1968}.
 Although A* works quite well for many problems, especially in early game AI, it falls short in cases where the assumptions of A* do not hold.
 For example, A* requires a heuristic, and an optimal solution under stochastic environments.
 It is computationally infeasible on large problems.
@@ -44,13 +44,13 @@ Monte Carlo techniques are designed to handle complex environments.
 \section{Monte Carlo Methods}
 In 1873, Joseph Jagger observed the bias in roulette wheels at the Monte Carlo Casino.
 He studied the bias by recording the results of roulette wheels and won over 2 million francs over several days by betting on the most favorably biased wheel \cite{MonteCarloCasino__2022}.
-Therefore, \textbf{Monte Carlo (MC)} methods gained their name as a class of algorithms based on random samplings.
+Therefore, \textbf{Monte Carlo (MC)} methods gained their name as a class of algorithms based on random sampling.
 
 MC methods are used in many domains but in this thesis we will primarily focus on its usage in search.
 In a game where terminal states are usually unreachable by the limited search depth, evaluation has to be performed on the leaf nodes that represent intermediate game states.
 One way of obtaining an evaluation on a state is by applying a heuristic function.
 Heuristic functions used this way are usually hand-crafted by human based on expert knowledge, and hence are prone to human error.
-The other way of evaluating the state is to perform a rollout from that state to a terminal state by selecting actions randomly.
+The other way of evaluating the state is to perform a rollout from that state to a terminal state by selecting actions by some randomized policy.
 This evaluation process is called \textbf{random rollout} or \textbf{Monte Carlo rollout}.
 
 \section{Monte Carlo Tree Search (MCTS)} \label{sec:mcts}
@@ -60,10 +60,10 @@ Rémi Coulom developed the general idea of \textbf{Monte Carlo Tree Search} that
 Shortly afterwards,
 \citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} implemented another Go program MoGo that uses the UCT selection formula \cite{ModificationUCTPatterns_Gelly.Wang.ea_2006}.
 MCTS was generalized by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} as a framework for game AI \cite{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008}.
-This framework requires less domain knowledge than classic approaches to game AI while giving better results.
+This framework requires less domain knowledge than classic approaches to game AI while often giving better results.
 % There are four steps in this framework that are iteratively applied to the search tree.
 The core idea of this framework is to gradually build the search tree by iteratively applying four steps: \textbf{selection}, \textbf{expansion}, \textbf{evaluation}, and \textbf{backpropagation}.
-The search tree built in this way emphasizes more promising moves and game states based on collected statistics in rollouts.
+The search tree built in this way emphasizes search of more promising moves and game states based on collected statistics in rollouts.
 More promising states are visited more often, have more children, have deeper subtrees, and rollout results are aggregated to yield more accurate values. Here we detail the four steps in the MCTS framework by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} (see Figure \ref{fig:mcts}).
 
 \includeimage{mcts}{
@@ -90,9 +90,10 @@ For example, the UCT algorithm uses
     B(s, a)  & = \sqrt{\frac{2 * \log(\sum_{b \in \mathcal{A}}N(s, b))}{N(s, a)}}
 \end{align*}
 where $V(s)$ is the value of the node, and $N(s, a)$ is the visit count of the edge.
-This \citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} used this selection rule in their implementation of MoGo,
+\citeauthor{ModificationUCTPatterns_Gelly.Wang.ea_2006} used this selection rule in their implementation of MoGo,
 the first computer Go program that uses UCT \cite{ModificationUCTPatterns_Gelly.Wang.ea_2006}.
-\citeauthor{MultiarmedBanditsEpisode_Rosin_2011} developed the PUCB and the PUCT algorithm that utilize a predictor $P(s, a)$ that estimates the prior probability of the action $a$ being selected from state $s$ and later being used in AlphaGo (\ref{sec:puct}, \cite{MultiarmedBanditsEpisode_Rosin_2011}).
+\citeauthor{MultiarmedBanditsEpisode_Rosin_2011} developed the PUCB and the PUCT algorithm that utilize a predictor $P(s, a)$ that estimates the prior probability of the action $a$ being selected from state $s$.
+This approach was later used in AlphaGo (Section \ref{sec:puct} and \cite{MultiarmedBanditsEpisode_Rosin_2011}).
 
 \subsection{Expansion}
 The selected leaf node is expanded by adding one or more children.
@@ -100,9 +101,9 @@ Each child represents a successor game state reached by playing the associated l
 
 \subsection{Evaluation}
 The expanded node is evaluated, either by playing a game with a rollout policy, or by using an evaluation function, or by using a blend of both approaches.
-Many MCTS algorithms use a randomized policy as the rollout policy and the game result as the evaluation.
+Many MCTS algorithms use a randomized policy as the rollout policy, and the game result as the evaluation.
 Early work on evaluation functions focused on hand-crafted or machine learned heuristic functions based on expert knowledge.
-Recently, evaluation functions use deep neural networks specifically trained for the problems (\ref{sec:alpha_go}).
+Recently, evaluation functions use deep neural networks specifically trained for the given problem (Section \ref{sec:alpha_go} gives an example).
 
 \subsection{Backpropagation}
 After the expanded nodes are evaluated, the nodes on the path from the expanded nodes back to the root are updated.
@@ -124,7 +125,7 @@ This SL policy $p$ is parametrized by weights $\sigma$, denoted $p_{\sigma}$.
 The input of the policy network is a representation of the board state, denoted $s$.
 The network outputs a probability distribution over all legal moves $a$ through the last softmax layer.
 During the training of the network, randomly sampled expert moves are used as training targets.
-The weights $\sigma$ are then updated through gradient ascent to maximize the probability of matching human expert move:
+The weights $\sigma$ are then updated through gradient ascent to maximize the probability of matching the human expert move:
 $$
     \Delta \sigma \propto \frac{\partial \log p_{\sigma}(a \mid s)}{\partial \sigma}
 $$
@@ -145,12 +146,12 @@ $$
 $$
 
 AlphaGo combines the policy network $p_{\rho}$ and the value network $V_{\theta}$ with MCTS for acting.
-AlphaGo uses a MCTS variant called PUCT similar to that described in \ref{sec:mcts}.
+AlphaGo uses a MCTS variant called PUCT similar to that described in Section \ref{sec:mcts}.
 In the search tree, each edge $(s, a)$ stores an action value $Q(s, a)$, a visit count $N(s, a)$, and a prior probability $P(s, a)$.
 At each time step, the search starts at the root node and simulates until the budget runs out.
-In the select phase of each simulation, an action is selected for each traversed node using the same base formula in Equation \ref{eq:mcts_selection}.
-In AlphaGo, the exploitation score of the selection formula is the estimated average value of the next state after taking the actions, namely $Q(s, a)$.
-In AlphaGo's PUCT formula, The exploration bonus of edge $(s, a)$ is based on the prior probability $P$ and decays as its visit count $N$ grows.
+In the selection phase of each simulation, an action is selected for each traversed node using the base formula in Equation \ref{eq:mcts_selection}.
+In AlphaGo, the exploitation score of the selection formula is the estimated average value of the next state after taking the action $Q(s, a)$.
+In AlphaGo's PUCT formula, the exploration bonus of edge $(s, a)$ is based on the prior probability $P$ and decays as its visit count $N$ grows.
 As before, the action taken at time $t$ maximizes the sum of the exploitation score and the exploration bonus
 \begin{align*}
     I(s)     & = \argmax{a \in \mathcal{A}}\left[ E(s, a)+B(s, a) \right]  \\
@@ -158,16 +159,16 @@ As before, the action taken at time $t$ maximizes the sum of the exploitation sc
     B(s, a)  & \propto \frac{P(s, a)}{1 + N(s, a)}  \\
 \end{align*}
 
-AlphaGo evaluates a leaf node state $s_L$ by blending both the value network estimation $V_\theta(s_L)$ and the game result $z_L$ obtained by the rollout policy $p_\pi$
+AlphaGo evaluates a leaf node state $s_L$ by blending both the value network estimation $V_\theta(s_L)$ and the game result $z_L$ obtained by the rollout policy $p_\pi$.
 The mixing parameter $\lambda \in [0, 1]$ is used to balance these two types of evaluations into the final evaluation $V(s_L)$
 $$
-    V\left(s_{L}\right)=(1-\lambda) V_{\theta}\left(s_{L}\right)+\lambda z_{L}
+    V\left(s_{L}\right)=(1-\lambda) V_{\theta}\left(s_{L}\right)+\lambda z_{L} ~~ .
 $$
 
 \section{AlphaGo Zero}
 \textbf{AlphaGo Zero} is a successor of AlphaGo that beat AlphaGo by 100-0 in 100 games \cite{MasteringGameGo_Silver.Schrittwieser.ea_2017}.
 In contrast, AlphaGo Zero learns to play Go from \textit{tabula rasa}.
-This means it learns solely by reinforcement learning from self-play, starting from random play, without supervision from human expert data.
+This means it learns solely by reinforcement learning from self-play, starting from random play, without supervised learning from human expert data.
 
 Central to AlphaGo Zero is a deep neural network $f_\theta$ with parameters $\theta$.
 Given a state $s$ as an input, the network outputs both move probabilities $\pmb{p}$ and value estimation $v$
@@ -199,20 +200,20 @@ One generalization is that in AlphaZero the game result is no longer either winn
 \section{\textit{MuZero}} \label{sec:muzero}
 In \citeyear{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020},
 \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed
-\textbf{\textit{MuZero}}, an even more algorithm that learns to play Atari, Go, chess and Shogi at superhuman level.
-Compared to the AlphaGo and AlphaZero,
+\textbf{\textit{MuZero}}, an even more general algorithm that learns to play Atari, Go, chess and Shogi at superhuman level.
+Compared to AlphaGo and AlphaZero,
 MuZero has no access to a perfect model of the game.
-MuZero plans with a neural network that learns the game dynamics through experience.
-Therefore, MuZero can be applied to games where either the perfect model is not known or is infeasible to compute with.
+MuZero plans with a neural network that also learns the game dynamics through experience.
+Therefore, MuZero can be applied to games where the perfect model is either not known or is infeasible to compute with.
 
 MuZero defines three main functions.
 The \textbf{representation function} $h$ encodes a history of observations $o_1, o_2, \dots, o_t$ and actions $a_1, a_2, \dots, a_{t - 1}$ into a hidden state $\mathbf{x}_t^0$.
-This hidden state is learned, and is the main conceptual change from AlphaZero.
+This hidden state representation is learned, and is the main conceptual change from AlphaZero.
 The \textbf{dynamics function} $g$ implements action execution in the representation.
 Given a hidden state $\mathbf{x}^k$ and action $a^k$, produces an immediate reward $r^k$ and the next hidden state $\mathbf{x}^{k+1}$.
 The \textbf{prediction function} $f$ corresponds to the one network in AlphaZero.
 Given a hidden state $\mathbf{x}^k$, it produces a probability distribution $p^k$ of actions and a value $v^k$ associated to that hidden state.
-Three functions $f, g, h$ are approximated jointly in a neural network with weights $\theta$
+The three functions $f, g, h$ are approximated jointly in a neural network with weights $\theta$
 \begin{align}
     \mathbf{x}^0_t                     & = h_{\theta}(o_1, \dots, o_t, a_1, \dots, a_{t - 1}) \label{eq:muzero_h}  \\
     (\mathbf{x}^{k+1}, \hat{r}^{k+1})  & = g_{\theta}(\mathbf{x}^k, a^k)  \label{eq:muzero_g}  \\
@@ -221,28 +222,28 @@ Three functions $f, g, h$ are approximated jointly in a neural network with weig
 The superscripts of $\mathbf{x}, a, v$ denote the depth of such values in the search tree, and depth $0$ is at the search tree's root.
 Equivalently, the superscripts also mean the number of recurrent inferences (through the dynamics function $g$) the algorithm performs to obtain that value.
 
-MuZero plans with a search method based on the MCTS framework (discussed in \ref{sec:mcts}).
+MuZero plans with a search method based on the MCTS framework (discussed in Section \ref{sec:mcts}).
 Due to the lack of access to a perfect model, MuZero's MCTS differs from a standard one in numerous ways.
 The nodes are no longer perfect representations of the board states.
 Instead, each node is associated with a hidden state $\mathbf{x}$ as a learned representation of the board state.
 The transition is no longer made by the perfect model but by the dynamics function $g$.
-Moreover, since the dynamics function also predicts a reward, edges created through inferencing with the dynamics function also contribute to the $Q$ value estimation.
+Moreover, since the dynamics function also predicts a reward, edges created through inferencing with the dynamics function also contribute to the $Q$-value estimation.
 % That is, traditionally we have $Q(s, a) = \mathit{E} \left[ V(S_{t + 1}) \mid S_t = s, A_t = a \right]$.
 
-To act in the environment, MuZero plans following the MCTS framework described in section \ref{sec:mcts}.
-At each timestep $t$, $\mathbf{x}^0_t$ is created using (\ref{eq:muzero_h}).
+To act in the environment, MuZero plans following the MCTS framework described in Section \ref{sec:mcts}.
+At each timestep $t$, $\mathbf{x}^0_t$ is created using Equation \ref{eq:muzero_h}.
 % To select an action following the MCTS selection template equation , 
-A variant of PUCT is used to select an action during the search
+A variant of PUCT is used to select an action during the search:
 \begin{align*}
     I(s)     & = \argmax{a \in \mathcal{A}} \left( E(s, a) + B(s, a) \right)  \\
     E(s, a)  & = Q(s, a)  \\
     B(s, a)  & \propto P(s, a) \frac{\sqrt{\sum_{b \in \mathcal{A}}N(s, b)}}{1+N(s, a)}\left[c_{1}+\log \left(\frac{\sum_{b \in \mathcal{A}}N(s, b)+c_{2}+1}{c_{2}}\right)\right] ~~~~.
 \end{align*}
-Where $c_1$ and $c_2$ are two constants that adjust the exploration bonus.
-The selected edge $(\mathbf{x}^k, a^k)$ at depth $k$ is expanded using (\ref{eq:muzero_g}) and evaluated using (\ref{eq:muzero_f}).
+Here $c_1$ and $c_2$ are two constants that adjust the exploration bonus.
+The selected edge $(\mathbf{x}^k, a^k)$ at depth $k$ is expanded using Equation \ref{eq:muzero_g} and evaluated using Equation \ref{eq:muzero_f}.
 At the end of the simulation, the statistics of the nodes along the search path are updated.
-We denote the updated prior action probabilities $\mathbf{p}^*$, and the updated value estimation $v^*$.
-Notice since the transitions of the nodes are approximated by the neural network, the search is performed over hypothetical trajectories without using a perfect model.
+We denote the updated prior action probabilities $\mathbf{p}^*$, and the updated value estimation with $v^*$.
+Since the node transitions are approximated by the neural network, the search is performed over hypothetical trajectories without using a perfect model.
 Finally, the action $a^0$ of the most visited edge $(\mathbf{x}^0, a^0)$ of the root node is selected as the action to take in the environment.
 
 Experience generated is stored in a replay buffer and processed into training targets.
@@ -264,14 +265,14 @@ where $K$ is the rollout depth, \circled{1} is the loss of the predicted prior m
 \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} also developed \textbf{MuZero Reanalyze}, a sample efficient variant of MuZero \cite{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020}.
 This method generates training targets in addition to those generated through game play through re-executing search on old games using the latest parameters.
 \textbf{MuZero Unplugged} and \textbf{Efficient Zero} also use similar mechanisms to generate new data by updating search statistics of old data \cite{OnlineOfflineReinforcement_Schrittwieser.Hubert.ea_2021}.
-In Efficient Zero, experiments are ran with a reanalyze ratio of 0.99, which means only $1\%$ of the training data are generated through interacting with the environment, and the other 99\% are generated by re-running search on old trajectories.
-In our project, we also implement a reanalyze worker to perform this task (see Section \ref{sec:reanalyze}, \ref{sec:re_w}).
+In Efficient Zero, experiments use a reanalyze ratio of 0.99, which means only $1\%$ of the training data are generated through interacting with the environment, and the other 99\% are generated by re-running search on old trajectories.
+In our project, we also implement a reanalyze worker to perform this task (see Sections \ref{sec:reanalyze} and \ref{sec:re_w}).
 
-\section{Atari Games Playing}
-\subsection{Atari Learning Environment} \label{sec:ale}
+\section{Atari Game Playing}
+\subsection{The Atari Learning Environment} \label{sec:ale}
 \textbf{The Atari 2600} gaming console was developed by \textit{Atari, Inc.} and was released in 1977.
 Over 30 million copies of the console sold over its 15 years on the market \cite{Atari2600__2022}.
-The most popular game, PacMan, was sold over 8 million copies and was the all-time best-selling video game back then.
+The most popular game, PacMan, sold over 8 million copies and was the all-time best-selling video game back then.
 \textbf{Stella} is a multi-platform Atari 2600 emulator released under the GNU General Public License (GPL) \cite{StellaMultiPlatformAtari__}.
 Stella was ported to popular operating systems such as Linux, MacOS, and Windows, providing Atari 2600 experiences to users without physical copies of the equipment.
 In \citeyear{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013}, \citeauthor{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013} introduced the \textbf{Arcade Learning Environment (ALE)} and the library has been publicly available since \cite{ArcadeLearningEnvironment_Bellemare.Naddaf.ea_2013}.
@@ -280,17 +281,17 @@ Each ALE environment has specifications on its visual representation, action spa
 ALE environments are suitable for controlled machine learning research,
 because data are well-represented and evaluation metrics are clearly defined.
 Moreover, ALE environments are diverse in their characteristics: while some environments require more mechanical mastery of the agent, others require more long-term planning.
-This makes solving multiple ALE environments using the same algorithm a good general game playing problem (\ref{sec:intro}).
+This makes solving multiple ALE environments using the same algorithm a good general game playing problem.
 
 \subsection{Deep Q-Networks} \label{sec:dqn}
 \citeauthor{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013} pioneered the study of using deep neural networks to learn in ALE environments \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}.
 They developed the algorithm \textbf{Deep Q-Networks (DQN)} that learned to play seven of the Atari games and reached human-level performance.
 The DQN agent has a neural network that approximates the $Q$ function, parametrized by weights $\theta$, denoted $Q_\theta$.
-Experiences are generated through interacting with the environment by taking the action that maximizes the immediate $Q$ value
+Experiences are generated through interacting with the environment by taking the action that maximizes the immediate $Q$-value
 \begin{align*}
     \pi(a_t \mid (o_{t - L + 1}, \dots, o_t)) = \argmax{a}{Q_{\theta}(o_{t - L + 1}, \dots, o_t, a)}
 \end{align*}
-where $L$ is the length of history, and $o_t$ is the ``frame'', a partial observation of the game state at timestep $t$ (also see \ref{sec:history_stacking}).
+where $L$ is the length of history, and $o_t$ is the ``frame'', a partial observation of the game state at timestep $t$ (also see Section \ref{sec:history_stacking}).
 Generated experience is stored in an experience replay buffer implemented as a FIFO queue.
 For each training step, a batch of uniformly sampled experience is drawn from the experience replay, and the loss is computed using
 \begin{equation*}
@@ -300,13 +301,13 @@ The network parameters $\theta'$ are updated less frequently than $\theta$.
 
 \subsection{Double Q Learning}
 \citeauthor{DoubleQlearning_Hasselt_2010} analyzed the overestimation problem of Q values in Q-learning and developed \textbf{double Q learning}, where a double Q update replaces the traditional Q update \cite{DoubleQlearning_Hasselt_2010}.
-Double Q learning reduces the overestimation problem by introducing an additional Q estimator's and updating two estimator using each other
+Double Q learning reduces the overestimation problem by introducing an additional Q estimator and updating the two estimators using each other:
 \begin{align*}
     Q^{A}(s, a) \leftarrow Q^{A}(s, a)+ \alpha \left(r+\gamma Q^{B}\left(s', \argmax{a'}{Q^A(s', a')}\right)-Q^{A}(s, a)\right)  \\
     Q^{B}(s, a) \leftarrow Q^{B}(s, a)+ \alpha \left(r+\gamma Q^{A}\left(s', \argmax{a'}{Q^B(s', a')}\right)-Q^{B}(s, a)\right)
 \end{align*}
 where $Q^A$ and $Q^B$ are two different Q estimators updated alternately.
-\citeauthor{DeepReinforcementLearning_Hasselt.Guez.ea_2016} applied the double Q learning in DQN \cite{DeepReinforcementLearning_Hasselt.Guez.ea_2016}.
+\citeauthor{DeepReinforcementLearning_Hasselt.Guez.ea_2016} applied double Q learning to DQN \cite{DeepReinforcementLearning_Hasselt.Guez.ea_2016}.
 Similar to the double Q update above, a double Q update for neural networks is formulated as
 \begin{align*}
     \mathcal{L}(\theta^A)  & \propto \mathbb{E}_\pi \left[ r + \gamma Q_{\theta^B}\left(s', \argmax{a'}{Q_{\theta^A}(s', a')} \right) - Q_{\theta^A}(s, a) \right]  \\
@@ -315,9 +316,9 @@ Similar to the double Q update above, a double Q update for neural networks is f
 Here $Q_{\theta^A}$ and $Q_{\theta^B}$ are two sets of parameters of the same neural network architecture.
 
 \subsection{Experience Replay}
-\citeauthor{PrioritizedExperienceReplay_Schaul.Quan.ea_2016} studied the role of a experience replay in DQN and developed the \textbf{prioritized experience replay} method \cite{PrioritizedExperienceReplay_Schaul.Quan.ea_2016}.
-In the original work of DQN, all samples were drawn from the experience replay uniformly.
-In prioritized experience replay, however, samples are drawn according to a distribution based on their calculated priority
+\citeauthor{PrioritizedExperienceReplay_Schaul.Quan.ea_2016} studied the role of experience replay in DQN and developed the \textbf{prioritized experience replay} method \cite{PrioritizedExperienceReplay_Schaul.Quan.ea_2016}.
+In the original DQN, all samples were drawn from the experience replay uniformly.
+In prioritized experience replay however, samples are drawn according to a distribution based on their calculated priority
 \begin{align*}
     P(i)=\frac{p_{i}^{\alpha}}{\sum_{k} p_{k}^{\alpha}}
 \end{align*}
@@ -334,23 +335,23 @@ In \textbf{rank-based sampling}, the same temporal differences are calculated, b
     p_{i}              & = \frac{1}{\operatorname{rank}(\operatorname{score}(i))}
 \end{align*}
 \citeauthor{DistributedPrioritizedExperience_Horgan.Quan.ea_2022} followed up by implementing a distributed version of prioritized experience replay \cite{DistributedPrioritizedExperience_Horgan.Quan.ea_2022}.
-\citeauthor{RecurrentExperienceReplay_Kapturowski.Ostrovski.ea_2022} investigated the challenges of using experience replays for RNN-based agents and developed \textbf{Recurrent Replay Distributed DQN} \cite{RecurrentExperienceReplay_Kapturowski.Ostrovski.ea_2022}.
+\citeauthor{RecurrentExperienceReplay_Kapturowski.Ostrovski.ea_2022} investigated the challenges of using experience replay for RNN-based agents and developed \textbf{Recurrent Replay Distributed DQN} \cite{RecurrentExperienceReplay_Kapturowski.Ostrovski.ea_2022}.
 
 \subsection{Network Architectures}
 \citeauthor{DuelingNetworkArchitectures_Wang.Schaul.ea_2016} studied an alternative neural network architecture for ALE learning \cite{DuelingNetworkArchitectures_Wang.Schaul.ea_2016}.
-\textbf{Dueling Q-network} retains the input and output specifications of the Q-network used in DQN and structurally represented the learning of the advantage function $A(s, a)$ defined as
+A \textbf{Dueling Q-network} retains the input and output specifications of the Q-network used in DQN and structurally represents the learning of the advantage function $A(s, a)$ defined as
 \begin{align*}
     A(s, a) = Q(s, a) - V(s)
 \end{align*}
 The Q-network has three parts:
 $\theta$, the shared trunk of the network; $\varLambda$, the advantage head; and $\varUpsilon$, the value head.
 The network approximates the value function internally through the shared trunk and the value head, denoted $V_{\theta, \varUpsilon}$, and the advantage function, denoted $A_{\theta, \varLambda}$.
-The values computed by the two heads are combined to form the Q-value as follows
+The values computed by the two heads are combined to form the Q-value as follows:
 \begin{align*}
     Q_{\theta, \varUpsilon, \varLambda}(s, a)
     = V_{\theta, \varUpsilon}(s)
     + \left( A_{\theta, \varLambda}(s, a)
-    - \frac{1}{| \mathcal{A} | } \sum_{a'}A_{\theta, \varLambda}(s, a') \right)
+    - \frac{1}{| \mathcal{A} | } \sum_{a'}A_{\theta, \varLambda}(s, a') \right)  ~~ .
 \end{align*}
 Similar to DQN, the dueling Q-network is trained through fitting to empirical data generated by interacting with the environment.
 Experiments show that this architecture encourages the network to learn to differentiate between the values of states and the values of state-action pairs, and leads to better performance of the agent.
@@ -360,7 +361,7 @@ Experiments show that this architecture encourages the network to learn to diffe
 We focus on discussing the \textbf{transformed Bellman Operator} since both MuZero and MooZi use it.
 For different Atari games, reward signals can vary drastically both in density and scale.
 This leads to high variance in training targets during training of the algorithms, causing algorithms to have difficulty converging.
-In DQN, rewards are clipped the reward signal to a range of $[-1, 1]$ to reduce such variance \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}.
+DQN clips the reward signal to a range of $[-1, 1]$ to reduce such variance \cite{PlayingAtariDeep_Mnih.Kavukcuoglu.ea_2013}.
 However, this clipping discards the scale of rewards and consequently changes the set of optimal policies.
 The transformed Bellman Operator was developed to address this problem.
 The $Q$ update of the new operator is as follows
@@ -374,21 +375,13 @@ One example of such a transformation is
     \phi(x)       & = \operatorname{sign}(x)\left(\sqrt{|x|+1}-1\right)+\varepsilon x  \\
     \phi^{-1}(x)  & = \operatorname{sign}(x)\left(\left(\frac{\sqrt{1+4 \varepsilon(|x|+1+\varepsilon)}-1}{2 \varepsilon}\right)^{2}-1\right)
 \end{align*}
-Both \textit{MuZero} and \moozi use this specific $\phi$ definition for both value transformations and reward transformations (\ref{sec:nn}).
-
-% \subsection{Efficiency Problems with ALE} \label{sec:eff_ale}
-% % ALE environments are slower transition than environments of board games.
-% For algorithms like DQN, more time are spent on stepping the environments than computing policies.
-% One key reason is that policies based on neural networks can be computed using specialized hardwares such as GPUs and TPUs.
-% ALE environments are CPU-only and linearly increasing number of environments always also linearly increase their memory and CPU cycle consumptions.
-% Data hungry algorithms such as MuZero were trained with 20 billion environment frames, 1 million of training steps, and lasted more than 12 hours.
-% It is difficult for researchers with limited computation resources to produce such work, let alone extending it.
+Both \textit{MuZero} and \moozi use this specific $\phi$ definition to transform both values and rewards (see Section \ref{sec:nn}).
 
 \subsection{MinAtar} \label{sec:min_atar}
 \textbf{MinAtar}, developed by \citeauthor{MinAtarAtariInspiredTestbed_Young.Tian_2019}, is an open-source project that offers RL environments inspired by ALE \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
 \textit{MinAtar} offers five environments that pose similar challenges to ALE environments: learning representation from raw pixels, and learning behaviors that associate actions and delayed rewards.
-\textit{MinAtar} environments are implemented in pure Python, have simpler environment dynamics, and are visually less rich than ALE environments.
-This makes \textit{MinAtar} perfect test environment for university research.
+\textit{MinAtar} environments are implemented in pure Python, have simpler environment dynamics, and are visually less rich than ALE environments, while retaining some flavor of the original games.
+This makes \textit{MinAtar} environments perfect for university research.
 
 \subsection{Consistency Loss}
 One interesting characteristic of Atari-like games is that the environment frames are usually temporally consistent.
@@ -401,23 +394,28 @@ The consistency loss they developed creates a smoother path in the 3D space and 
 
 \section{Deep Reinforcement Learning Systems} \label{sec:drl_systems}
 Deep reinforcement learning systems involve irregular computation patterns and complicated hardware interactions between CPUs and AI accelerators.
-Designing such systems efficiently a great challenge.
-Decisions the designer has to make include but are not limited to (1) Where and how to generate experience? (2) Where and how to store generated experience? (3) Where to store the model and copies of it? (4) Where is the gradient computation carried out? (4) How to orchestrate processes for stable training?
-Here we briefly review popular deep reinforcement learning system designs that utilize parallelization to achieve faster and more efficient training.
+Designing such systems efficiently is a great challenge.
+Decisions the designer has to make include but are not limited to: 
+(1) Where and how to generate experience? 
+(2) Where and how to store generated experience? 
+(3) Where to store the model and copies of it? 
+(4) Where to carry out the gradient computation?
+(5) How to orchestrate processes for stable training?
+Here we briefly review several popular deep reinforcement learning system designs that utilize parallelization to achieve faster and more efficient training.
 
 \subsection{\Citeauthor{AsynchronousMethodsDeep_Mnih.Badia.ea_2016}'s Asynchronous Methods Framework}
-\citeauthor{AsynchronousMethodsDeep_Mnih.Badia.ea_2016} developed asynchronous variants for four popular RL algorithms with a parallelization structure uses actor-learner processes \cite{AsynchronousMethodsDeep_Mnih.Badia.ea_2016}.
+\citeauthor{AsynchronousMethodsDeep_Mnih.Badia.ea_2016} developed asynchronous variants for four popular RL algorithms with a parallelization structure that uses actor-learner processes \cite{AsynchronousMethodsDeep_Mnih.Badia.ea_2016}.
 Each actor-learner process holds a local copy of the model, generates experience locally using the model, and accumulates gradients locally.
 Once in a while, all local gradients are aggregated to update the global model.
 Delaying and aggregating updates to neural network parameters reduces gradient variance among processes and achieves a more stable learning.
-Among the asynchronous algorithm variants, \textbf{Asynchronous Advantage Actor Critic (A3C)} had the best performance and achieved the state-of-the-art at the time using only half the training time.
+Among the asynchronous algorithm variants, \textbf{Asynchronous Advantage Actor Critic (A3C)} had the best performance and achieved the state-of-the-art at the time of publication using only half the training time.
 
 \subsection{The IMPALA Architecture} \label{sec:impala}
 \citeauthor{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018} developed \textbf{IMPALA}, a scalable distributed deep reinforcement learning agent \cite{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}.
 IMPALA deploys two types of computation workers: \textit{actor} and \textit{learner}.
 A actor holds a copy of the neural network parameters and the environment.
 It performs model inferences locally to interact with its environments and generates experiences.
-Generated experiences are saved in a local storage and subsequently pushed into the learner's local storage.
+Generated experiences are saved in local storage and subsequently pushed into the learner's local storage.
 The learner holds the master copy of the neural network parameters.
 Once the learner receives enough experiences from the actors, it samples experiences from its local queue and performs batched forward pass and back-propagation steps using its model.
 Figure \ref{fig:impala} shows two variants of this structure.
@@ -446,7 +444,7 @@ Figure \ref{fig:seed} illustrates a distributed SEED agent.
 
 \subsection{The Acme Framework}
 \citeauthor{AcmeResearchFramework_Hoffman.Shahriari.ea_2020} developed the \textbf{Acme} research framework \cite{AcmeResearchFramework_Hoffman.Shahriari.ea_2020}.
-Acme similar to IMPALA:
+Acme is similar to IMPALA:
 processes that interact with the environment are actors,
 and processes that collect experience and update gradients are learners.
 Additionally, Acme has a \textit{dataset} component, which is synonymous to the replay buffer used in DQN.
@@ -462,19 +460,19 @@ Figure \ref{fig:acme} illustrates a distributed asynchronous agent in Acme.
 Ray enables both task-level and actor-level parallelization through a unified interface.
 \textbf{Ray Core} was designed with AI applications in mind and has powerful primitives for building distributed AI systems.
 For example, Ray uses shared memory to store inputs and outputs of tasks, allowing zero-copy data sharing among tasks.
-This is useful for DRL systems in which generated experiences are stored and sampled in a separate process.
+This is useful for DRL systems in which generated experiences are stored and sampled in separate processes.
 \citeauthor{RLlibAbstractionsDistributed_Liang.Liaw.ea_2018} developed \textbf{RLlib}, an industrial-grade deep reinforcement learning library.
-RLlib is built on top of Ray Core and provides abstractions for a broad range of DRL systems could make use of.
+RLlib is built on top of Ray Core and provides abstractions for a broad range of DRL systems.
 Figure \ref{fig:rllib} illustrates RLlib's abstraction layers.
-As of the writing of this thesis, RLlib implemented 24 popular DRL algorithms using its abstractions.
+As of the writing of this thesis, RLlib implements 24 popular DRL algorithms using its abstractions.
 One major difference between RLlib agents and other DRL agents is that RLlib deploys a hierarchical control over the worker processes.
-Our project uses Ray Core to implement its worker processes and deploys a hierarchical control paradigm similar to RLlib (see \ref{sec:method}).
+Our project uses Ray Core to implement its worker processes and deploys a hierarchical control paradigm similar to RLlib (see Section \ref{sec:method}).
 \includeimage[0.5]{rllib}{
     \textbf{RLlib Abstraction Layers, from \cite{RLlibAbstractionsDistributed_Liang.Liaw.ea_2018}.}
 }{}
 
 \subsection{JAX and Podracer Architecture} \label{sec:jax_and_podracer}
-\citeauthor{CompilingMachineLearning_Frostig.Johnson.ea_2018} designed \textbf{JAX}, a just-in-time (JIT) compiler that compiles computations expressed in Python code into high-performance accelerators code \cite{CompilingMachineLearning_Frostig.Johnson.ea_2018}.
+\citeauthor{CompilingMachineLearning_Frostig.Johnson.ea_2018} designed \textbf{JAX}, a just-in-time (JIT) compiler that compiles computations expressed in Python code into high-performance accelerator code \cite{CompilingMachineLearning_Frostig.Johnson.ea_2018}.
 JAX is compatible with \textbf{Autograd}, so computation procedures expressed and compiled with JAX can be automatically differentiated.
 JAX also supports control flow, allowing more sophisticated logic to be expressed while taking advantage of accelerators.
 Our project uses JAX for both neural networks and search.
@@ -483,10 +481,10 @@ As a result, we are able to compile the entire policy in rollout workers, includ
 In the \textbf{Anakin} architecture, the environment is implemented with JAX and the entire agent-environment loop is compiled using JAX and computed with accelerators.
 \textbf{Gymnax}, developed by \citeauthor{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022}, provides environment implementations in native JAX, and is compatible with the Anakin architecture \cite{GymnaxJAXbasedReinforcement_RobertTjarkoLange_2022}.
 However, pure JAX implemented environments are not always feasible, especially when environments involve external services, such as Stella or Unity in their backend.
-Alternatively, in the \textbf{Sebulba} architecture, environments run on CPUs, but policies could be compiled and computed on accelerators.
+Alternatively, in the \textbf{Sebulba} architecture \cite{PodracerArchitecturesScalable_Hessel.Kroiss.ea_2021}, environments run on CPUs, but policies could be compiled and computed on accelerators.
 Generated experiences in both architectures can be used to compute gradients directly on accelerators.
 Figure \ref{fig:sebulba} illustrates the Sebulba architecture.
-\includeimage{sebulba}{\textbf{Sebulba architecture, from \cite{PodracerArchitecturesScalable_Hessel.Kroiss.ea_2021}.}}{
+\includeimage{sebulba}{\textbf{Sebulba architecture, from \citeauthor{PodracerArchitecturesScalable_Hessel.Kroiss.ea_2021} \cite{PodracerArchitecturesScalable_Hessel.Kroiss.ea_2021}.}}{
     The environments runs on CPUs.
     Inferences and gradient computations are compiled, optimized and executed on TPUs.
 }
