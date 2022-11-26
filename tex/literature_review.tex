@@ -67,7 +67,7 @@ The search tree built in this way emphasizes search of more promising moves and 
 More promising states are visited more often, have more children, have deeper subtrees, and rollout results are aggregated to yield more accurate values. Here we detail the four steps in the MCTS framework by \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} (see Figure \ref{fig:mcts}).
 
 \includeimage{mcts}{
-    \textbf{The Monte Carlo Tree Search Framework, from \cite{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008}.}
+    \textbf{The Monte Carlo Tree Search Framework, from \citeauthor{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008} \cite{MonteCarloTreeSearch_Chaslot.Bakkes.ea_2008}.}
 }{}
 
 \subsection{Selection}
@@ -432,7 +432,7 @@ The learner holds the master copy of the neural network parameters.
 Once the learner receives enough experiences from the actors, it samples experiences from its local queue and performs batched forward pass and back-propagation steps using its model.
 Figure \ref{fig:impala} shows two variants of this structure.
 \includeimage[0.8]{impala}{
-    \textbf{IMPALA Architecture, from \cite{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}.}.
+    \textbf{IMPALA Architecture, from \citeauthor{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018} \cite{IMPALAScalableDistributed_Espeholt.Soyer.ea_2018}.}.
 }{
     \textit{Left}: a single learner computes all gradients;
     \textit{Right}: multiple worker learners compute gradients and one master learner collects and aggregates gradients.
@@ -449,7 +449,7 @@ Moreover, since the learner batches queries from all actors, the IO overhead fro
 One downside of the SEED architecture is that actors have to wait for a response from the learner to take an action, and thus have a higher latency for taking a step.
 Figure \ref{fig:seed} illustrates a distributed SEED agent.
 \includeimage[0.8]{seed}{
-    \textbf{The SEED Architecture, from \cite{SEEDRLScalable_Espeholt.Marinier.ea_2020}}.
+    \textbf{The SEED Architecture, from \citeauthor{SEEDRLScalable_Espeholt.Marinier.ea_2020} \cite{SEEDRLScalable_Espeholt.Marinier.ea_2020}}.
 }{
     All inferences are computed on the learner and actors act through querying the learner.
 }
@@ -464,7 +464,7 @@ This component uses \textbf{Reverb}, a high-performance library developed by \ci
 Figure \ref{fig:acme} illustrates a distributed asynchronous agent in Acme.
 % Our project has a similar structure to Acme framework
 \includeimage[0.5]{acme}{
-    \textbf{Example of a distributed asynchronous agent with Acme, from \cite{AcmeResearchFramework_Hoffman.Shahriari.ea_2020}.}
+    \textbf{Example of a distributed asynchronous agent with Acme, from \citeauthor{AcmeResearchFramework_Hoffman.Shahriari.ea_2020} \cite{AcmeResearchFramework_Hoffman.Shahriari.ea_2020}.}
 }{}
 
 \subsection{Ray and RLlib} \label{sec:ray}
@@ -480,7 +480,7 @@ As of the writing of this thesis, RLlib implements 24 popular DRL algorithms usi
 One major difference between RLlib agents and other DRL agents is that RLlib deploys a hierarchical control over the worker processes.
 Our project uses Ray Core to implement its worker processes and deploys a hierarchical control paradigm similar to RLlib (see Section \ref{sec:method}).
 \includeimage[0.5]{rllib}{
-    \textbf{RLlib Abstraction Layers, from \cite{RLlibAbstractionsDistributed_Liang.Liaw.ea_2018}.}
+    \textbf{RLlib Abstraction Layers, from \citeauthor{RLlibAbstractionsDistributed_Liang.Liaw.ea_2018} \cite{RLlibAbstractionsDistributed_Liang.Liaw.ea_2018}.}
 }{}
 
 \subsection{JAX and Podracer Architecture} \label{sec:jax_and_podracer}

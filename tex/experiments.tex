@@ -151,17 +151,18 @@ The reward is $+1$ if the player obtains a treasure and $0$ in all other situati
 The game ends when the player bumps into an enemy.
 Enemies have different speed indicated by the color of their tail.
 
-
-\includeimage[0.7]{minatar}{\textbf{
-        \textit{MinAtar} Environments, from \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
-    }}{}
-
 Figure \ref{fig:minatar} shows screen shots of the MinAtar environments.
 MuZero is reported to have much better performance in more deterministic environments \cite{VectorQuantizedModels_Ozair.Li.ea_2021}.
 To compare \moozi in more deterministic environments, we compare with the results reported by Gymnax, in which algorithms are evaluated in environments with no sticky action.
 We discuss this difference in section \ref{sec:sticky_minatar}.
 
-\note{New: Experiments with 3 seeds, and one more \textit{MinAtar} environment.}
+\includeimage[0.7]{minatar}{
+    \textbf{
+        \textit{MinAtar} Environments, from \citeauthor{MinAtarAtariInspiredTestbed_Young.Tian_2019} \cite{MinAtarAtariInspiredTestbed_Young.Tian_2019}.
+    }
+}{}
+
+\FloatBarrier
 
 Figure \ref{fig:moozi_vs_ppo} shows the evaluation of \moozi on \textit{MinAtar} environments.
 We run \moozi with three seeds on each of these environment.
@@ -188,18 +189,10 @@ Gymnax does not provide their runtime statistics, but we presume their result is
     The \textit{y} axis shows the average return of the algorithm in the environment.
 }
 
-\section{Sticky Actions in MinAtar} \label{sec:sticky_minatar}
+\FloatBarrier
 
-\includeimage[0.6]{experiments_breakout_w_wo_sticky_actions}{\textbf{
-        Evaluation of \moozi vs PPO vs AC in two variants of \textit{Breakout}.
-    }}
-{
-    The \textit{x} axis shows the number of environment frames used in training, in units of \num{1.0e7} frames.
-    The \textit{y} axis shows the average return of the algorithm in the environment.
-    \textit{Top}: Non-deterministic variant of \textit{Breakout} with sticky actions.
-    \textit{Bottom}: Deterministic variant of \textit{Breakout} without sticky actions.
-    The average return of PPO and AC are their final reported return.
-}
+
+\section{Sticky Actions in MinAtar} \label{sec:sticky_minatar}
 
 \textit{MinAtar} environments have a default sticky action probability of 10\%.
 This means that in one out of ten timesteps, the environment uses the last taken action to step the environment instead of using the agent's output action.
@@ -218,6 +211,20 @@ In Figure \ref{fig:experiments_breakout_w_wo_sticky_actions}, we use the final a
 In \textit{Breakout} with sticky actions, \moozi learns more slowly and the final average return is much lower.
 In \textit{Breakout} without sticky actions, \moozi quickly learns a near-optimal policy and never fails to return the ball.
 In both environments, \moozi out-performs the other algorithm.
+
+\includeimage[0.6]{experiments_breakout_w_wo_sticky_actions}{\textbf{
+        Evaluation of \moozi vs PPO vs AC in two variants of \textit{Breakout}.
+    }}
+{
+    The \textit{x} axis shows the number of environment frames used in training, in units of \num{1.0e7} frames.
+    The \textit{y} axis shows the average return of the algorithm in the environment.
+    \textit{Top}: Non-deterministic variant of \textit{Breakout} with sticky actions.
+    \textit{Bottom}: Deterministic variant of \textit{Breakout} without sticky actions.
+    The average return of PPO and AC are their final reported return.
+}
+
+\FloatBarrier
+
 \section{Testing Strength when Scaling the Search Budget in \textit{Asterix}}
 We use the trained \moozi model in the \textit{Space Invaders} environment to evaluate its strength while varying the number of simulations.
 We only use model checkpoints from the first 3 million environment frames because after that the agent behaves optimally even when using the prior policy to act.
@@ -232,6 +239,7 @@ With 3 million frames of training, acting according to the prior (1 simulation) 
 The prior policy, with a bit more training, quickly catches up to or even exceeds the deep search policy with less training.
 This finding aligns with the analysis by \citeauthor{RolePlanningModelbased_Hamrick.Friesen.ea_2022} \cite{RolePlanningModelbased_Hamrick.Friesen.ea_2022}:
 the planner contributes more to the algorithm by \textit{generating better data for training the model} rather than \textit{exploiting the model for better testing}.
+
 \includeimage[1]{experiments_space_invaders_vs_simulations}{
     \textbf{Agent strength with different number of simulations.}
 }{
@@ -239,15 +247,10 @@ the planner contributes more to the algorithm by \textit{generating better data 
     The \textit{y} axis shows the average return of the algorithm.
 }
 
+\FloatBarrier
+
 
 \section{Improving Sample Efficiency with Reanalyze in \textit{Asterix}} \label{sec:exp:re}
-\note{New: Section \ref{sec:exp:re}}
-
-\includeimage{reana}{\textbf{\moozi with reanalyze workers in \textit{Asterix}.}}
-{
-    The \textit{x} axis shows the number of environment frames used in training, in units of \num{1.0e6} frames.
-    The \textit{y} axis shows the average return of the algorithm on a log scale.
-}
 
 We run three sets of parameters of \moozi, each with three experiments in the \textit{Asterix} environment.
 We configure training workers and reanalyze workers to generate the exact same amount of training targets for each training step.
@@ -269,8 +272,15 @@ This means that the training targets generated by the reanalyze workers do no lo
 We hypothesize that the reason for this observation is that in the early stage of the training, training targets shift more quickly, and updating past trajectories with the latest model is more valuable.
 However, in the later stage of the training, training targets stabilize and it becomes more important to have better performing trajectories than more accurate estimates from worse trajectories.
 
+\includeimage{reana}{\textbf{\moozi with reanalyze workers in \textit{Asterix}.}}
+{
+    The \textit{x} axis shows the number of environment frames used in training, in units of \num{1.0e6} frames.
+    The \textit{y} axis shows the average return of the algorithm on a log scale.
+}
+
+\FloatBarrier
+
 \section{Analysis of Planning in \textit{Space Invaders}} \label{sec:exp:plan_space_invaders}
-\note{New: Section \ref{sec:exp:plan_space_invaders}}
 
 \includeimage{minatar_search}{\textbf{
         \moozi acting in \textit{Space Invaders} environment by planning with a learned model.
@@ -304,7 +314,6 @@ The training target created from this interaction will also shift the prior of t
 
 
 \section{Learning through Self-play in \textit{Breakthrough}} \label{sec:exp:breakthrough}
-\note{New: Section \ref{sec:exp:breakthrough}}
 
 \includeimage[0.9]{breakthrough}{\textbf{
         The board game \textit{Breakthrough}.
@@ -339,7 +348,6 @@ The steady Elo rating increase shows that the model learns reliably through self
 
 
 \section{Analysis of Planning in \textit{Breakthrough}} \label{sec:exp:plan_breakthrough}
-\note{New: Section \ref{sec:exp:plan_breakthrough}}
 
 \includeimage[0.9]{half_tree}
 {
@@ -380,7 +388,6 @@ This example shows that a well-learned model learns game dynamics far beyond fiv
 
 
 \section{Visualizing the Hidden Space of the Learned Representation} \label{sec:exp:tsne}
-\note{New: Section \ref{sec:exp:tsne}}
 
 \includeimage{tsne_2}{\textbf{
         The hidden space of the learned representation visualized through \textit{t-distributed stochastic neighbor embedding (t-SNE)}.
