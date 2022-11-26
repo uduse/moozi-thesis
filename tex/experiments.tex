@@ -323,7 +323,7 @@ Figure \ref{fig:breakthrough} illustrates the starting board used in our experim
 We use the \textit{OpenSpiel} implementation of \textit{Breakthrough}.
 The action space size of the environment is around 300, and a typical state has five to twelve legal actions.
 
-\includeimage[0.9]{breakthrough_elo}{\textbf{
+\includeimage[0.9]{breakthrough_elo_dots}{\textbf{
         Evaluation of \moozi training in \textit{Breakthrough}.
     }}
 {
@@ -332,7 +332,7 @@ The action space size of the environment is around 300, and a typical state has 
 }
 We train \moozi through self-play with a shared network for both players.
 The planner is configured for a two-player game as described in Section \ref{sec:planner}.
-Figure \ref{fig:breakthrough_elo} shows the evaluation of \moozi throughout training.
+Figure \ref{fig:breakthrough_elo_dots} shows the evaluation of \moozi throughout training.
 We evaluate 23 model checkpoints by running a round-robin tournament in which all models pairs with all other models and play 16 matches alternating first and second player.
 We initialize the Elo of each checkpoint to zero and compute the new Elo rating based on the results of the tournament.
 The steady Elo rating increase shows that the model learns reliably through self-play.

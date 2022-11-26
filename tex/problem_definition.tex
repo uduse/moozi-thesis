@@ -5,7 +5,7 @@ A RL problem is usually represented as a \textbf{Markov Decision Process (MDP)}.
 MDP is defined as a four-tuple $(\mathcal{S}, \mathcal{A}, R, P)$.
 $\mathcal{S}$ is a set of states that forms the \textbf{state space}.
 $\mathcal{A}$ is a set of actions that forms the \textbf{action space};
-$P(s' | s, a) = \operatorname{Pr}[ s_{t+1} = s' \mid  s_t = s, a_t = a]$ is the \textbf{transition probability function}.
+$P(s' | s, a) \doteq \operatorname{Pr}[ s_{t+1} = s' \mid  s_t = s, a_t = a]$ is the \textbf{transition probability function}.
 $R(s, a, s')$ is the \textbf{reward function}.
 We use the \textbf{agent-environment interface} (as in Figure \ref{fig:agent_environment_interface}) to solve a problem formulated as an MDP.
 The MDP is represented as the \textbf{environment}.
@@ -23,32 +23,32 @@ Figure \ref{fig:agent_environment_interface} illustrates the interaction between
 
 \section{Policies and Value Functions} \label{sec:policies_and_functions}
 At each state $s$, the agent takes an action based on a \textbf{policy} $\pi(a \mid s)$.
-This policy represents the conditional probability of the agent taking an action given a state, $\pi(a \mid s) = Pr[ a_{t} = a \mid  s_t = s]$.
+This policy represents the conditional probability of the agent taking an action given a state, $\pi(a \mid s) \doteq Pr[ a_{t} = a \mid  s_t = s]$.
 The objective of the agent is to maximize the expected discounted sum of rewards from the current state $s_t$ following the policy $\pi$
 \begin{align}
     \text{maximize} ~~~~  & \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] , ~~~~ \forall s \in \mathcal{S} \label{eq:maximize_return} \\
-    G_t                   & = \sum_{k=0}^{T} \gamma^{k} r_{t+k+1} ~~~~ . 
+    G_t                   & \doteq \sum_{k=0}^{T} \gamma^{k} r_{t+k+1} ~~~~ . 
 \end{align}
 Here $\gamma$ is the discount factor to favor short-term rewards.
 $G$ is the discounted sum of rewards, or, equivalently, the discounted \textbf{return}.
 We represent the maximization target above as the \textbf{value function} $V$
 \begin{align*}
-    V_\pi(s) = \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] ~~.
+    V_\pi(s) \doteq \mathbb{E}_{\pi}\left[ G_t \mid s_t = s \right] ~~.
 \end{align*}
 The value function indicates how good a state is when following the policy $\pi$.
 Similarly, we define the \textbf{state-action value function}
 \begin{align*}
-    Q_\pi(s, a) = \mathbb{E}_{\pi}\left[ G_t \mid s_t = s, a_t = a \right]  \\
+    Q_\pi(s, a) \doteq \mathbb{E}_{\pi}\left[ G_t \mid s_t = s, a_t = a \right]  \\
 \end{align*}
 that indicates how good a state and action pair is.
 We define the $N$-step return as a proxy of the true return, bootstrapped from a value function of a future state
 \begin{align*}
-    G^N_t = \sum_{k=0}^{N - 1} \gamma^{k} r_{t+k+1} + \gamma^{N} V(s_{t+N}) ~~ .
+    G^N_t \doteq \sum_{k=0}^{N - 1} \gamma^{k} r_{t+k+1} + \gamma^{N} V(s_{t+N}) ~~ .
 \end{align*}
 
 \section{Partially Observable Markov Decision Process} \label{sec:pomdp}
 A generalization of MDP is a Partially Observable Markov Decision Process (POMDP) \cite{OptimalControlMarkov_Astrom_1965}.
-In addition to the four-tuples of MDP, POMDP also defines $\Omega$, a set of observations $o$ that forms the \textbf{observation space}; and $O(o \mid s, a) = \operatorname{Pr}[o_t \mid s_t = s, a_t = a]$, the conditional probability of observing $o_t$ given the last taken action $a_t$ and state $s_t$.
+In addition to the four-tuples of MDP, POMDP also defines $\Omega$, a set of observations $o$ that forms the \textbf{observation space}; and $O(o \mid s, a) \doteq \operatorname{Pr}[o_t \mid s_t = s, a_t = a]$, the conditional probability of observing $o_t$ given the last taken action $a_t$ and state $s_t$.
 In an agent-environment interface with a POMDP represented environment, the true environment state $s_t$ at each timestep is hidden from the agent and the agent only receives a partial observation $o_t$.
 
 \section{Game Playing}

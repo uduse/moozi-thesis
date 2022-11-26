@@ -76,7 +76,7 @@ At each level of the tree, a child node is selected based on a selection formula
 A selection formula usually has two parts: the exploitation part based on the evaluation function $E$, and the exploration bonus function $B$.
 For actions $(s, a), a \in \mathcal{A}$ of a parent state $s$ , the selection $I(s)$ is defined as
 \begin{align}
-    I(s) = \argmax{a \in \mathcal{A}}{\left[ E(s, a) + B(s, a) \right]}
+    I(s) \doteq \argmax{a \in \mathcal{A}}{\left[ E(s, a) + B(s, a) \right]}
     \label{eq:mcts_selection}
 \end{align}
 
@@ -162,7 +162,7 @@ As before, the action taken at time $t$ maximizes the sum of the exploitation sc
 AlphaGo evaluates a leaf node state $s_L$ by blending both the value network estimation $V_\theta(s_L)$ and the game result $z_L$ obtained by the rollout policy $p_\pi$.
 The mixing parameter $\lambda \in [0, 1]$ is used to balance these two types of evaluations into the final evaluation $V(s_L)$
 $$
-    V\left(s_{L}\right)=(1-\lambda) V_{\theta}\left(s_{L}\right)+\lambda z_{L} ~~ .
+    V\left(s_{L}\right) = (1-\lambda) V_{\theta}\left(s_{L}\right)+\lambda z_{L} ~~ .
 $$
 
 \section{AlphaGo Zero}
@@ -200,11 +200,23 @@ One generalization is that in AlphaZero the game result is no longer either winn
 \section{\textit{MuZero}} \label{sec:muzero}
 In \citeyear{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020},
 \citeauthor{MasteringAtariGo_Schrittwieser.Antonoglou.ea_2020} developed
-\textbf{\textit{MuZero}}, an even more general algorithm that learns to play Atari, Go, chess and Shogi at superhuman level.
+\textbf{MuZero}, an even more general algorithm that learns to play Atari, Go, chess and Shogi at superhuman level.
 Compared to AlphaGo and AlphaZero,
 MuZero has no access to a perfect model of the game.
 MuZero plans with a neural network that also learns the game dynamics through experience.
 Therefore, MuZero can be applied to games where the perfect model is either not known or is infeasible to compute with.
+Figure \ref{fig:muzero_orig} illustrates how MuZero plans, acts, and trains with a learned model.
+
+\includeimage[0.9]{muzero_orig}{
+    \textbf{Illustration of \textit{MuZero} planning, acting, and training with a learned model.}
+}{
+    \textit{A}: MuZero plans with MCTS and the learned model.
+    The \textit{representation function} $h$ is used to construct the root node.
+    The \textit{prediction function} $f$ is used to estimate node values and action priors.
+    The \textit{dynamics function} $g$ is used to estimate state transitions and transition rewards.
+    \textit{B}: MuZero acts in the environment by sampling an action proportional to the action visit counts at the root.
+    \textit{C}: MuZero trains its three functions by aligning the unrolled model outputs and collected statistics in trajectories.
+}
 
 MuZero defines three main functions.
 The \textbf{representation function} $h$ encodes a history of observations $o_1, o_2, \dots, o_t$ and actions $a_1, a_2, \dots, a_{t - 1}$ into a hidden state $\mathbf{x}_t^0$.
@@ -249,7 +261,7 @@ Finally, the action $a^0$ of the most visited edge $(\mathbf{x}^0, a^0)$ of the 
 Experience generated is stored in a replay buffer and processed into training targets.
 The three functions of the model are trained jointly using the loss function
 \begin{equation}
-    \mathcal{L}_{t}(\theta)=
+    \mathcal{L}_{t}(\theta) =
     \underbrace{\sum_{k=0}^{K} \mathcal{L}^{p}\left(p^*_{t+k}, p_{t}^{k}\right)}_{\circled{1}}
     +
     \underbrace{\sum_{k=0}^{K} \mathcal{L}^{v}\left(z_{t+k}, v^*_{t}\right)}_{\circled{2}}
@@ -341,7 +353,7 @@ In \textbf{rank-based sampling}, the same temporal differences are calculated, b
 \citeauthor{DuelingNetworkArchitectures_Wang.Schaul.ea_2016} studied an alternative neural network architecture for ALE learning \cite{DuelingNetworkArchitectures_Wang.Schaul.ea_2016}.
 A \textbf{Dueling Q-network} retains the input and output specifications of the Q-network used in DQN and structurally represents the learning of the advantage function $A(s, a)$ defined as
 \begin{align*}
-    A(s, a) = Q(s, a) - V(s)
+    A(s, a) \doteq Q(s, a) - V(s)
 \end{align*}
 The Q-network has three parts:
 $\theta$, the shared trunk of the network; $\varLambda$, the advantage head; and $\varUpsilon$, the value head.
@@ -367,13 +379,13 @@ The transformed Bellman Operator was developed to address this problem.
 The $Q$ update of the new operator is as follows
 \begin{align*}
     % Q^{A}(s, a) \leftarrow Q^{A}(s, a)+ \alpha \left(r+\gamma Q^{B}\left(s', \argmax{a'}{Q^A(s', a')}\right)-Q^{A}(s, a)\right)  \\
-    Q(s, a) \leftarrow Q(s, a) + \alpha \phi \left(r +\gamma \max _{a' \in \mathcal{A}} \phi^{-1}\left(Q\left(s', a'\right)\right)\right)
+    Q(s, a) \leftarrow Q(s, a) + \alpha \phi \left(r +\gamma \phi^{-1}\left( \max _{a' \in \mathcal{A}} Q\left(s', a'\right)\right) - \phi^{-1} Q(s, a)\right)
 \end{align*}
 where $\phi$ is an invertible transformation that contracts.
 One example of such a transformation is
 \begin{align*}
-    \phi(x)       & = \operatorname{sign}(x)\left(\sqrt{|x|+1}-1\right)+\varepsilon x  \\
-    \phi^{-1}(x)  & = \operatorname{sign}(x)\left(\left(\frac{\sqrt{1+4 \varepsilon(|x|+1+\varepsilon)}-1}{2 \varepsilon}\right)^{2}-1\right)
+    \phi(x)       & \doteq \operatorname{sign}(x)\left(\sqrt{|x|+1}-1\right)+\varepsilon x  \\
+    \phi^{-1}(x)  & \doteq \operatorname{sign}(x)\left(\left(\frac{\sqrt{1+4 \varepsilon(|x|+1+\varepsilon)}-1}{2 \varepsilon}\right)^{2}-1\right)
 \end{align*}
 Both \textit{MuZero} and \moozi use this specific $\phi$ definition to transform both values and rewards (see Section \ref{sec:nn}).
 
@@ -395,10 +407,10 @@ The consistency loss they developed creates a smoother path in the 3D space and 
 \section{Deep Reinforcement Learning Systems} \label{sec:drl_systems}
 Deep reinforcement learning systems involve irregular computation patterns and complicated hardware interactions between CPUs and AI accelerators.
 Designing such systems efficiently is a great challenge.
-Decisions the designer has to make include but are not limited to: 
-(1) Where and how to generate experience? 
-(2) Where and how to store generated experience? 
-(3) Where to store the model and copies of it? 
+Decisions the designer has to make include but are not limited to:
+(1) Where and how to generate experience?
+(2) Where and how to store generated experience?
+(3) Where to store the model and copies of it?
 (4) Where to carry out the gradient computation?
 (5) How to orchestrate processes for stable training?
 Here we briefly review several popular deep reinforcement learning system designs that utilize parallelization to achieve faster and more efficient training.
