@@ -435,7 +435,7 @@ KOMA-script documentation for details.}]{fancyhdr}
 %	ACKNOWLEDGEMENTS PAGE DESIGN
 %----------------------------------------------------------------------------------------
 
-\colorlet{mdtRed}{red!50!black}
+\colorlet{mdtRed}{red!75!black}
 \newcommand{\acknowledgementname}{Acknowledgements}
 \providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish} {\acknowledgementname}{Acknowledgements} % Acknowledgement text for English countries
 \providecaptionname{german,ngerman,austrian,naustrian}{\acknowledgementname}{Danksagung} % Acknowledgement text for Germanic countries
@@ -545,6 +545,12 @@ KOMA-script documentation for details.}]{fancyhdr}
 
 %----------------------------------------------------------------------------------------
 
+
+
+\definecolor{mybase}{RGB}{83, 8, 18}
+\definecolor{mylink}{RGB}{122, 111, 155}
+\definecolor{mycite}{RGB}{127, 183, 190}
+
 \ifbool{hyperrefsupport}{% If the nohyperref class option has not been specified
 \AtEndPreamble{\RequirePackage{hyperref}
 \hypersetup{pdfpagemode={UseOutlines},
@@ -553,9 +559,9 @@ bookmarksopen=true,
 bookmarksopenlevel=0,
 hypertexnames=false,
 colorlinks=true,% Set to false to disable coloring links
-citecolor=CornflowerBlue,% The color of citations
-linkcolor=red,% The color of references to document elements (sections, figures, etc)
-urlcolor=mdtRed,% The color of hyperlinks (URLs)
+citecolor=mycite,% The color of citations
+linkcolor=mylink,% The color of references to document elements (sections, figures, etc)
+urlcolor=mybase,% The color of hyperlinks (URLs)
 pdfstartview={FitV},
 unicode,
 breaklinks=true,
